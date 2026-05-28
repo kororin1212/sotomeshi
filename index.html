@@ -516,7 +516,7 @@ body{
     </div>
 
     <!-- 下ゾーン：メシネコ大表示（中央寄せ） -->
-    <div id="meshiko-stage" onclick="meshikoTap()" style="flex:1;position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:8px 0 16px;min-height:260px;cursor:pointer;overflow:visible">
+    <div id="meshiko-stage" onclick="meshikoTap()" style="flex:1;position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;padding:0 0 8px;min-height:300px;cursor:pointer;overflow:hidden">
       <!-- ふきだし（キャラの上） -->
       <div id="meshiko-bubble" style="display:none;position:absolute;top:12px;left:16px;transform:none;background:linear-gradient(135deg,#fff,#FDF2F8);border:2px solid #FBCFE8;border-radius:20px;padding:10px 18px;font-size:13px;color:#6B21A8;z-index:10;box-shadow:0 4px 16px rgba(244,114,182,0.2);max-width:260px;white-space:normal;text-align:left;line-height:1.7;font-weight:700;font-family:'Zen Maru Gothic',sans-serif">
         <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid #FBCFE8"></div>
@@ -524,7 +524,7 @@ body{
         <span id="meshiko-bubble-text"></span>
       </div>
       <!-- メシネコ本体（mix-blend-modeで白背景を透過） -->
-      <img id="meshiko-img" src="" alt="メシネコ" style="width:522px;height:auto;display:block;mix-blend-mode:multiply;filter:drop-shadow(0 6px 20px rgba(168,85,247,0.2));margin-left:-20px">
+      <img id="meshiko-img" src="" alt="メシネコ" style="width:390px;height:auto;display:block;mix-blend-mode:multiply;filter:drop-shadow(0 6px 20px rgba(168,85,247,0.15));margin-left:-8px;margin-top:60px">
     </div>
   </div>
 
@@ -594,7 +594,7 @@ body{
 
     <!-- メシネココメントエリア -->
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-      <img id="wt-meshineko-img" src="" style="width:72px;height:72px;object-fit:contain;mix-blend-mode:multiply;flex-shrink:0">
+      <img id="wt-meshineko-img" src="" style="width:108px;height:108px;object-fit:contain;mix-blend-mode:multiply;flex-shrink:0">
       <div id="wt-meshineko-msg" style="background:linear-gradient(135deg,#fff,#FDF2F8);border:2px solid #FBCFE8;border-radius:16px;padding:10px 14px;font-size:12px;color:#6B21A8;font-weight:700;line-height:1.6;position:relative;flex:1">
         <div style="position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-right:10px solid #FBCFE8"></div>
         <div style="position:absolute;left:-7px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-right:9px solid #FDF2F8"></div>
@@ -1462,26 +1462,26 @@ function sw(tab){
 
 // ========== メシネコ ==========
 const MESHINEKO_COMMENTS=[
-  '今日もごはん、ちゃんと食べてね！にゃ♪',
-  'タンパク質が足りてないにゃ…お肉かお魚、選んでみて！',
-  '野菜も忘れずに！メシネコが応援してるにゃ🥦',
-  '今日の栄養バランス、バッチリだにゃ！えらい！',
-  'ちゃんと食べてくれると、メシネコもうれしいにゃ♡',
-  '鶏むね肉って実は万能なんだにゃ。今日どうかにゃ？',
-  'メシネコ的には、夜はタンパク質多めがおすすめだにゃ！',
-  '食べる順番も大事にゃよ〜！野菜→タンパク質→炭水化物がいいにゃ',
-  '朝ごはん抜いてないにゃ？代謝が下がっちゃうにゃよ！',
-  'ご主人のこと、いつも気にしてるにゃ♡ちゃんと食べてね',
-  '今日もがんばってるにゃって、ちゃんと知ってるにゃよ♡',
-  'ご主人が元気でいてくれるのが、メシネコの一番の幸せにゃ',
-  'えらい！今日も記録してくれてありがとうにゃ♡',
-  'メシネコ、ずっとそばにいるにゃよ！',
-  'お腹すいてるにゃ？メシネコもちょっとすいてきたにゃ',
-  '食べすぎた日も、次の日があるにゃ！気にしないにゃよ♪',
-  '深夜のごはんは…メシネコ的にはちょっと心配にゃ…💧',
-  '今日のランキング1位、見た？メシネコのおすすめだにゃ！',
-  'ご主人の食事記録、全部見てるにゃ♡もっと教えてほしいにゃ',
-  'カレーにもタンパク質入れたらもっとよくなるにゃ♪',
+  '今日もごはん、\nちゃんと食べてね！にゃ♪',
+  'タンパク質が足りてないにゃ…\nお肉かお魚、選んでみて！',
+  '野菜も忘れずに！\nメシネコが応援してるにゃ🥦',
+  '今日の栄養バランス、\nバッチリだにゃ！えらい！',
+  'ちゃんと食べてくれると、\nメシネコもうれしいにゃ♡',
+  '鶏むね肉って実は万能なんだにゃ。\n今日どうかにゃ？',
+  'メシネコ的には、\n夜はタンパク質多めがおすすめだにゃ！',
+  '食べる順番も大事にゃよ〜！\n野菜→タンパク質→炭水化物がいいにゃ',
+  '朝ごはん抜いてないにゃ？\n代謝が下がっちゃうにゃよ！',
+  'ご主人のこと、\nいつも気にしてるにゃ♡',
+  '今日もがんばってるにゃって、\nちゃんと知ってるにゃよ♡',
+  'ご主人が元気でいてくれるのが、\nメシネコの一番の幸せにゃ',
+  'えらい！今日も記録して\nくれてありがとうにゃ♡',
+  'メシネコ、\nずっとそばにいるにゃよ！',
+  'お腹すいてるにゃ？\nメシネコもすいてきたにゃ',
+  '食べすぎた日も、\n次の日があるにゃ！気にしないにゃよ♪',
+  '深夜のごはんは…\nメシネコ的にはちょっと心配にゃ…💧',
+  '今日のランキング1位、見た？\nメシネコのおすすめだにゃ！',
+  'ご主人の食事記録、全部見てるにゃ♡\nもっと教えてほしいにゃ',
+  'カレーにもタンパク質入れたら\nもっとよくなるにゃ♪',
 ];
 
 // ========== メシネコ（表情別画像版） ==========
@@ -1521,7 +1521,7 @@ function updateMeshiko(){
   if(img.src!==url){
     img.src=url;
     // 画像更新時に初期コメントを自動表示
-    const initComments=['今日もがんばってにゃ♪','ご主人の食事、メシネコが見てるにゃ♡','何食べるか決まったにゃ？','栄養バランス、気にしてるにゃよ♪','タップしてにゃ♡'];
+    const initComments=['今日もがんばってにゃ♪','ご主人の食事、\nメシネコが見てるにゃ♡','何食べるか\n決まったにゃ？','栄養バランス、\n気にしてるにゃよ♪','タップしてにゃ♡'];
     showMeshikoBubble(initComments[Math.floor(Math.random()*initComments.length)]);
   }
   img.onerror=()=>{
@@ -1548,7 +1548,7 @@ function showMeshikoBubble(comment){
   const bubble=document.getElementById('meshiko-bubble');
   const textEl=document.getElementById('meshiko-bubble-text');
   if(!bubble||!textEl)return;
-  textEl.textContent=comment;
+  textEl.innerHTML=comment.replace(/\n/g,'<br>');
   bubble.style.display='block';
   if(meshikoBubbleTimer)clearTimeout(meshikoBubbleTimer);
   meshikoBubbleTimer=setTimeout(()=>{bubble.style.display='none'},5000);
