@@ -491,15 +491,18 @@ body{
     <div style="display:flex;gap:10px;margin-top:8px">
       <div style="flex:1;text-align:center;background:rgba(255,255,255,0.15);border-radius:10px;padding:4px 0">
         <div style="font-size:8px;color:rgba(255,255,255,0.75);font-weight:700">タンパク質</div>
-        <div style="font-size:12px;font-weight:700;color:#fff" id="hdr-p">0g</div>
+        <div style="font-size:11px;font-weight:700;color:#fff" id="hdr-p">0g</div>
+        <div style="font-size:8px;color:rgba(255,255,255,0.6)" id="hdr-p-tgt"></div>
       </div>
       <div style="flex:1;text-align:center;background:rgba(255,255,255,0.15);border-radius:10px;padding:4px 0">
         <div style="font-size:8px;color:rgba(255,255,255,0.75);font-weight:700">脂質</div>
-        <div style="font-size:12px;font-weight:700;color:#fff" id="hdr-f">0g</div>
+        <div style="font-size:11px;font-weight:700;color:#fff" id="hdr-f">0g</div>
+        <div style="font-size:8px;color:rgba(255,255,255,0.6)" id="hdr-f-tgt"></div>
       </div>
       <div style="flex:1;text-align:center;background:rgba(255,255,255,0.15);border-radius:10px;padding:4px 0">
         <div style="font-size:8px;color:rgba(255,255,255,0.75);font-weight:700">糖質</div>
-        <div style="font-size:12px;font-weight:700;color:#fff" id="hdr-c">0g</div>
+        <div style="font-size:11px;font-weight:700;color:#fff" id="hdr-c">0g</div>
+        <div style="font-size:8px;color:rgba(255,255,255,0.6)" id="hdr-c-tgt"></div>
       </div>
     </div>
   </div>
@@ -521,7 +524,7 @@ body{
         <span id="meshiko-bubble-text"></span>
       </div>
       <!-- メシネコ本体（mix-blend-modeで白背景を透過） -->
-      <img id="meshiko-img" src="" alt="メシネコ" style="width:220px;height:auto;display:block;mix-blend-mode:multiply;filter:drop-shadow(0 6px 20px rgba(168,85,247,0.2))">
+      <img id="meshiko-img" src="" alt="メシネコ" style="width:290px;height:auto;display:block;mix-blend-mode:multiply;filter:drop-shadow(0 6px 20px rgba(168,85,247,0.2))">
     </div>
   </div>
 
@@ -723,10 +726,10 @@ body{
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h6a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>記録
   </button>
   <button class="nb" id="nb-suggest" onclick="sw('suggest')">
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2l2.09 6.26L18 9.27l-4.5 4.38 1.09 6.35L10 17l-4.59 3-1.09-6.35L0 9.27l5.91-1.01z"/></svg>ランキング
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="11" width="4" height="7" rx="1"/><rect x="8" y="7" width="4" height="11" rx="1"/><rect x="15" y="3" width="4" height="15" rx="1"/></svg>ランキング
   </button>
   <button class="nb" id="nb-weight" onclick="sw('weight')">
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 17 7 11 11 13 15 7 17 9"/></svg>体重
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 17 7 11 11 13 15 7 17 9"/></svg>からだ
   </button>
   <button class="nb" id="nb-settings" onclick="sw('settings')">
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="3"/><path d="M10 1v2M10 17v2M1 10h2M17 10h2M3.22 3.22l1.42 1.42M15.36 15.36l1.42 1.42M3.22 16.78l1.42-1.42M15.36 4.64l1.42-1.42"/></svg>設定
@@ -1117,8 +1120,8 @@ function renderHome(){
   const t=tots();const tgt=S.tgt;
   const pct=Math.min(100,Math.round(t.kcal/tgt*100));
   document.getElementById('hdr-tgt').textContent=tgt+' kcal';
-  document.getElementById('hdr-eaten').textContent=t.kcal+' kcal摂取';
-  document.getElementById('hdr-rem').textContent='残り '+(tgt-t.kcal)+' kcal';
+  document.getElementById('hdr-eaten').textContent=Math.round(t.kcal)+' kcal摂取';
+  document.getElementById('hdr-rem').textContent='残り '+Math.round(tgt-t.kcal)+' kcal';
   document.getElementById('hdr-bar').style.width=pct+'%';
   // P/F/C ミニ表示
   const hp=document.getElementById('hdr-p');
@@ -1127,6 +1130,9 @@ function renderHome(){
   if(hp)hp.textContent=t.protein.toFixed(1)+'g';
   if(hf)hf.textContent=t.fat.toFixed(1)+'g';
   if(hc)hc.textContent=t.carb.toFixed(1)+'g';
+  const hpt=document.getElementById('hdr-p-tgt');if(hpt)hpt.textContent='目標'+S.macros.protein+'g';
+  const hft=document.getElementById('hdr-f-tgt');if(hft)hft.textContent='目標'+S.macros.fat+'g';
+  const hct=document.getElementById('hdr-c-tgt');if(hct)hct.textContent='目標'+S.macros.carb+'g';
   updateMeshiko();
 }
 
@@ -1136,8 +1142,8 @@ function renderKiroku(){
   const pct=Math.min(100,Math.round(t.kcal/tgt*100));
   // ヘッダー更新
   document.getElementById('hdr-tgt').textContent=tgt+' kcal';
-  document.getElementById('hdr-eaten').textContent=t.kcal+' kcal摂取';
-  document.getElementById('hdr-rem').textContent='残り '+(tgt-t.kcal)+' kcal';
+  document.getElementById('hdr-eaten').textContent=Math.round(t.kcal)+' kcal摂取';
+  document.getElementById('hdr-rem').textContent='残り '+Math.round(tgt-t.kcal)+' kcal';
   document.getElementById('hdr-bar').style.width=pct+'%';
   // 残量・マクロ
   document.getElementById('tdee-d').textContent=tgt+' kcal';
@@ -1149,8 +1155,8 @@ function renderKiroku(){
   const sft=document.getElementById('sf-tgt');if(sft)sft.textContent=m.fat;
   const sct=document.getElementById('sc-tgt');if(sct)sct.textContent=m.carb;
   // バランスバー
-  const bars=[{l:'カロリー',v:t.kcal,mx:tgt,u:'kcal',c:'fb'},{l:'タンパク質',v:t.protein,mx:m.protein,u:'g',c:'fg'},{l:'脂質',v:t.fat,mx:m.fat,u:'g',c:'fa'},{l:'糖質',v:t.carb,mx:m.carb,u:'g',c:'fb'}];
-  document.getElementById('nbars').innerHTML=bars.map(b=>{const p=Math.min(100,Math.round(b.v/b.mx*100));return`<div class="bw"><div class="bm"><span>${b.l}</span><span>${b.v}/${b.mx}${b.u}</span></div><div class="bbg"><div class="bf ${p>110?'fr':b.c}" style="width:${p}%"></div></div></div>`}).join('');
+  const bars=[{l:'カロリー',v:Math.round(t.kcal),mx:tgt,u:'kcal',c:'fb',int:true},{l:'タンパク質',v:t.protein,mx:m.protein,u:'g',c:'fg'},{l:'脂質',v:t.fat,mx:m.fat,u:'g',c:'fa'},{l:'糖質',v:t.carb,mx:m.carb,u:'g',c:'fb'}];
+  document.getElementById('nbars').innerHTML=bars.map(b=>{const p=Math.min(100,Math.round(b.v/b.mx*100));const dv=b.int?Math.round(b.v):b.v.toFixed(1);return`<div class="bw"><div class="bm"><span>${b.l}</span><span>${dv}/${b.mx}${b.u}</span></div><div class="bbg"><div class="bf ${p>110?'fr':b.c}" style="width:${p}%"></div></div></div>`}).join('');
   // 食事リスト（最後追加が上）
   const reversed=[...S.eaten].reverse();
   document.getElementById('mlist').innerHTML=reversed.length===0
