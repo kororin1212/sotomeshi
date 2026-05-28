@@ -547,18 +547,16 @@ body{
       <div id="day-plan-wrap"><!-- 献立ここに表示 --></div>
     </div>
 
-    <!-- 下ゾーン：メシネコ大表示（中央寄せ） -->
-    <div id="meshiko-stage" onclick="meshikoTap()" style="position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 0 12px;cursor:pointer">
-      <!-- ふきだし領域（事前確保・高さ固定） -->
-      <div style="min-height:80px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:8px">
-        <div id="meshiko-bubble" style="z-index:10;font-family:'Zen Maru Gothic',sans-serif;visibility:hidden">
-          <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid #FBCFE8"></div>
-          <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:9px solid #FDF2F8"></div>
-          <span id="meshiko-bubble-text">　</span>
-        </div>
+    <!-- メシネコゾーン：ふきだし+キャラを固定高さのコンテナに -->
+    <div id="meshiko-stage" onclick="meshikoTap()" style="position:relative;text-align:center;cursor:pointer;padding:8px 16px 12px;height:360px;overflow:visible">
+      <!-- ふきだし（position:absoluteでメシネコの上に固定） -->
+      <div id="meshiko-bubble" style="position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10;font-family:'Zen Maru Gothic',sans-serif;visibility:hidden;width:260px">
+        <div id="meshiko-bubble-text" style="display:block;background:linear-gradient(135deg,#fff,#FDF2F8);border:2px solid #FBCFE8;border-radius:20px;padding:10px 18px;font-size:13px;color:#6B21A8;line-height:1.7;font-weight:700;text-align:center;box-shadow:0 4px 16px rgba(244,114,182,0.2)">　</div>
+        <div style="width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid #FBCFE8;margin:0 auto"></div>
+        <div style="width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:9px solid #FDF2F8;margin:-10px auto 0"></div>
       </div>
-      <!-- メシネコ本体（mix-blend-modeで白背景を透過） -->
-      <img id="meshiko-img" src="" alt="メシネコ" style="width:280px;height:auto;display:block;mix-blend-mode:multiply">
+      <!-- メシネコ本体（ふきだしの下・位置固定） -->
+      <img id="meshiko-img" src="" alt="メシネコ" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:280px;height:auto;display:block;mix-blend-mode:multiply">
     </div>
   </div>
 
@@ -1650,7 +1648,8 @@ function getMeshinekoEmotion(){
   const remP=m.protein-t.protein;
   if(t.kcal>tgt*1.15)return'overate';
   if(remP<-10)return'angry';
-  if(remP>m.protein*0.5&&t.kcal>0)return'sad';
+  // sadは「タンパク質が目標の80%以上残っていて、かつカロリーも半分以上摂っている」時のみ
+  if(remP>m.protein*0.8&&t.kcal>tgt*0.5)return'sad';
   const pctP=t.protein/m.protein;const pctF=t.fat/m.fat;const pctC=t.carb/m.carb;
   if(pctP>=0.8&&pctF<=1.1&&pctC<=1.1&&t.kcal>tgt*0.7)return'balance';
   if(t.kcal>tgt*0.8&&t.kcal<=tgt*1.05)return'joy';
