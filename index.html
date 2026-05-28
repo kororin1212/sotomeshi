@@ -419,7 +419,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Hiragino Kaku
         ／ 初期データ: <span id="total-count">0</span> 品
       </div>
       <div style="margin-top:6px;font-size:10px;color:var(--text-h)">
-        データ出所:
+        チェーン店データ出所:
         <a href="https://www.matsuyafoods.co.jp" target="_blank" class="source-link">松屋</a>・
         <a href="https://www.mcdonalds.co.jp" target="_blank" class="source-link">マクドナルド</a>・
         <a href="https://www.yoshinoya.com" target="_blank" class="source-link">吉野家</a>・
@@ -427,6 +427,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Hiragino Kaku
         <a href="https://www.nakau.co.jp" target="_blank" class="source-link">なか卯</a>・
         <a href="https://www.ichibanya.co.jp" target="_blank" class="source-link">CoCo壱番屋</a>
         各社公式サイト
+      </div>
+      <div style="margin-top:4px;font-size:10px;color:var(--text-h)">
+        調理済み食品データ出所:
+        <a href="https://www.mext.go.jp/a_menu/syokuhinseibun/index.htm" target="_blank" class="source-link">日本食品標準成分表（八訂）増補2023年（文部科学省）</a>
+        第18群 調理済み流通食品類から引用
       </div>
     </div>
   </div>
@@ -591,9 +596,63 @@ const INIT_FOODS=[
   {id:'local-903',name:'納豆ごはん',store:'自炊',type:'recipe',kcal:290,protein:16,fat:5,carb:44,gluten:false,meat:false,estimated:false,desc:'即完成'},
 ];
 
+// 文部科学省「日本食品標準成分表（八訂）増補2023年」第18群 調理済み流通食品類から引用
+// 出典：日本食品標準成分表（八訂）増補2023年（文部科学省）
+// 商用利用可・出所明記条件 https://www.mext.go.jp/a_menu/syokuhinseibun/index.htm
+const MEXT_FOODS=[
+  {id:'mext-18024',name:'青菜の白和え',store:'和風料理',type:'super',kcal:122,protein:6.3,fat:5.1,carb:13.8,gluten:false,meat:false,estimated:true,desc:'1人前150g'},
+  {id:'mext-18025',name:'いんげんのごま和え',store:'和風料理',type:'super',kcal:116,protein:5.5,fat:5.1,carb:10.8,gluten:false,meat:false,estimated:true,desc:'1人前150g'},
+  {id:'mext-18026',name:'わかめとねぎの酢みそ和え',store:'和風料理',type:'super',kcal:128,protein:5.7,fat:1.4,carb:22.4,gluten:false,meat:false,estimated:true,desc:'1人前150g'},
+  {id:'mext-18028',name:'とん汁',store:'和風料理',type:'super',kcal:39,protein:2.2,fat:2.2,carb:2.4,gluten:false,meat:true,estimated:true,desc:'1人前150g'},
+  {id:'mext-18027',name:'紅白なます',store:'和風料理',type:'super',kcal:51,protein:0.9,fat:0.9,carb:9.8,gluten:false,meat:false,estimated:true,desc:'1人前150g'},
+  {id:'mext-18029',name:'卯の花いり',store:'和風料理',type:'super',kcal:126,protein:6.6,fat:6.2,carb:11.1,gluten:false,meat:false,estimated:true,desc:'1人前150g'},
+  {id:'mext-18030',name:'親子丼の具',store:'和風料理',type:'super',kcal:202,protein:16.8,fat:10.4,carb:11.6,gluten:false,meat:true,estimated:true,desc:'1人前200g'},
+  {id:'mext-18031',name:'牛飯の具',store:'和風料理',type:'super',kcal:244,protein:8.2,fat:18.8,carb:13.2,gluten:false,meat:true,estimated:true,desc:'1人前200g'},
+  {id:'mext-18032',name:'切り干し大根の煮物',store:'和風料理',type:'super',kcal:72,protein:3.5,fat:3.8,carb:7.2,gluten:false,meat:false,estimated:true,desc:'1人前150g'},
+  {id:'mext-18033',name:'きんぴらごぼう',store:'和風料理',type:'super',kcal:126,protein:2.1,fat:6.8,carb:9.6,gluten:false,meat:false,estimated:true,desc:'1人前150g'},
+  {id:'mext-18034',name:'ぜんまいのいため煮',store:'和風料理',type:'super',kcal:120,protein:5.1,fat:6.3,carb:10.7,gluten:false,meat:false,estimated:true,desc:'1人前150g'},
+  {id:'mext-18035',name:'筑前煮',store:'和風料理',type:'super',kcal:153,protein:7.9,fat:6.3,carb:15.8,gluten:false,meat:true,estimated:true,desc:'1人前180g'},
+  {id:'mext-18036',name:'肉じゃが',store:'和風料理',type:'super',kcal:156,protein:8.6,fat:2.6,carb:25.0,gluten:false,meat:true,estimated:true,desc:'1人前200g'},
+  {id:'mext-18037',name:'ひじきのいため煮',store:'和風料理',type:'super',kcal:112,protein:4.7,fat:6.0,carb:10.9,gluten:false,meat:false,estimated:true,desc:'1人前150g'},
+  {id:'mext-18038',name:'アジの南蛮漬け',store:'和風料理',type:'super',kcal:164,protein:12.2,fat:9.2,carb:11.2,gluten:false,meat:true,estimated:true,desc:'1人前150g'},
+  {id:'mext-18053',name:'お好み焼き',store:'和風料理',type:'super',kcal:340,protein:13.0,fat:16.2,carb:31.0,gluten:true,meat:false,estimated:false,desc:'1人前250g'},
+  {id:'mext-18054',name:'とりから揚げ',store:'和風料理',type:'super',kcal:306,protein:23.4,fat:15.2,carb:26.4,gluten:false,meat:true,estimated:false,desc:'1人前150g'},
+  {id:'mext-18023',name:'松前漬け しょうゆ漬',store:'和風料理',type:'super',kcal:249,protein:25.5,fat:2.1,carb:31.5,gluten:false,meat:false,estimated:false,desc:'1人前150g'},
+  {id:'mext-18040',name:'チキンカレー',store:'洋風料理',type:'super',kcal:707,protein:30.2,fat:47.5,carb:42.1,gluten:false,meat:true,estimated:true,desc:'1人前540g'},
+  {id:'mext-18001',name:'ビーフカレー',store:'洋風料理',type:'super',kcal:643,protein:13.0,fat:48.6,carb:42.7,gluten:false,meat:true,estimated:true,desc:'1人前540g'},
+  {id:'mext-18041',name:'ポークカレー',store:'洋風料理',type:'super',kcal:626,protein:15.1,fat:46.4,carb:41.6,gluten:false,meat:true,estimated:true,desc:'1人前540g'},
+  {id:'mext-18043',name:'カニクリームコロッケ',store:'洋風料理',type:'super',kcal:306,protein:6.1,fat:20.5,carb:26.9,gluten:true,meat:false,estimated:true,desc:'1人前120g'},
+  {id:'mext-18044',name:'コーンクリームコロッケ',store:'洋風料理',type:'super',kcal:294,protein:6.1,fat:19.2,carb:28.1,gluten:true,meat:false,estimated:true,desc:'1人前120g'},
+  {id:'mext-18018',name:'ポテトコロッケ',store:'洋風料理',type:'super',kcal:271,protein:6.4,fat:15.1,carb:29.5,gluten:true,meat:false,estimated:true,desc:'1人前120g'},
+  {id:'mext-18045',name:'チキンシチュー',store:'洋風料理',type:'super',kcal:372,protein:18.6,fat:24.0,carb:22.5,gluten:false,meat:true,estimated:true,desc:'1人前300g'},
+  {id:'mext-18011',name:'ビーフシチュー',store:'洋風料理',type:'super',kcal:459,protein:12.3,fat:37.8,carb:22.5,gluten:false,meat:true,estimated:true,desc:'1人前300g'},
+  {id:'mext-18015',name:'ミートボール',store:'洋風料理',type:'super',kcal:298,protein:15.3,fat:18.8,carb:21.4,gluten:true,meat:true,estimated:true,desc:'1人前150g'},
+  {id:'mext-18042',name:'かぼちゃのクリームスープ',store:'洋風料理',type:'super',kcal:110,protein:2.2,fat:5.8,carb:14.1,gluten:false,meat:false,estimated:true,desc:'1人前150g'},
+  {id:'mext-18005',name:'コーンクリームスープ',store:'洋風料理',type:'super',kcal:93,protein:2.5,fat:3.9,carb:12.4,gluten:false,meat:false,estimated:true,desc:'1人前150g'},
+  {id:'mext-18050',name:'合いびきハンバーグ',store:'洋風料理',type:'super',kcal:236,protein:16.1,fat:14.6,carb:13.9,gluten:true,meat:true,estimated:true,desc:'1人前120g'},
+  {id:'mext-18051',name:'チキンハンバーグ',store:'洋風料理',type:'super',kcal:205,protein:15.1,fat:12.2,carb:11.9,gluten:true,meat:true,estimated:true,desc:'1人前120g'},
+  {id:'mext-18052',name:'豆腐ハンバーグ',store:'洋風料理',type:'super',kcal:170,protein:11.9,fat:11.0,carb:10.6,gluten:true,meat:true,estimated:true,desc:'1人前120g'},
+  {id:'mext-18019',name:'いかフライ',store:'洋風料理',type:'super',kcal:227,protein:13.3,fat:11.3,carb:22.6,gluten:true,meat:true,estimated:true,desc:'1人前100g'},
+  {id:'mext-18020',name:'えびフライ',store:'洋風料理',type:'super',kcal:283,protein:19.1,fat:13.9,carb:27.2,gluten:true,meat:true,estimated:true,desc:'1人前120g'},
+  {id:'mext-18055',name:'かきフライ',store:'洋風料理',type:'super',kcal:347,protein:10.7,fat:21.6,carb:32.2,gluten:true,meat:true,estimated:false,desc:'1人前120g'},
+  {id:'mext-18021',name:'白身フライ',store:'洋風料理',type:'super',kcal:448,protein:14.6,fat:32.7,carb:23.9,gluten:true,meat:true,estimated:false,desc:'1人前150g'},
+  {id:'mext-18022',name:'メンチカツ',store:'洋風料理',type:'super',kcal:328,protein:12.8,fat:22.4,carb:23.2,gluten:true,meat:true,estimated:true,desc:'1人前120g'},
+  {id:'mext-18003',name:'えびグラタン',store:'洋風料理',type:'super',kcal:256,protein:11.0,fat:13.8,carb:24.6,gluten:true,meat:true,estimated:true,desc:'1人前200g'},
+  {id:'mext-18014',name:'えびピラフ',store:'洋風料理',type:'super',kcal:511,protein:11.6,fat:8.0,carb:102.9,gluten:false,meat:true,estimated:true,desc:'1人前350g'},
+  {id:'mext-18002',name:'ぎょうざ',store:'中国料理',type:'super',kcal:314,protein:10.3,fat:16.9,carb:35.0,gluten:true,meat:true,estimated:true,desc:'1人前150g'},
+  {id:'mext-18012',name:'しゅうまい',store:'中国料理',type:'super',kcal:229,protein:10.9,fat:11.0,carb:23.9,gluten:true,meat:true,estimated:true,desc:'1人前120g'},
+  {id:'mext-18046',name:'中華ちまき',store:'中国料理',type:'super',kcal:261,protein:8.8,fat:8.2,carb:42.6,gluten:true,meat:true,estimated:true,desc:'1人前150g'},
+  {id:'mext-18056',name:'春巻き',store:'中国料理',type:'super',kcal:332,protein:9.0,fat:28.9,carb:39.8,gluten:true,meat:true,estimated:false,desc:'1人前150g'},
+  {id:'mext-18047',name:'酢豚',store:'中国料理',type:'super',kcal:154,protein:9.2,fat:6.6,carb:15.4,gluten:false,meat:true,estimated:true,desc:'1人前200g'},
+  {id:'mext-18057',name:'チャーハン',store:'中国料理',type:'super',kcal:721,protein:17.5,fat:18.2,carb:109.9,gluten:false,meat:false,estimated:false,desc:'1人前350g'},
+  {id:'mext-18048',name:'八宝菜',store:'中国料理',type:'super',kcal:160,protein:14.5,fat:8.0,carb:10.0,gluten:false,meat:true,estimated:true,desc:'1人前250g'},
+  {id:'mext-18049',name:'麻婆豆腐',store:'中国料理',type:'super',kcal:260,protein:19.5,fat:17.0,carb:10.2,gluten:false,meat:false,estimated:true,desc:'1人前250g'},
+  {id:'mext-18039',name:'もやしのナムル',store:'韓国料理',type:'super',kcal:56,protein:2.5,fat:3.6,carb:3.2,gluten:false,meat:false,estimated:true,desc:'1人前80g'},
+];
+
 const REGISTERED_STORES=['松屋','マクドナルド'];
 const NEAR_STORES=['松屋','マクドナルド','すき家'];
-const STORES=['すべて','松屋','マクドナルド','吉野家','すき家','なか卯','CoCo壱番屋','自炊'];
+const STORES=['すべて','松屋','マクドナルド','吉野家','すき家','なか卯','CoCo壱番屋','和風料理','洋風料理','中国料理','韓国料理','自炊'];
 
 let S={gender:'male',age:30,ht:170,wt:65,act:1.2,goal:'maintain',restrictions:['low_carb'],autoMacro:true,eaten:[],tdee:0,tgt:0,macros:{protein:0,fat:0,carb:0},weeklyTotals:{protein:0,fat:0,carb:0,kcal:0,days:1}};
 let gV='male',aV=1.2,goalV='maintain',agreedToTerms=false,curStore='すべて';
@@ -613,7 +672,7 @@ async function loadFoodsFromDB(){
 }
 
 function mergeFoods(){
-  ALL_FOODS=[...INIT_FOODS,...dbFoods.map(f=>({...f,id:'db-'+f.id}))];
+  ALL_FOODS=[...INIT_FOODS,...MEXT_FOODS,...dbFoods.map(f=>({...f,id:'db-'+f.id}))];
 }
 
 function updateDBCount(){
@@ -700,7 +759,7 @@ async function goMain(){
   document.getElementById('st-wt').value=S.wt;document.getElementById('st-age').value=S.age;
   document.getElementById('m-k').value=S.tgt;document.getElementById('m-p').value=S.macros.protein;
   document.getElementById('m-f').value=S.macros.fat;document.getElementById('m-c').value=S.macros.carb;
-  document.getElementById('total-count').textContent=INIT_FOODS.length;
+  document.getElementById('total-count').textContent=INIT_FOODS.length+MEXT_FOODS.length;
   renderHome();buildStoreTabs();
   await loadFoodsFromDB();
   subscribeRealtime();
@@ -1042,7 +1101,7 @@ function sw(tab){
     document.getElementById('m-p').value=S.macros.protein;
     document.getElementById('m-f').value=S.macros.fat;
     document.getElementById('m-c').value=S.macros.carb;
-    document.getElementById('total-count').textContent=INIT_FOODS.length;
+    document.getElementById('total-count').textContent=INIT_FOODS.length+MEXT_FOODS.length;
     renderHome();buildStoreTabs();
     loadFoodsFromDB().then(()=>subscribeRealtime());
   }
