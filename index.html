@@ -317,7 +317,7 @@ body{
 .plan-meal-name{font-weight:700;color:var(--text)}.plan-meal-info{font-size:10px;color:var(--main-m);text-align:right;font-weight:700}
 
 /* ===== メシネコふきだし ===== */
-#meshiko-bubble{
+#meshineko-bubble{
   /* スタイルはインラインで管理 */
 }
 
@@ -576,23 +576,25 @@ body{
   </div>
 
   <!-- ホームタブ -->
-  <div id="t-home" style="display:block;min-height:calc(100vh - 120px)">
+  <div id="t-home" style="display:block">
 
-    <!-- 上ゾーン：コンパクト食事プラン -->
-    <div style="padding:12px 16px 0" id="day-plan-outer">
-      <div id="day-plan-wrap"><!-- 献立ここに表示 --></div>
+    <!-- ① 献立 -->
+    <div style="padding:10px 16px 0">
+      <div id="day-plan-wrap"></div>
     </div>
 
-    <!-- メシネコゾーン：ふきだし+キャラを固定高さのコンテナに -->
-    <div id="meshiko-stage" onclick="meshikoTap()" style="position:relative;text-align:center;cursor:pointer;padding:8px 16px 0;height:320px;overflow:visible">
-      <!-- ふきだし（メシネコの直上・bottomで位置を固定） -->
-      <div id="meshiko-bubble" style="position:absolute;bottom:230px;left:50%;transform:translateX(-50%);z-index:10;font-family:'Zen Maru Gothic',sans-serif;visibility:hidden;width:240px">
-        <div id="meshiko-bubble-text" style="display:block;background:linear-gradient(135deg,#fff,#FDF2F8);border:2px solid #FBCFE8;border-radius:20px;padding:9px 16px;font-size:12px;color:#6B21A8;line-height:1.7;font-weight:700;text-align:center;box-shadow:0 4px 16px rgba(244,114,182,0.2)">　</div>
-        <div style="width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:9px solid #FBCFE8;margin:0 auto"></div>
-        <div style="width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid #FDF2F8;margin:-9px auto 0"></div>
+    <!-- ② 吹き出し + ③ メシネコ（縦並び・間隔なし） -->
+    <div id="meshineko-stage" onclick="meshinekoTap()" style="cursor:pointer;text-align:center;padding:8px 16px 0">
+      <!-- 吹き出し：高さを事前に確保（visibility切り替えでレイアウト変化しない） -->
+      <div style="min-height:90px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:4px">
+        <div id="meshineko-bubble" style="visibility:hidden;width:240px;font-family:'Zen Maru Gothic',sans-serif;position:relative">
+          <div id="meshineko-bubble-text" style="background:linear-gradient(135deg,#fff,#FDF2F8);border:2px solid #FBCFE8;border-radius:20px;padding:9px 16px;font-size:12px;color:#6B21A8;line-height:1.7;font-weight:700;text-align:center;box-shadow:0 4px 12px rgba(244,114,182,0.2)">　</div>
+          <div style="width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:9px solid #FBCFE8;margin:0 auto"></div>
+          <div style="width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid #FDF2F8;margin:-9px auto 0"></div>
+        </div>
       </div>
-      <!-- メシネコ本体 -->
-      <img id="meshiko-img" src="" alt="メシネコ" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:240px;height:auto;display:block;mix-blend-mode:multiply">
+      <!-- メシネコ：常にこの位置（吹き出しの有無で動かない） -->
+      <img id="meshineko-img" src="" alt="メシネコ" style="width:240px;height:auto;display:block;margin:0 auto;mix-blend-mode:multiply">
     </div>
   </div>
 
@@ -1136,7 +1138,7 @@ async function goMain(){
   document.getElementById('s-main').classList.add('active');
   document.getElementById('bnav').style.display='grid';
   const now=new Date();
-  document.getElementById('hdr-date').textContent=`${now.getMonth()+1}月${now.getDate()}日（${'日月火水木金土'[now.getDay()]}）`;
+  document.getElementById('hdr-date').textContent=`${now.getMonth()+1}月${now.getDate()}日（${'日月火水木金土'[now.getDay()]}） ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
   document.getElementById('st-wt').value=S.wt;document.getElementById('st-age').value=S.age;
   document.getElementById('m-k').value=S.tgt;document.getElementById('m-p').value=S.macros.protein;
   document.getElementById('m-f').value=S.macros.fat;document.getElementById('m-c').value=S.macros.carb;
@@ -1151,9 +1153,7 @@ async function goMain(){
 function renderDayPlan(){
   const el=document.getElementById('day-plan-wrap');
   if(!el){console.error('[DayPlan] day-plan-wrap not found');return;}
-  const h=new Date().getHours();
-  console.log('[DayPlan] hour='+h+', ALL_FOODS='+ALL_FOODS.length);
-  if(h<6||h>=23){el.innerHTML='';return;}
+  console.log('[DayPlan] ALL_FOODS='+ALL_FOODS.length);
 
   const tgt=S.tgt||2000;
   const mealDefs=[
@@ -1696,7 +1696,7 @@ function getMeshinekoEmotion(){
 }
 
 function updateMeshiko(){
-  const img=document.getElementById('meshiko-img');
+  const img=document.getElementById('meshineko-img');
   if(!img)return;
   const emotion=getMeshinekoEmotion();
   const url=MESHINEKO_IMGS[emotion]||MESHINEKO_IMGS.fun;
@@ -1711,10 +1711,10 @@ function updateMeshiko(){
     img.src=MESHINEKO_IMGS.fun;
     // funも失敗したら絵文字で代替
     img.onerror=()=>{
-      const wrap=document.getElementById('meshiko-wrap');
-      if(wrap&&!wrap.querySelector('.meshiko-fallback')){
+      const wrap=document.getElementById('meshineko-wrap');
+      if(wrap&&!wrap.querySelector('.meshineko-fallback')){
         const fb=document.createElement('div');
-        fb.className='meshiko-fallback';
+        fb.className='meshineko-fallback';
         fb.style.cssText='font-size:80px;line-height:1;display:block;text-align:center;padding:10px 0';
         fb.textContent='🐱';
         wrap.insertBefore(fb,img);
@@ -1725,18 +1725,18 @@ function updateMeshiko(){
 }
 
 
-let meshikoBubbleTimer=null;
+let meshinekoBubbleTimer=null;
 function showMeshikoBubble(comment){
-  const bubble=document.getElementById('meshiko-bubble');
-  const textEl=document.getElementById('meshiko-bubble-text');
+  const bubble=document.getElementById('meshineko-bubble');
+  const textEl=document.getElementById('meshineko-bubble-text');
   if(!bubble||!textEl)return;
   textEl.innerHTML=comment.replace(/\n/g,'<br>');
   bubble.style.visibility='visible';
-  if(meshikoBubbleTimer)clearTimeout(meshikoBubbleTimer);
-  meshikoBubbleTimer=setTimeout(()=>{bubble.style.visibility='hidden';textEl.innerHTML='　';},5000);
+  if(meshinekoBubbleTimer)clearTimeout(meshinekoBubbleTimer);
+  meshinekoBubbleTimer=setTimeout(()=>{bubble.style.visibility='hidden';textEl.innerHTML='　';},5000);
 }
-function meshikoTap(){
-  const emotion=document.getElementById('meshiko-img')?.getAttribute('data-emotion')||'fun';
+function meshinekoTap(){
+  const emotion=document.getElementById('meshineko-img')?.getAttribute('data-emotion')||'fun';
   const comments=EMOTION_COMMENTS[emotion]||MESHINEKO_COMMENTS;
   showMeshikoBubble(comments[Math.floor(Math.random()*comments.length)]);
 }
@@ -1874,7 +1874,7 @@ function checkVersion(){
     document.getElementById('s-main').classList.add('active');
     document.getElementById('bnav').style.display='grid';
     const now=new Date();
-    document.getElementById('hdr-date').textContent=`${now.getMonth()+1}月${now.getDate()}日（${'日月火水木金土'[now.getDay()]}）`;
+    document.getElementById('hdr-date').textContent=`${now.getMonth()+1}月${now.getDate()}日（${'日月火水木金土'[now.getDay()]}） ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     document.getElementById('st-wt').value=S.wt;document.getElementById('st-age').value=S.age;
     document.getElementById('m-k').value=S.tgt;document.getElementById('m-p').value=S.macros.protein;
     document.getElementById('m-f').value=S.macros.fat;document.getElementById('m-c').value=S.macros.carb;
@@ -1894,6 +1894,13 @@ function checkVersion(){
     const target=document.getElementById('s'+targetStep);
     if(target)target.classList.add('active');
   }
+
+// 時刻を1分ごとに更新
+setInterval(()=>{
+  const now=new Date();
+  const el=document.getElementById('hdr-date');
+  if(el)el.textContent=`${now.getMonth()+1}月${now.getDate()}日（${'日月火水木金土'[now.getDay()]}） ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+},60000);
 })();
 </script>
 </body>
