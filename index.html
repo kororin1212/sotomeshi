@@ -584,15 +584,15 @@ body{
     </div>
 
     <!-- メシネコゾーン：ふきだし+キャラを固定高さのコンテナに -->
-    <div id="meshiko-stage" onclick="meshikoTap()" style="position:relative;text-align:center;cursor:pointer;padding:8px 16px 12px;height:360px;overflow:visible">
-      <!-- ふきだし（position:absoluteでメシネコの上に固定） -->
-      <div id="meshiko-bubble" style="position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10;font-family:'Zen Maru Gothic',sans-serif;visibility:hidden;width:260px">
-        <div id="meshiko-bubble-text" style="display:block;background:linear-gradient(135deg,#fff,#FDF2F8);border:2px solid #FBCFE8;border-radius:20px;padding:10px 18px;font-size:13px;color:#6B21A8;line-height:1.7;font-weight:700;text-align:center;box-shadow:0 4px 16px rgba(244,114,182,0.2)">　</div>
-        <div style="width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid #FBCFE8;margin:0 auto"></div>
-        <div style="width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:9px solid #FDF2F8;margin:-10px auto 0"></div>
+    <div id="meshiko-stage" onclick="meshikoTap()" style="position:relative;text-align:center;cursor:pointer;padding:8px 16px 0;height:320px;overflow:visible">
+      <!-- ふきだし（メシネコの直上・bottomで位置を固定） -->
+      <div id="meshiko-bubble" style="position:absolute;bottom:230px;left:50%;transform:translateX(-50%);z-index:10;font-family:'Zen Maru Gothic',sans-serif;visibility:hidden;width:240px">
+        <div id="meshiko-bubble-text" style="display:block;background:linear-gradient(135deg,#fff,#FDF2F8);border:2px solid #FBCFE8;border-radius:20px;padding:9px 16px;font-size:12px;color:#6B21A8;line-height:1.7;font-weight:700;text-align:center;box-shadow:0 4px 16px rgba(244,114,182,0.2)">　</div>
+        <div style="width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:9px solid #FBCFE8;margin:0 auto"></div>
+        <div style="width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid #FDF2F8;margin:-9px auto 0"></div>
       </div>
-      <!-- メシネコ本体（ふきだしの下・位置固定） -->
-      <img id="meshiko-img" src="" alt="メシネコ" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:280px;height:auto;display:block;mix-blend-mode:multiply">
+      <!-- メシネコ本体 -->
+      <img id="meshiko-img" src="" alt="メシネコ" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:240px;height:auto;display:block;mix-blend-mode:multiply">
     </div>
   </div>
 
