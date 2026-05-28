@@ -334,6 +334,10 @@ body{
   position:relative;
   white-space:normal;
 }
+
+/* ===== タブ切り替えフェード ===== */
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.tab-fade{animation:fadeIn 0.5s ease-out}
 </style>
 </head>
 <body>
@@ -545,11 +549,13 @@ body{
 
     <!-- 下ゾーン：メシネコ大表示（中央寄せ） -->
     <div id="meshiko-stage" onclick="meshikoTap()" style="position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 0 12px;cursor:pointer">
-      <!-- ふきだし（キャラの上） -->
-      <div id="meshiko-bubble" style="z-index:10;font-family:'Zen Maru Gothic',sans-serif">
-        <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid #FBCFE8"></div>
-        <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:9px solid #FDF2F8"></div>
-        <span id="meshiko-bubble-text"></span>
+      <!-- ふきだし領域（事前確保・高さ固定） -->
+      <div style="min-height:80px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:8px">
+        <div id="meshiko-bubble" style="z-index:10;font-family:'Zen Maru Gothic',sans-serif;visibility:hidden">
+          <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid #FBCFE8"></div>
+          <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:9px solid #FDF2F8"></div>
+          <span id="meshiko-bubble-text">　</span>
+        </div>
       </div>
       <!-- メシネコ本体（mix-blend-modeで白背景を透過） -->
       <img id="meshiko-img" src="" alt="メシネコ" style="width:280px;height:auto;display:block;mix-blend-mode:multiply">
@@ -641,9 +647,18 @@ body{
     <div class="card">
       <div class="card-title">📈 推移グラフ（直近14日）</div>
       <!-- グラフ切り替えタブ -->
-      <div style="display:flex;gap:6px;margin-bottom:12px">
+      <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
         <button class="stab on" id="graph-wt-btn" onclick="switchGraph('wt',this)" style="font-family:inherit">体重</button>
         <button class="stab" id="graph-bf-btn" onclick="switchGraph('bf',this)" style="font-family:inherit">体脂肪率</button>
+      </div>
+      <!-- 期間選択 -->
+      <div style="display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap" id="graph-period-btns">
+        <button class="stab" onclick="switchPeriod(14,this)" style="font-family:inherit;font-size:10px;padding:4px 9px">2週間</button>
+        <button class="stab on" onclick="switchPeriod(30,this)" style="font-family:inherit;font-size:10px;padding:4px 9px">1ヶ月</button>
+        <button class="stab" onclick="switchPeriod(90,this)" style="font-family:inherit;font-size:10px;padding:4px 9px">3ヶ月</button>
+        <button class="stab" onclick="switchPeriod(180,this)" style="font-family:inherit;font-size:10px;padding:4px 9px">半年</button>
+        <button class="stab" onclick="switchPeriod(365,this)" style="font-family:inherit;font-size:10px;padding:4px 9px">1年</button>
+        <button class="stab" onclick="switchPeriod(9999,this)" style="font-family:inherit;font-size:10px;padding:4px 9px">全体</button>
       </div>
       <!-- SVGグラフ -->
       <div style="overflow-x:auto">
@@ -1210,7 +1225,7 @@ function renderKiroku(){
   const reversed=[...S.eaten].reverse();
   document.getElementById('mlist').innerHTML=reversed.length===0
     ?`<p style="font-size:12px;color:var(--text-h);padding:4px 0">まだ記録がありません</p>`
-    :reversed.map((f,ri)=>{const i=S.eaten.length-1-ri;return`<div class="mi"><div><div class="mn">${f.name}</div><div class="ms"><span class="tag ${f.type==='chain'?'tc':f.type==='super'?'ts2':'tr'}">${f.store}</span> ${f.kcal} kcal${String(f.id).startsWith('db-')?` <span class="db-badge">DB</span>`:''}</div></div><button onclick="rmF(${i})" style="background:none;border:none;color:var(--text-h);cursor:pointer;font-size:18px;line-height:1">×</button></div>`}).join('');
+    :reversed.map((f,ri)=>{const i=S.eaten.length-1-ri;const mt=f.mealTime||'';const mtColor={朝食:'#F59E0B',昼食:'#22C55E',夕食:'#6366F1',間食:'#EC4899',深夜:'#1E1B4B'}[mt]||'#9CA3AF';return`<div class="mi"><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">${mt?`<span style="font-size:9px;padding:2px 7px;border-radius:20px;background:${mtColor}20;color:${mtColor};border:1px solid ${mtColor}40;font-weight:700">${mt}</span>`:''}<div class="mn">${f.name}</div></div><div class="ms"><span class="tag ${f.type==='chain'?'tc':f.type==='super'?'ts2':'tr'}">${f.store}</span> ${f.kcal} kcal${String(f.id).startsWith('db-')?` <span class="db-badge">DB</span>`:''}</div></div><button onclick="rmF(${i})" style="background:none;border:none;color:var(--text-h);cursor:pointer;font-size:18px;line-height:1;flex-shrink:0">×</button></div>`}).join('');
 }
 
 // ========== スコアリング ==========
@@ -1436,6 +1451,13 @@ async function submitFood(){
 // ========== 体重ログ ==========
 // ========== 体重グラフ ==========
 let graphMode='wt';
+let graphPeriod=30;
+function switchPeriod(days,el){
+  graphPeriod=days;
+  document.querySelectorAll('#graph-period-btns .stab').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  drawWeightChart();
+}
 function switchGraph(mode,el){
   graphMode=mode;
   document.querySelectorAll('#graph-wt-btn,#graph-bf-btn').forEach(b=>b.classList.remove('on'));
@@ -1443,7 +1465,7 @@ function switchGraph(mode,el){
   drawWeightChart();
 }
 function drawWeightChart(){
-  const logs=loadWeightLogs().slice(0,14).reverse();
+  const logs=loadWeightLogs().slice(0,graphPeriod).reverse();
   const svg=document.getElementById('wt-chart');
   if(!svg)return;
   const dates=graphMode==='wt'?logs:logs.filter(l=>l.bf!=null);
@@ -1554,12 +1576,15 @@ function closeTerms(){document.getElementById('terms-modal').classList.remove('o
 // ========== ナビ ==========
 function sw(tab){
   ['home','kiroku','suggest','places','weight','settings','add','history'].forEach(t=>{
-    const el=document.getElementById('t-'+t);if(el)el.style.display=t===tab?'block':'none'
+    const el=document.getElementById('t-'+t);
+    if(!el)return;
+    if(t===tab){el.style.display='block';el.classList.remove('tab-fade');void el.offsetWidth;el.classList.add('tab-fade');}
+    else el.style.display='none';
   });
   ['home','kiroku','suggest','weight','settings'].forEach(t=>{
     const b=document.getElementById('nb-'+t);if(b)b.className='nb'+(t===tab?' on':'')
   });
-  if(tab==='home'){renderHome();renderDayPlan();}
+  if(tab==='home'){renderHome();renderDayPlan();window.scrollTo(0,0);}
   if(tab==='suggest')renderSuggest();
   if(tab==='kiroku')renderKiroku();
   if(tab==='add'){filterF('');document.getElementById('fsearch').value='';searchTabMode='all';document.getElementById('stab-all').classList.add('on');document.getElementById('stab-hist').classList.remove('on');window.scrollTo(0,0);}
@@ -1605,6 +1630,20 @@ const MESHINEKO_IMGS={
   recording:'https://sotomeshi.vercel.app/meshineko_fun.png'     ,
 };
 
+
+// ========== 表情別コメント ==========
+const EMOTION_COMMENTS={
+  joy:['今日の栄養バランス、\nバッチリだにゃ！えらい！','目標に近づいてるにゃ！\nこの調子でいこう！','いい感じにゃ！\n食事記録、続けてにゃ！'],
+  angry:['タンパク質が足りてないにゃ！\nお肉かお魚、選んでみて！','このままでは心配にゃ…\nタンパク質を補おうにゃ！','脂質が多すぎるにゃ！\n気をつけてほしいにゃ！'],
+  sad:['タンパク質が不足してるにゃ…\nもう少し食べてほしいにゃ','このバランスだと心配にゃ…\n何か食べてにゃ','記録はあるけど\n栄養が偏ってるにゃ…'],
+  fun:['今日もごはん、\nちゃんと食べてにゃ！','何食べるか\n決まったにゃ？','一緒に頑張ろうにゃ！\n今日もよろしくにゃ！'],
+  relax:['目標達成が見えてきたにゃ！\nもう少しにゃ！','いい感じに\n整ってきたにゃ！','バランスが\n安定してるにゃ！'],
+  overate:['食べすぎちゃったにゃ…\n次の食事は軽めにしようにゃ','カロリーオーバーにゃ…\n明日また頑張ろうにゃ','今日は食べすぎたにゃ。\n気にしすぎないことも大事にゃ'],
+  balance:['栄養バランス◎にゃ！\nとても上手にゃ！','PFCが\nきれいに揃ってるにゃ！','完璧な食事にゃ！\n素晴らしいにゃ！'],
+  ganba:['3食ちゃんと記録してるにゃ！\nえらいにゃ！','今日も頑張ってるにゃ！\nメシネコも応援してるにゃ！','毎日続けることが\n大切にゃよ！'],
+  hungry:['お腹すいてるにゃ？\n早めに食べてほしいにゃ','夕方なのに\nまだ食事が足りてないにゃ…','何か食べてにゃ！\nエネルギー補給が必要にゃ！'],
+  recording:['食事を記録してにゃ♪\nデータが積み重なるにゃ！','記録すると\n振り返りができるにゃよ！','今日の食事、\n教えてにゃ！'],
+};
 function getMeshinekoEmotion(){
   const t=tots();const m=S.macros;const tgt=S.tgt;
   if(t.kcal===0)return'fun';
@@ -1625,12 +1664,12 @@ function updateMeshiko(){
   if(!img)return;
   const emotion=getMeshinekoEmotion();
   const url=MESHINEKO_IMGS[emotion]||MESHINEKO_IMGS.fun;
-  if(img.src!==url){
-    img.src=url;
-    // 画像更新時に初期コメントを自動表示
-    const initComments=['今日もがんばってにゃ！','ご主人の食事、\nメシネコが見てるにゃ。','何食べるか\n決まったにゃ？','栄養バランス、\n気にしてるにゃよ！','タップしてにゃ！'];
-    showMeshikoBubble(initComments[Math.floor(Math.random()*initComments.length)]);
-  }
+  const changed=img.getAttribute('data-emotion')!==emotion;
+  img.src=url;
+  img.setAttribute('data-emotion',emotion);
+  // 表情に対応したコメントを表示
+  const comments=EMOTION_COMMENTS[emotion]||EMOTION_COMMENTS.fun;
+  showMeshikoBubble(comments[Math.floor(Math.random()*comments.length)]);
   img.onerror=()=>{
     img.onerror=null;
     img.src=MESHINEKO_IMGS.fun;
@@ -1656,18 +1695,19 @@ function showMeshikoBubble(comment){
   const textEl=document.getElementById('meshiko-bubble-text');
   if(!bubble||!textEl)return;
   textEl.innerHTML=comment.replace(/\n/g,'<br>');
-  bubble.style.display='block';
+  bubble.style.visibility='visible';
   if(meshikoBubbleTimer)clearTimeout(meshikoBubbleTimer);
-  meshikoBubbleTimer=setTimeout(()=>{bubble.style.display='none'},5000);
+  meshikoBubbleTimer=setTimeout(()=>{bubble.style.visibility='hidden';textEl.innerHTML='　';},5000);
 }
 function meshikoTap(){
-  const comment=MESHINEKO_COMMENTS[Math.floor(Math.random()*MESHINEKO_COMMENTS.length)];
-  showMeshikoBubble(comment);
+  const emotion=document.getElementById('meshiko-img')?.getAttribute('data-emotion')||'fun';
+  const comments=EMOTION_COMMENTS[emotion]||MESHINEKO_COMMENTS;
+  showMeshikoBubble(comments[Math.floor(Math.random()*comments.length)]);
 }
 
 
 // ========== バージョン管理 ==========
-const APP_VERSION='2026052807'; // 更新時はこの数字を変更する
+const APP_VERSION='2026052808'; // 更新時はこの数字を変更する
 const LS_VERSION='sotomeshi_version';
 
 function checkVersion(){
