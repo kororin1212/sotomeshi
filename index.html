@@ -1413,8 +1413,28 @@ function meshikoTap(){
 }
 
 
+// ========== バージョン管理 ==========
+const APP_VERSION='2026052801'; // 更新時はこの数字を変更する
+const LS_VERSION='sotomeshi_version';
+
+function checkVersion(){
+  try{
+    const saved=localStorage.getItem(LS_VERSION);
+    if(saved===APP_VERSION)return true; // 同じバージョン→問題なし
+    // バージョンが違う or 初回 → 食事・体重データだけ退避してプロフィールをリセット
+    const meals=localStorage.getItem(LS_MEALS);
+    const weight=localStorage.getItem(LS_WEIGHT);
+    localStorage.clear();
+    if(meals)localStorage.setItem(LS_MEALS,meals);
+    if(weight)localStorage.setItem(LS_WEIGHT,weight);
+    localStorage.setItem(LS_VERSION,APP_VERSION);
+    return false; // 設定し直しが必要
+  }catch(e){return false;}
+}
+
 (function init(){
-  const done=loadProfile();
+  const isCurrentVersion=checkVersion();
+  const done=isCurrentVersion&&loadProfile();
   if(done){
     loadTodayMeals();
     S.tdee=calcTDEE();S.tgt=calcTgt(S.tdee);
