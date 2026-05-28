@@ -516,15 +516,15 @@ body{
     </div>
 
     <!-- 下ゾーン：メシネコ大表示（中央寄せ） -->
-    <div id="meshiko-stage" onclick="meshikoTap()" style="flex:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 0 20px;min-height:260px;cursor:pointer">
+    <div id="meshiko-stage" onclick="meshikoTap()" style="flex:1;position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:8px 0 16px;min-height:260px;cursor:pointer;overflow:visible">
       <!-- ふきだし（キャラの上） -->
-      <div id="meshiko-bubble" style="display:none;position:absolute;top:12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#fff,#FDF2F8);border:2px solid #FBCFE8;border-radius:20px;padding:10px 18px;font-size:13px;color:#6B21A8;z-index:10;box-shadow:0 4px 16px rgba(244,114,182,0.2);max-width:280px;white-space:normal;text-align:center;line-height:1.7;font-weight:700;font-family:'Zen Maru Gothic',sans-serif">
+      <div id="meshiko-bubble" style="display:none;position:absolute;top:12px;left:16px;transform:none;background:linear-gradient(135deg,#fff,#FDF2F8);border:2px solid #FBCFE8;border-radius:20px;padding:10px 18px;font-size:13px;color:#6B21A8;z-index:10;box-shadow:0 4px 16px rgba(244,114,182,0.2);max-width:260px;white-space:normal;text-align:left;line-height:1.7;font-weight:700;font-family:'Zen Maru Gothic',sans-serif">
         <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid #FBCFE8"></div>
         <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:9px solid #FDF2F8"></div>
         <span id="meshiko-bubble-text"></span>
       </div>
       <!-- メシネコ本体（mix-blend-modeで白背景を透過） -->
-      <img id="meshiko-img" src="" alt="メシネコ" style="width:290px;height:auto;display:block;mix-blend-mode:multiply;filter:drop-shadow(0 6px 20px rgba(168,85,247,0.2))">
+      <img id="meshiko-img" src="" alt="メシネコ" style="width:522px;height:auto;display:block;mix-blend-mode:multiply;filter:drop-shadow(0 6px 20px rgba(168,85,247,0.2));margin-left:-20px">
     </div>
   </div>
 
@@ -1461,7 +1461,7 @@ function sw(tab){
 }
 
 // ========== メシネコ ==========
-const MESHIKO_COMMENTS=[
+const MESHINEKO_COMMENTS=[
   '今日もごはん、ちゃんと食べてね！にゃ♪',
   'タンパク質が足りてないにゃ…お肉かお魚、選んでみて！',
   '野菜も忘れずに！メシネコが応援してるにゃ🥦',
@@ -1518,7 +1518,12 @@ function updateMeshiko(){
   if(!img)return;
   const emotion=getMeshinekoEmotion();
   const url=MESHINEKO_IMGS[emotion]||MESHINEKO_IMGS.fun;
-  if(img.src!==url)img.src=url;
+  if(img.src!==url){
+    img.src=url;
+    // 画像更新時に初期コメントを自動表示
+    const initComments=['今日もがんばってにゃ♪','ご主人の食事、メシネコが見てるにゃ♡','何食べるか決まったにゃ？','栄養バランス、気にしてるにゃよ♪','タップしてにゃ♡'];
+    showMeshikoBubble(initComments[Math.floor(Math.random()*initComments.length)]);
+  }
   img.onerror=()=>{
     img.onerror=null;
     img.src=MESHINEKO_IMGS.fun;
@@ -1539,21 +1544,23 @@ function updateMeshiko(){
 
 
 let meshikoBubbleTimer=null;
-function meshikoTap(){
-  const comment=MESHINEKO_COMMENTS[Math.floor(Math.random()*MESHINEKO_COMMENTS.length)];
+function showMeshikoBubble(comment){
   const bubble=document.getElementById('meshiko-bubble');
   const textEl=document.getElementById('meshiko-bubble-text');
-  if(!bubble)return;
-  if(textEl)textEl.textContent=comment;
-  else bubble.childNodes[bubble.childNodes.length-1].textContent=comment;
+  if(!bubble||!textEl)return;
+  textEl.textContent=comment;
   bubble.style.display='block';
   if(meshikoBubbleTimer)clearTimeout(meshikoBubbleTimer);
-  meshikoBubbleTimer=setTimeout(()=>{bubble.style.display='none'},4500);
+  meshikoBubbleTimer=setTimeout(()=>{bubble.style.display='none'},5000);
+}
+function meshikoTap(){
+  const comment=MESHINEKO_COMMENTS[Math.floor(Math.random()*MESHINEKO_COMMENTS.length)];
+  showMeshikoBubble(comment);
 }
 
 
 // ========== バージョン管理 ==========
-const APP_VERSION='2026052801'; // 更新時はこの数字を変更する
+const APP_VERSION='2026052802'; // 更新時はこの数字を変更する
 const LS_VERSION='sotomeshi_version';
 
 function checkVersion(){
