@@ -487,6 +487,21 @@ body{
       <div class="hdr-prog-row"><span id="hdr-eaten">0 kcal摂取</span><span id="hdr-rem"></span></div>
       <div class="hdr-bar-bg"><div class="hdr-bar-fill" id="hdr-bar" style="width:0%"></div></div>
     </div>
+    <!-- P/F/C ミニ表示 -->
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <div style="flex:1;text-align:center;background:rgba(255,255,255,0.15);border-radius:10px;padding:4px 0">
+        <div style="font-size:8px;color:rgba(255,255,255,0.75);font-weight:700">タンパク質</div>
+        <div style="font-size:12px;font-weight:700;color:#fff" id="hdr-p">0g</div>
+      </div>
+      <div style="flex:1;text-align:center;background:rgba(255,255,255,0.15);border-radius:10px;padding:4px 0">
+        <div style="font-size:8px;color:rgba(255,255,255,0.75);font-weight:700">脂質</div>
+        <div style="font-size:12px;font-weight:700;color:#fff" id="hdr-f">0g</div>
+      </div>
+      <div style="flex:1;text-align:center;background:rgba(255,255,255,0.15);border-radius:10px;padding:4px 0">
+        <div style="font-size:8px;color:rgba(255,255,255,0.75);font-weight:700">糖質</div>
+        <div style="font-size:12px;font-weight:700;color:#fff" id="hdr-c">0g</div>
+      </div>
+    </div>
   </div>
 
   <!-- ホームタブ -->
@@ -497,19 +512,16 @@ body{
       <div id="day-plan-wrap"></div>
     </div>
 
-    <!-- 下ゾーン：メシネコ大表示（残りスペースを全部使う） -->
-    <div id="meshiko-stage" style="flex:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:20px;min-height:280px">
-      <!-- ふきだし（キャラの上・画面上部寄り） -->
-      <div id="meshiko-bubble" style="display:none;position:absolute;top:16px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#fff,#FDF2F8);border:2px solid #FBCFE8;border-radius:20px;padding:10px 18px;font-size:13px;color:#6B21A8;z-index:10;box-shadow:0 4px 16px rgba(244,114,182,0.2);max-width:280px;white-space:normal;text-align:center;line-height:1.7;font-weight:700;font-family:'Zen Maru Gothic',sans-serif">
-        <!-- ふきだしの三角（下向き） -->
+    <!-- 下ゾーン：メシネコ大表示（中央寄せ） -->
+    <div id="meshiko-stage" onclick="meshikoTap()" style="flex:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 0 20px;min-height:260px;cursor:pointer">
+      <!-- ふきだし（キャラの上） -->
+      <div id="meshiko-bubble" style="display:none;position:absolute;top:12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#fff,#FDF2F8);border:2px solid #FBCFE8;border-radius:20px;padding:10px 18px;font-size:13px;color:#6B21A8;z-index:10;box-shadow:0 4px 16px rgba(244,114,182,0.2);max-width:280px;white-space:normal;text-align:center;line-height:1.7;font-weight:700;font-family:'Zen Maru Gothic',sans-serif">
         <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid #FBCFE8"></div>
         <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:9px solid #FDF2F8"></div>
         <span id="meshiko-bubble-text"></span>
       </div>
-      <!-- メシネコ本体（大きく・下寄せ） -->
-      <div style="position:relative;cursor:pointer" onclick="meshikoTap()">
-        <img id="meshiko-img" src="" alt="メシネコ" style="width:240px;height:auto;display:block;filter:drop-shadow(0 8px 24px rgba(168,85,247,0.25))">
-      </div>
+      <!-- メシネコ本体（mix-blend-modeで白背景を透過） -->
+      <img id="meshiko-img" src="" alt="メシネコ" style="width:220px;height:auto;display:block;mix-blend-mode:multiply;filter:drop-shadow(0 6px 20px rgba(168,85,247,0.2))">
     </div>
   </div>
 
@@ -520,9 +532,9 @@ body{
       <div style="text-align:right"><div class="tdee-l">残り</div><div style="font-size:18px;font-weight:700;color:var(--pu-d)" id="rem-k">-- kcal</div></div>
     </div>
     <div class="sbox-row">
-      <div class="sbox"><div class="sv" id="sp">0g</div><div class="sl">タンパク質</div></div>
-      <div class="sbox"><div class="sv" id="sf">0g</div><div class="sl">脂質</div></div>
-      <div class="sbox"><div class="sv" id="sc">0g</div><div class="sl">糖質</div></div>
+      <div class="sbox"><div class="sv" id="sp">0g</div><div class="sl">タンパク質 / <span id="sp-tgt">--</span>g</div></div>
+      <div class="sbox"><div class="sv" id="sf">0g</div><div class="sl">脂質 / <span id="sf-tgt">--</span>g</div></div>
+      <div class="sbox"><div class="sv" id="sc">0g</div><div class="sl">糖質 / <span id="sc-tgt">--</span>g</div></div>
     </div>
     <div class="card">
       <div class="card-title">栄養バランス</div>
@@ -575,18 +587,54 @@ body{
   </div>
 
   <!-- 体重タブ -->
-  <div id="t-weight" style="display:none">
+  <div id="t-weight" style="display:none;padding:14px 16px 0">
+
+    <!-- メシネココメントエリア -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <img id="wt-meshineko-img" src="" style="width:72px;height:72px;object-fit:contain;mix-blend-mode:multiply;flex-shrink:0">
+      <div id="wt-meshineko-msg" style="background:linear-gradient(135deg,#fff,#FDF2F8);border:2px solid #FBCFE8;border-radius:16px;padding:10px 14px;font-size:12px;color:#6B21A8;font-weight:700;line-height:1.6;position:relative;flex:1">
+        <div style="position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-right:10px solid #FBCFE8"></div>
+        <div style="position:absolute;left:-7px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-right:9px solid #FDF2F8"></div>
+        <span id="wt-msg-text">今日の体重と体脂肪率を記録してにゃ♪</span>
+      </div>
+    </div>
+
+    <!-- 入力フォーム -->
     <div class="card">
-      <div class="card-title">体重ログ</div>
-      <div style="display:flex;gap:7px;margin-bottom:12px">
-        <input type="number" id="wt-in" placeholder="今日の体重 (kg)" step="0.1" style="flex:1;padding:9px 11px;border:0.5px solid var(--border-s);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text);outline:none;font-family:inherit">
-        <button onclick="logWt()" style="padding:9px 14px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-size:13px;cursor:pointer;font-family:inherit">記録</button>
+      <div class="card-title">📝 今日を記録する</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div class="fld" style="margin-bottom:0">
+          <label>体重 (kg)</label>
+          <input type="number" id="wt-in" placeholder="例: 65" step="1" min="20" max="300">
+        </div>
+        <div class="fld" style="margin-bottom:0">
+          <label>体脂肪率 (%)</label>
+          <input type="number" id="bf-in" placeholder="例: 22" step="1" min="3" max="60">
+        </div>
       </div>
-      <div id="wt-hist"><p style="font-size:12px;color:var(--text-h);padding:4px 0">まだ記録がありません</p></div>
-      <div style="margin-top:10px;padding:10px 12px;background:var(--blue-l);border-radius:var(--r)">
-        <div style="font-size:10px;color:var(--blue);font-weight:600">記録サマリー</div>
-        <div style="font-size:12px;color:var(--blue-d);margin-top:3px" id="wt-summary">まだ記録がありません</div>
+      <button class="btn-p" onclick="logWt()">記録する</button>
+    </div>
+
+    <!-- グラフカード -->
+    <div class="card">
+      <div class="card-title">📈 推移グラフ（直近14日）</div>
+      <!-- グラフ切り替えタブ -->
+      <div style="display:flex;gap:6px;margin-bottom:12px">
+        <button class="stab on" id="graph-wt-btn" onclick="switchGraph('wt',this)" style="font-family:inherit">体重</button>
+        <button class="stab" id="graph-bf-btn" onclick="switchGraph('bf',this)" style="font-family:inherit">体脂肪率</button>
       </div>
+      <!-- SVGグラフ -->
+      <div style="overflow-x:auto">
+        <svg id="wt-chart" width="100%" viewBox="0 0 340 160" style="display:block"></svg>
+      </div>
+      <!-- サマリー -->
+      <div id="wt-summary-box" style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+    </div>
+
+    <!-- 記録一覧 -->
+    <div class="card">
+      <div class="card-title">📋 記録一覧</div>
+      <div id="wt-hist"></div>
     </div>
   </div>
 
@@ -837,7 +885,19 @@ function loadStep(){try{return parseInt(localStorage.getItem(LS_SETUP)||'1')}cat
 function saveMeals(){try{const all=JSON.parse(localStorage.getItem(LS_MEALS)||'{}');all[todayKey()]=S.eaten;localStorage.setItem(LS_MEALS,JSON.stringify(all))}catch(e){}}
 function loadTodayMeals(){try{const all=JSON.parse(localStorage.getItem(LS_MEALS)||'{}');S.eaten=all[todayKey()]||[]}catch(e){S.eaten=[]}}
 function getAllMealDays(){try{return Object.entries(JSON.parse(localStorage.getItem(LS_MEALS)||'{}')).sort((a,b)=>b[0].localeCompare(a[0]))}catch(e){return[]}}
-function saveWeight(kg){try{const logs=JSON.parse(localStorage.getItem(LS_WEIGHT)||'[]');const today=todayKey();const idx=logs.findIndex(l=>l.date===today);if(idx>=0)logs[idx].kg=kg;else logs.unshift({date:today,kg});logs.splice(30);localStorage.setItem(LS_WEIGHT,JSON.stringify(logs));return logs}catch(e){return[]}}
+function saveWeight(kg,bf){
+  try{
+    const logs=JSON.parse(localStorage.getItem(LS_WEIGHT)||'[]');
+    const today=todayKey();
+    const idx=logs.findIndex(l=>l.date===today);
+    const entry={date:today,kg};
+    if(bf!=null)entry.bf=bf;
+    if(idx>=0)logs[idx]=entry; else logs.unshift(entry);
+    logs.splice(30);
+    localStorage.setItem(LS_WEIGHT,JSON.stringify(logs));
+    return logs;
+  }catch(e){return[];}
+}
 function loadWeightLogs(){try{return JSON.parse(localStorage.getItem(LS_WEIGHT)||'[]')}catch(e){return[]}}
 
 // ========== Supabase ==========
@@ -1060,6 +1120,13 @@ function renderHome(){
   document.getElementById('hdr-eaten').textContent=t.kcal+' kcal摂取';
   document.getElementById('hdr-rem').textContent='残り '+(tgt-t.kcal)+' kcal';
   document.getElementById('hdr-bar').style.width=pct+'%';
+  // P/F/C ミニ表示
+  const hp=document.getElementById('hdr-p');
+  const hf=document.getElementById('hdr-f');
+  const hc=document.getElementById('hdr-c');
+  if(hp)hp.textContent=t.protein.toFixed(1)+'g';
+  if(hf)hf.textContent=t.fat.toFixed(1)+'g';
+  if(hc)hc.textContent=t.carb.toFixed(1)+'g';
   updateMeshiko();
 }
 
@@ -1075,9 +1142,12 @@ function renderKiroku(){
   // 残量・マクロ
   document.getElementById('tdee-d').textContent=tgt+' kcal';
   document.getElementById('rem-k').textContent=Math.max(0,tgt-t.kcal)+' kcal';
-  document.getElementById('sp').textContent=t.protein+'g';
-  document.getElementById('sf').textContent=t.fat+'g';
-  document.getElementById('sc').textContent=t.carb+'g';
+  document.getElementById('sp').textContent=t.protein.toFixed(1)+'g';
+  document.getElementById('sf').textContent=t.fat.toFixed(1)+'g';
+  document.getElementById('sc').textContent=t.carb.toFixed(1)+'g';
+  const spt=document.getElementById('sp-tgt');if(spt)spt.textContent=m.protein;
+  const sft=document.getElementById('sf-tgt');if(sft)sft.textContent=m.fat;
+  const sct=document.getElementById('sc-tgt');if(sct)sct.textContent=m.carb;
   // バランスバー
   const bars=[{l:'カロリー',v:t.kcal,mx:tgt,u:'kcal',c:'fb'},{l:'タンパク質',v:t.protein,mx:m.protein,u:'g',c:'fg'},{l:'脂質',v:t.fat,mx:m.fat,u:'g',c:'fa'},{l:'糖質',v:t.carb,mx:m.carb,u:'g',c:'fb'}];
   document.getElementById('nbars').innerHTML=bars.map(b=>{const p=Math.min(100,Math.round(b.v/b.mx*100));return`<div class="bw"><div class="bm"><span>${b.l}</span><span>${b.v}/${b.mx}${b.u}</span></div><div class="bbg"><div class="bf ${p>110?'fr':b.c}" style="width:${p}%"></div></div></div>`}).join('');
@@ -1252,20 +1322,83 @@ async function submitFood(){
 }
 
 // ========== 体重ログ ==========
+// ========== 体重グラフ ==========
+let graphMode='wt';
+function switchGraph(mode,el){
+  graphMode=mode;
+  document.querySelectorAll('#graph-wt-btn,#graph-bf-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  drawWeightChart();
+}
+function drawWeightChart(){
+  const logs=loadWeightLogs().slice(0,14).reverse();
+  const svg=document.getElementById('wt-chart');
+  if(!svg)return;
+  const dates=graphMode==='wt'?logs:logs.filter(l=>l.bf!=null);
+  const vals=dates.map(l=>graphMode==='wt'?l.kg:l.bf);
+  if(!vals.length){svg.innerHTML=`<text x="170" y="80" text-anchor="middle" fill="#A78BCA" font-size="12" font-family="sans-serif">${graphMode==='wt'?'まだ記録がありません':'体脂肪率のデータがありません'}</text>`;return}
+  const W=340,H=160,PL=40,PR=16,PT=20,PB=30;
+  const mn=Math.min(...vals),mx=Math.max(...vals),range=(mx-mn)||1,pad=range*.2;
+  const vmin=mn-pad,vmax=mx+pad;
+  const gW=W-PL-PR,gH=H-PT-PB;
+  const px=(i)=>PL+i/Math.max(1,dates.length-1)*gW;
+  const py=(v)=>PT+gH-(v-vmin)/(vmax-vmin)*gH;
+  const col=graphMode==='wt'?'#A855F7':'#F472B6';
+  let h=`<defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${col}" stop-opacity="0.25"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>`;
+  for(let i=0;i<=3;i++){const yy=PT+gH/3*i;const v=(vmax-(vmax-vmin)/3*i).toFixed(1);h+=`<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="rgba(167,139,250,0.2)" stroke-width="1"/><text x="${PL-4}" y="${yy+4}" text-anchor="end" font-size="9" fill="#A78BCA" font-family="sans-serif">${v}</text>`;}
+  if(dates.length>1){const pts=dates.map((l,i)=>`${px(i)},${py(vals[i])}`).join(' ');h+=`<polygon points="${pts} ${px(dates.length-1)},${PT+gH} ${px(0)},${PT+gH}" fill="url(#lg)"/><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;}
+  dates.forEach((l,i)=>{const cx=px(i),cy=py(vals[i]);h+=`<circle cx="${cx}" cy="${cy}" r="4" fill="${col}" stroke="#fff" stroke-width="2"/>`;const[,m,d]=l.date.split('-');if(i===0||i===dates.length-1||i%Math.ceil(dates.length/4)===0)h+=`<text x="${cx}" y="${H-4}" text-anchor="middle" font-size="9" fill="#A78BCA" font-family="sans-serif">${m}/${d}</text>`;});
+  if(dates.length){const lv=vals[vals.length-1];const lx=px(dates.length-1),ly=py(lv);h+=`<rect x="${lx-22}" y="${ly-18}" width="44" height="16" rx="8" fill="${col}"/><text x="${lx}" y="${ly-7}" text-anchor="middle" font-size="10" fill="#fff" font-family="sans-serif" font-weight="bold">${lv}${graphMode==='wt'?'kg':'%'}</text>`;}
+  svg.innerHTML=h;
+}
+function getWtMsg(logs){
+  if(!logs.length)return{e:'fun',m:'今日の体重と体脂肪率を記録してにゃ♪'};
+  if(logs.length<3)return{e:'fun',m:'記録を続けるといい感じになるにゃ！一緒に頑張ろう♪'};
+  const diff=logs[0].kg-logs[Math.min(6,logs.length-1)].kg;
+  if(S.goal==='lose'){
+    if(diff<-1)return{e:'joy',m:`${Math.abs(diff.toFixed(1))}kg減ったにゃ！すごい！この調子でいこうにゃ♡`};
+    if(diff<0)return{e:'balance',m:'じわじわ減ってるにゃ！コツコツが大事にゃよ♪'};
+    if(diff>1)return{e:'sad',m:'少し増えちゃったにゃ…食事を見直してみようにゃ'};
+    return{e:'fun',m:'維持できてるにゃ！食事記録も続けてほしいにゃ♪'};
+  }
+  if(S.goal==='muscle'||S.goal==='gain'){
+    if(diff>0.5)return{e:'joy',m:`${diff.toFixed(1)}kg増えたにゃ！いい感じにゃ♡`};
+    if(diff<-0.5)return{e:'angry',m:'もう少し食べてほしいにゃ！タンパク質も大事にゃよ！'};
+    return{e:'fun',m:'安定してるにゃ！トレーニングも頑張ってにゃ♪'};
+  }
+  if(Math.abs(diff)<0.5)return{e:'balance',m:'体重が安定してるにゃ！いい感じにゃ♡'};
+  return{e:'fun',m:'記録ありがとうにゃ！毎日続けるのが大事にゃよ♪'};
+}
 function renderWeightLogs(){
   const logs=loadWeightLogs();
-  if(!logs.length){document.getElementById('wt-hist').innerHTML=`<p style="font-size:12px;color:var(--text-h);padding:4px 0">まだ記録がありません</p>`;return}
-  const max=Math.max(...logs.map(l=>l.kg));const min=Math.min(...logs.map(l=>l.kg));const range=max-min||1;
-  document.getElementById('wt-hist').innerHTML=logs.slice(0,10).map(l=>{
-    const pct=Math.round(((l.kg-min)/range)*60+20);const[y,m,d]=l.date.split('-');
-    return`<div class="wt-row"><span class="wt-date">${m}/${d}</span><div class="wt-bar"><div class="wt-fill" style="width:${pct}%"></div></div><span class="wt-val">${l.kg} kg</span></div>`;
-  }).join('');
-  if(logs.length>=2){const diff=(logs[0].kg-logs[logs.length-1].kg).toFixed(1);const sign=diff>0?'+':'';document.getElementById('wt-summary').textContent=`直近${logs.length}日間 ${sign}${diff} kg`;}
+  const{e,m}=getWtMsg(logs);
+  const imgEl=document.getElementById('wt-meshineko-img');
+  const msgEl=document.getElementById('wt-msg-text');
+  if(imgEl)imgEl.src=MESHINEKO_IMGS[e]||MESHINEKO_IMGS.fun;
+  if(msgEl)msgEl.textContent=m;
+  drawWeightChart();
+  const sb=document.getElementById('wt-summary-box');
+  if(sb&&logs.length){
+    const l=logs[0];
+    const wl=logs.filter(x=>x.kg),bl=logs.filter(x=>x.bf!=null);
+    const wd=wl.length>=2?(wl[0].kg-wl[wl.length-1].kg).toFixed(1):null;
+    const bd=bl.length>=2?(bl[0].bf-bl[bl.length-1].bf).toFixed(1):null;
+    sb.innerHTML=`<div style="background:linear-gradient(135deg,var(--pu-l),#fff);border:1.5px solid var(--pu-b);border-radius:var(--r);padding:10px;text-align:center"><div style="font-size:10px;color:var(--main-m);font-weight:700">最新体重</div><div style="font-size:20px;font-weight:700;color:var(--pu-d)">${l.kg}<span style="font-size:11px">kg</span></div>${wd!=null?`<div style="font-size:10px;color:${wd>0?'#EF4444':'#22C55E'};font-weight:700">${wd>0?'+':''}${wd}kg</div>`:''}</div><div style="background:linear-gradient(135deg,var(--pk-l),#fff);border:1.5px solid var(--pk-b);border-radius:var(--r);padding:10px;text-align:center"><div style="font-size:10px;color:var(--pk-m);font-weight:700">最新体脂肪率</div><div style="font-size:20px;font-weight:700;color:var(--pk-d)">${l.bf!=null?l.bf:'--'}<span style="font-size:11px">%</span></div>${bd!=null?`<div style="font-size:10px;color:${bd>0?'#EF4444':'#22C55E'};font-weight:700">${bd>0?'+':''}${bd}%</div>`:''}</div>`;
+  }else if(sb)sb.innerHTML='';
+  const hist=document.getElementById('wt-hist');
+  if(!hist)return;
+  if(!logs.length){hist.innerHTML=`<p style="font-size:12px;color:var(--text-h);padding:4px 0">まだ記録がありません</p>`;return}
+  hist.innerHTML=logs.slice(0,14).map(l=>{const[,m2,d]=l.date.split('-');return`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1.5px dashed var(--border)"><span style="font-size:12px;color:var(--text-s);font-weight:700">${m2}/${d}</span><div style="display:flex;gap:12px"><span style="font-size:13px;font-weight:700;color:var(--pu-d)">${l.kg}kg</span>${l.bf!=null?`<span style="font-size:12px;font-weight:700;color:var(--pk-d)">${l.bf}%</span>`:`<span style="font-size:11px;color:var(--text-h)">体脂肪--</span>`}</div></div>`;}).join('');
 }
 function logWt(){
-  const v=parseFloat(document.getElementById('wt-in').value);
-  if(isNaN(v)||v<20||v>300){showToast('正しい体重を入力してください');return}
-  S.wt=v;saveWeight(v);renderWeightLogs();document.getElementById('wt-in').value='';showToast('体重を記録しました');
+  const kg=parseFloat(document.getElementById('wt-in').value);
+  const bfRaw=document.getElementById('bf-in').value;
+  const bf=bfRaw!==''?parseFloat(bfRaw):null;
+  if(isNaN(kg)||kg<20||kg>300){showToast('正しい体重を入力してください');return}
+  if(bf!=null&&(isNaN(bf)||bf<3||bf>60)){showToast('正しい体脂肪率を入力してください');return}
+  S.wt=kg;saveWeight(kg,bf);renderWeightLogs();
+  document.getElementById('wt-in').value='';document.getElementById('bf-in').value='';
+  showToast('記録しました！');
 }
 
 // ========== 過去の記録 ==========
