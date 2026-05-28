@@ -318,21 +318,7 @@ body{
 
 /* ===== メシネコふきだし ===== */
 #meshiko-bubble{
-  display:none;
-  background:linear-gradient(135deg,#fff,#FDF2F8);
-  border:2px solid var(--pk-b);
-  border-radius:20px;
-  box-shadow:0 4px 16px rgba(244,114,182,0.2);
-  font-weight:700;
-  margin-bottom:12px;
-  max-width:260px;
-  text-align:center;
-  padding:10px 18px;
-  font-size:13px;
-  color:#6B21A8;
-  line-height:1.7;
-  position:relative;
-  white-space:normal;
+  /* スタイルはインラインで管理 */
 }
 
 /* ===== タブ切り替えフェード ===== */
@@ -364,6 +350,56 @@ body{
       本規約は予告なく改定される場合があります。<br>お問い合わせ：lupin3.1212@gmail.com
     </div>
     <button class="btn-p" onclick="closeTerms()">閉じる</button>
+  </div>
+</div>
+
+<!-- ========== 昨日の振り返りモーダル ========== -->
+<div class="modal-bg" id="review-modal">
+  <div class="modal" style="padding-bottom:36px">
+    <div style="text-align:center;margin-bottom:16px">
+      <img id="review-meshineko" src="" style="width:90px;height:90px;object-fit:contain;mix-blend-mode:multiply;margin-bottom:4px">
+      <div id="review-meshineko-msg" style="font-size:13px;font-weight:700;color:var(--main-m);line-height:1.6"></div>
+    </div>
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px;text-align:center">📋 昨日の振り返り</div>
+
+    <!-- カロリー達成 -->
+    <div style="background:linear-gradient(135deg,var(--pu-l),#fff);border:1.5px solid var(--pu-b);border-radius:var(--r);padding:12px 14px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:12px;font-weight:700;color:var(--text)">カロリー</span>
+        <span style="font-size:11px;color:var(--text-s)" id="rv-kcal-label">-- / -- kcal</span>
+      </div>
+      <div style="height:8px;background:var(--bg-t);border-radius:4px;overflow:hidden">
+        <div id="rv-kcal-bar" style="height:8px;border-radius:4px;background:linear-gradient(90deg,#A855F7,#C084FC);width:0%;transition:width 1s ease-out"></div>
+      </div>
+    </div>
+
+    <!-- PFC達成 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+      <div style="background:#fff;border:1.5px solid var(--border);border-radius:var(--r);padding:10px 8px;text-align:center">
+        <div style="font-size:9px;color:var(--text-h);font-weight:700">タンパク質</div>
+        <div style="font-size:16px;font-weight:700;color:var(--pu-d)" id="rv-p">--g</div>
+        <div style="font-size:9px;color:var(--text-h)" id="rv-p-pct">--%</div>
+        <div style="height:4px;background:var(--bg-t);border-radius:2px;margin-top:4px;overflow:hidden"><div id="rv-p-bar" style="height:4px;border-radius:2px;background:#34D399;width:0%;transition:width 1s ease-out 0.2s"></div></div>
+      </div>
+      <div style="background:#fff;border:1.5px solid var(--border);border-radius:var(--r);padding:10px 8px;text-align:center">
+        <div style="font-size:9px;color:var(--text-h);font-weight:700">脂質</div>
+        <div style="font-size:16px;font-weight:700;color:var(--pu-d)" id="rv-f">--g</div>
+        <div style="font-size:9px;color:var(--text-h)" id="rv-f-pct">--%</div>
+        <div style="height:4px;background:var(--bg-t);border-radius:2px;margin-top:4px;overflow:hidden"><div id="rv-f-bar" style="height:4px;border-radius:2px;background:#FB923C;width:0%;transition:width 1s ease-out 0.3s"></div></div>
+      </div>
+      <div style="background:#fff;border:1.5px solid var(--border);border-radius:var(--r);padding:10px 8px;text-align:center">
+        <div style="font-size:9px;color:var(--text-h);font-weight:700">糖質</div>
+        <div style="font-size:16px;font-weight:700;color:var(--pu-d)" id="rv-c">--g</div>
+        <div style="font-size:9px;color:var(--text-h)" id="rv-c-pct">--%</div>
+        <div style="height:4px;background:var(--bg-t);border-radius:2px;margin-top:4px;overflow:hidden"><div id="rv-c-bar" style="height:4px;border-radius:2px;background:#A78BFA;width:0%;transition:width 1s ease-out 0.4s"></div></div>
+      </div>
+    </div>
+
+    <!-- 食事リスト -->
+    <div style="font-size:11px;font-weight:700;color:var(--text-s);margin-bottom:6px">昨日食べたもの</div>
+    <div id="rv-meals" style="max-height:160px;overflow-y:auto;margin-bottom:16px"></div>
+
+    <button class="btn-p" onclick="closeReviewModal()">今日も頑張るにゃ！</button>
   </div>
 </div>
 
@@ -1108,6 +1144,7 @@ async function goMain(){
   renderHome();renderDayPlan();renderKiroku();updateMeshiko();
   await loadFoodsFromDB();
   subscribeRealtime();
+  checkDateAndShowReview();
 }
 
 // ========== 1日の食事プラン生成（調査データに基づく） ==========
@@ -1705,6 +1742,111 @@ function meshikoTap(){
 }
 
 
+// ========== 日付チェック・昨日の振り返り ==========
+const LS_LAST_DATE='sotomeshi_last_date';
+
+function getYesterdayKey(){
+  const d=new Date();d.setDate(d.getDate()-1);
+  return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function checkDateAndShowReview(){
+  const today=todayKey();
+  const lastDate=localStorage.getItem(LS_LAST_DATE);
+  // 同じ日なら何もしない
+  if(lastDate===today)return;
+  // 日付が変わった
+  localStorage.setItem(LS_LAST_DATE,today);
+  // 昨日のデータを取得
+  const yesterday=getYesterdayKey();
+  let ydMeals=[];
+  try{
+    const all=JSON.parse(localStorage.getItem(LS_MEALS)||'{}');
+    ydMeals=(all[yesterday]||[]).map(migrateFoodEntry);
+  }catch(e){}
+  // 昨日のデータがなければスキップ
+  if(!ydMeals.length)return;
+  showReviewModal(yesterday,ydMeals);
+}
+
+function showReviewModal(date,meals){
+  const tgt=S.tgt;const m=S.macros;
+  const t=meals.reduce((a,f)=>({
+    kcal:a.kcal+(f.kcal||0),
+    protein:a.protein+(f.protein||0),
+    fat:a.fat+(f.fat||0),
+    carb:a.carb+(f.carb||0)
+  }),{kcal:0,protein:0,fat:0,carb:0});
+
+  const kcalPct=Math.min(120,Math.round(t.kcal/tgt*100));
+  const pPct=Math.min(120,Math.round(t.protein/m.protein*100));
+  const fPct=Math.min(120,Math.round(t.fat/m.fat*100));
+  const cPct=Math.min(120,Math.round(t.carb/m.carb*100));
+
+  // メシネコのコメントと表情を決定
+  let emotion='fun',msg='';
+  if(kcalPct>=90&&kcalPct<=110&&pPct>=80){
+    emotion='balance';msg='昨日は完璧なバランスだったにゃ！\nすごい！今日も続けてにゃ！';
+  }else if(kcalPct>=85&&kcalPct<=115){
+    emotion='joy';msg='昨日はいい感じだったにゃ！\n今日もこの調子でいこうにゃ！';
+  }else if(kcalPct>115){
+    emotion='overate';msg='昨日は少し食べすぎたにゃ…\n今日は少し軽めにしてみてにゃ。';
+  }else if(kcalPct<60){
+    emotion='sad';msg='昨日は食事が少なかったにゃ…\n今日はしっかり食べてほしいにゃ！';
+  }else if(pPct<60){
+    emotion='angry';msg='昨日はタンパク質が少なかったにゃ！\n今日はお肉・お魚を意識してにゃ！';
+  }else{
+    emotion='fun';msg='昨日の記録、ありがとうにゃ！\n今日も一緒に頑張ろうにゃ！';
+  }
+
+  // UIに反映
+  const imgEl=document.getElementById('review-meshineko');
+  if(imgEl)imgEl.src=MESHINEKO_IMGS[emotion]||MESHINEKO_IMGS.fun;
+  const msgEl=document.getElementById('review-meshineko-msg');
+  if(msgEl)msgEl.innerHTML=msg.replace(/\n/g,'<br>');
+
+  document.getElementById('rv-kcal-label').textContent=`${Math.round(t.kcal)} / ${tgt} kcal (${kcalPct}%)`;
+  document.getElementById('rv-p').textContent=t.protein.toFixed(1)+'g';
+  document.getElementById('rv-f').textContent=t.fat.toFixed(1)+'g';
+  document.getElementById('rv-c').textContent=t.carb.toFixed(1)+'g';
+  document.getElementById('rv-p-pct').textContent=pPct+'% 達成';
+  document.getElementById('rv-f-pct').textContent=fPct+'% 達成';
+  document.getElementById('rv-c-pct').textContent=cPct+'% 達成';
+
+  // 食事リスト
+  const mtColor={朝食:'#F59E0B',昼食:'#22C55E',夕食:'#6366F1',間食:'#EC4899',深夜:'#1E1B4B'};
+  document.getElementById('rv-meals').innerHTML=meals.length===0
+    ?'<p style="font-size:12px;color:var(--text-h)">記録なし</p>'
+    :meals.map(f=>{
+      const mt=f.mealTime||'';const col=mtColor[mt]||'#9CA3AF';
+      return`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed var(--border);font-size:12px">
+        <div style="display:flex;align-items:center;gap:6px">
+          ${mt?`<span style="font-size:9px;padding:2px 6px;border-radius:20px;background:${col}20;color:${col};border:1px solid ${col}40;font-weight:700;white-space:nowrap">${mt}</span>`:''}
+          <span style="font-weight:700">${f.name}</span>
+        </div>
+        <span style="color:var(--main-m);font-weight:700;white-space:nowrap">${f.kcal}kcal</span>
+      </div>`;
+    }).join('');
+
+  // モーダルを開く（少し遅延させてアニメーションを見せる）
+  document.getElementById('review-modal').classList.add('open');
+
+  // バーアニメーション（モーダル表示後に適用）
+  setTimeout(()=>{
+    const kb=document.getElementById('rv-kcal-bar');if(kb)kb.style.width=kcalPct+'%';
+    const pb=document.getElementById('rv-p-bar');if(pb)pb.style.width=pPct+'%';
+    const fb=document.getElementById('rv-f-bar');if(fb)fb.style.width=fPct+'%';
+    const cb=document.getElementById('rv-c-bar');if(cb)cb.style.width=cPct+'%';
+  },100);
+}
+
+function closeReviewModal(){
+  document.getElementById('review-modal').classList.remove('open');
+  // 閉じた後に今日のプランを表示
+  renderDayPlan();
+  updateMeshiko();
+}
+
 // ========== バージョン管理 ==========
 const APP_VERSION='2026052808'; // 更新時はこの数字を変更する
 const LS_VERSION='sotomeshi_version';
@@ -1738,7 +1880,7 @@ function checkVersion(){
     document.getElementById('m-f').value=S.macros.fat;document.getElementById('m-c').value=S.macros.carb;
     document.getElementById('total-count').textContent=INIT_FOODS.length+MEXT_FOODS.length;
     renderHome();renderDayPlan();renderKiroku();updateMeshiko();
-    loadFoodsFromDB().then(()=>subscribeRealtime());
+    loadFoodsFromDB().then(()=>{subscribeRealtime();checkDateAndShowReview();});
   } else {
     // 途中のステップから再開（s-mainは非表示のまま）
     const step=loadStep();
