@@ -149,7 +149,7 @@ body{
 }
 .nb{
   padding:10px 4px 8px;background:none;border:none;cursor:pointer;
-  text-align:center;font-size:9px;color:var(--text-h);
+  text-align:center;font-size:8px;color:var(--text-h);
   display:flex;flex-direction:column;align-items:center;gap:3px;
   font-family:inherit;font-weight:700;transition:color .2s;
 }
@@ -223,7 +223,7 @@ body{
 .score-bar{height:4px;border-radius:2px;margin-top:8px;background:var(--bg-t);overflow:hidden}
 .score-fill{height:4px;background:linear-gradient(90deg,#A855F7,#F472B6);border-radius:2px;transition:width .5s}
 .reason-tag{font-size:9px;padding:2px 8px;border-radius:20px;background:var(--pk-l);color:var(--pk-d);border:1px solid var(--pk-b);font-weight:700}
-.alt{padding:11px 13px;border-radius:var(--r);font-size:12px;margin-bottom:9px;display:flex;align-items:flex-start;gap:7px;line-height:1.5;font-weight:700}
+.alt{padding:6px 10px;border-radius:var(--r);font-size:11px;margin-bottom:4px;display:flex;align-items:center;gap:6px;line-height:1.4;font-weight:700}
 .aw{background:var(--yel-l);color:var(--yel-d);border:1.5px solid var(--yel)}
 .ao{background:var(--mint-l);color:var(--mint-d);border:1.5px solid var(--mint)}
 .ai{background:var(--sky-l);color:var(--sky-d);border:1.5px solid var(--sky)}
@@ -433,7 +433,7 @@ body{
       <button class="mealtime-btn" onclick="confirmMealTime('昼食')" style="padding:14px;background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:2px solid #86EFAC;border-radius:var(--r);font-size:14px;font-weight:700;color:#166534;cursor:pointer;font-family:inherit">☀️ 昼食</button>
       <button class="mealtime-btn" onclick="confirmMealTime('夕食')" style="padding:14px;background:linear-gradient(135deg,#EEF2FF,#E0E7FF);border:2px solid #A5B4FC;border-radius:var(--r);font-size:14px;font-weight:700;color:#3730A3;cursor:pointer;font-family:inherit">🌙 夕食</button>
       <button class="mealtime-btn" onclick="confirmMealTime('間食')" style="padding:14px;background:linear-gradient(135deg,#FDF2F8,#FCE7F3);border:2px solid #F9A8D4;border-radius:var(--r);font-size:14px;font-weight:700;color:#9D174D;cursor:pointer;font-family:inherit">🍩 間食</button>
-      <button class="mealtime-btn" onclick="confirmMealTime('深夜')" style="padding:14px;background:linear-gradient(135deg,#1E1B4B,#312E81);border:2px solid #6366F1;border-radius:var(--r);font-size:14px;font-weight:700;color:#C7D2FE;cursor:pointer;font-family:inherit;grid-column:1/-1">🌃 深夜</button>
+      <button class="mealtime-btn" onclick="confirmMealTime('その他')" style="padding:14px;background:linear-gradient(135deg,#F3F4F6,#E5E7EB);border:2px solid #9CA3AF;border-radius:var(--r);font-size:14px;font-weight:700;color:#4B5563;cursor:pointer;font-family:inherit;grid-column:1/-1">🍽️ その他</button>
     </div>
     <button onclick="cancelMealTime()" style="width:100%;padding:10px;background:none;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;font-weight:700;color:var(--text-s);cursor:pointer;font-family:inherit">← 選択をやめる</button>
   </div>
@@ -450,12 +450,29 @@ body{
       <select id="reg-type"><option value="chain">チェーン店</option><option value="super">お惣菜</option><option value="conv">コンビニ</option><option value="recipe">自炊</option><option value="other">その他</option></select>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
-      <div class="fld"><label>カロリー (kcal) *</label><input type="number" id="reg-kcal" placeholder="例: 687" min="0"></div>
-      <div class="fld"><label>タンパク質 (g) *</label><input type="number" id="reg-protein" placeholder="例: 17.1" step="0.1"></div>
+      <div class="fld"><label>カロリー (kcal)</label><input type="number" id="reg-kcal" placeholder="例: 687" min="0"></div>
+      <div class="fld"><label>タンパク質 (g)</label><input type="number" id="reg-protein" placeholder="例: 17.1" step="0.1"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
-      <div class="fld"><label>脂質 (g) *</label><input type="number" id="reg-fat" placeholder="例: 28.9" step="0.1"></div>
-      <div class="fld"><label>糖質 (g) *</label><input type="number" id="reg-carb" placeholder="例: 85.5" step="0.1"></div>
+      <div class="fld"><label>脂質 (g)</label><input type="number" id="reg-fat" placeholder="例: 28.9" step="0.1"></div>
+      <div class="fld"><label>糖質 (g)</label><input type="number" id="reg-carb" placeholder="例: 85.5" step="0.1"></div>
+    </div>
+    <div class="fld">
+      <label>よく食べる時間帯（任意・複数可）</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;background:var(--bg-s);border:1.5px solid var(--border);border-radius:var(--r);padding:6px 12px;transition:all .2s" id="mt-label-B">
+          <input type="checkbox" id="reg-mt-B" style="display:none" onchange="toggleMtLabel('B')"> 🌅 朝
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;background:var(--bg-s);border:1.5px solid var(--border);border-radius:var(--r);padding:6px 12px;transition:all .2s" id="mt-label-L">
+          <input type="checkbox" id="reg-mt-L" style="display:none" onchange="toggleMtLabel('L')"> ☀️ 昼
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;background:var(--bg-s);border:1.5px solid var(--border);border-radius:var(--r);padding:6px 12px;transition:all .2s" id="mt-label-D">
+          <input type="checkbox" id="reg-mt-D" style="display:none" onchange="toggleMtLabel('D')"> 🌙 夜
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;background:var(--bg-s);border:1.5px solid var(--border);border-radius:var(--r);padding:6px 12px;transition:all .2s" id="mt-label-S">
+          <input type="checkbox" id="reg-mt-S" style="display:none" onchange="toggleMtLabel('S')"> 🍩 その他
+        </label>
+      </div>
     </div>
     <div class="fld"><label>備考（任意）</label><input type="text" id="reg-desc" placeholder="例: みそ汁付き"></div>
     <div style="display:flex;gap:14px;margin-bottom:11px">
@@ -475,8 +492,60 @@ body{
   </div>
 </div>
 
+<!-- ========== オンボーディング ========== -->
+<div id="s0" class="screen" style="padding:20px 24px 80px">
+
+  <!-- ヘッダー -->
+  <div style="text-align:center;padding:20px 0 18px">
+    <div style="font-size:22px;font-weight:800;color:var(--blue)">ソトメシ <span style="font-size:11px;background:var(--blue-l);color:var(--blue);padding:2px 8px;border-radius:20px;font-weight:500;vertical-align:middle">β版</span></div>
+    <div style="font-size:12px;color:var(--text-s);margin-top:4px">外食派のための栄養ナビ</div>
+  </div>
+
+  <!-- ドットインジケーター -->
+  <div style="display:flex;justify-content:center;gap:8px;margin-bottom:20px" id="onb-dots">
+    <div class="onb-dot on" style="width:24px;height:8px;border-radius:4px;background:var(--main-m);transition:all .3s"></div>
+    <div class="onb-dot" style="width:8px;height:8px;border-radius:4px;background:var(--border);transition:all .3s"></div>
+    <div class="onb-dot" style="width:8px;height:8px;border-radius:4px;background:var(--border);transition:all .3s"></div>
+    <div class="onb-dot" style="width:8px;height:8px;border-radius:4px;background:var(--border);transition:all .3s"></div>
+  </div>
+
+  <!-- スライドコンテナ -->
+  <div id="onb-slides">
+    <!-- スライド1 -->
+    <div class="onb-slide" id="onb-0" style="display:block;background:#fff;border-radius:var(--rl);border:1.5px solid var(--border);box-shadow:var(--sh-s);margin-bottom:12px;padding:24px 20px">
+      <div style="text-align:center"><img src="https://raw.githubusercontent.com/kororin1212/sotomeshi/main/meshineko_joy.png" style="width:140px;height:auto;mix-blend-mode:multiply"></div>
+      <div style="text-align:center;font-size:17px;font-weight:800;color:var(--main-m);margin:12px 0 8px">ようこそ、ソトメシへ！</div>
+      <div style="text-align:center;font-size:14px;color:var(--text);line-height:1.9;font-weight:600">メシネコがあなたの食事を<br>サポートするにゃ！</div>
+    </div>
+    <!-- スライド2 -->
+    <div class="onb-slide" id="onb-1" style="display:none;background:#fff;border-radius:var(--rl);border:1.5px solid var(--border);box-shadow:var(--sh-s);margin-bottom:12px;padding:24px 20px">
+      <div style="text-align:center"><img src="https://raw.githubusercontent.com/kororin1212/sotomeshi/main/meshineko_balance.png" style="width:120px;height:auto;mix-blend-mode:multiply"></div>
+      <div style="text-align:center;font-size:16px;font-weight:800;color:var(--main-m);margin:12px 0 8px">おすすめ食事を提案</div>
+      <div style="text-align:center;font-size:14px;color:var(--text);line-height:1.9;font-weight:600">あなたの目標・制限に合わせて<br>毎日の食事をおすすめするにゃ！<br>栄養バランスも自動で管理するにゃ！</div>
+    </div>
+    <!-- スライド3 -->
+    <div class="onb-slide" id="onb-2" style="display:none;background:#fff;border-radius:var(--rl);border:1.5px solid var(--border);box-shadow:var(--sh-s);margin-bottom:12px;padding:24px 20px">
+      <div style="text-align:center"><img src="https://raw.githubusercontent.com/kororin1212/sotomeshi/main/meshineko_joy.png" style="width:120px;height:auto;mix-blend-mode:multiply"></div>
+      <div style="text-align:center;font-size:16px;font-weight:800;color:var(--main-m);margin:12px 0 8px">将来の夢</div>
+      <div style="text-align:center;font-size:14px;color:var(--text);line-height:1.9;font-weight:600">ゆくゆくは位置情報と連携して<br>近くの飲食店メニューから<br>おすすめを出せるようにしたいにゃ！</div>
+    </div>
+    <!-- スライド4 -->
+    <div class="onb-slide" id="onb-3" style="display:none;background:#fff;border-radius:var(--rl);border:1.5px solid var(--border);box-shadow:var(--sh-s);margin-bottom:12px;padding:24px 20px">
+      <div style="text-align:center"><img src="https://raw.githubusercontent.com/kororin1212/sotomeshi/main/meshineko_fun.png" style="width:120px;height:auto;mix-blend-mode:multiply"></div>
+      <div style="text-align:center;font-size:16px;font-weight:800;color:var(--main-m);margin:12px 0 8px">データ登録のお願い</div>
+      <div style="text-align:center;font-size:14px;color:var(--text);line-height:1.9;font-weight:600">そのためには食品データが必要にゃ。<br>知っているメニューがあれば<br>ぜひ登録してほしいにゃ！<br><span style="font-size:12px;color:var(--text-h)">（もちろん使うだけでも大歓迎にゃ！）</span></div>
+    </div>
+  </div>
+    <!-- ボタン -->
+  <div style="display:flex;gap:10px;margin-top:20px">
+    <button id="onb-back-btn" onclick="onbBack()" style="display:none;padding:14px 18px;background:var(--bg-s);color:var(--text-s);border:1.5px solid var(--border);border-radius:var(--r);font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;flex-shrink:0">←</button>
+    <button id="onb-btn" onclick="onbNext()" class="btn-p" style="flex:1;padding:14px;font-size:15px">次へ →</button>
+  </div>
+  <button onclick="onbSkip()" style="background:none;border:none;color:var(--text-h);font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;padding:10px;width:100%;margin-top:4px">スキップして登録へ</button>
+</div>
+
 <!-- ========== ステップ1 基本情報 ========== -->
-<div id="s1" class="screen active" style="padding-top:20px">
+<div id="s1" class="screen" style="padding-top:20px">
   <div style="text-align:center;padding:20px 0 18px">
     <div style="width:60px;height:60px;background:var(--blue);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:30px;height:30px"><path d="M3 19V7a2 2 0 012-2h14a2 2 0 012 2v12"/><path d="M8 19v-4h8v4"/><path d="M12 10a3 3 0 100-6 3 3 0 000 6z"/></svg>
@@ -624,10 +693,6 @@ body{
   <!-- 記録タブ（食事記録・栄養バランス） -->
   <div id="t-kiroku" style="display:none;padding:14px 18px 0">
     <div class="card">
-      <div class="card-title">栄養バランス</div>
-      <div id="nbars"></div>
-    </div>
-    <div class="card">
       <div class="card-title">今日の食事</div>
       <div id="mlist"><p style="font-size:12px;color:var(--text-h);padding:4px 0">まだ記録がありません</p></div>
       <button class="addbtn" onclick="sw('add')">＋ 食事を追加する</button>
@@ -643,7 +708,13 @@ body{
         <div style="font-size:14px;font-weight:700">🏆 おすすめランキング</div>
         <div style="font-size:10px;color:var(--text-s);margin-top:2px" id="ranking-sub"></div>
       </div>
-      <div class="time-badge" id="time-badge"></div>
+      <div style="display:flex;gap:4px" id="time-period-btns">
+        <button onclick="setTimePeriod(null)" id="tp-auto" style="font-size:9px;padding:3px 8px;border-radius:20px;border:1.5px solid var(--pk-b);background:linear-gradient(135deg,var(--pk-l),var(--pu-l));color:var(--main-m);cursor:pointer;font-family:inherit;font-weight:700">自動</button>
+        <button onclick="setTimePeriod('朝')" id="tp-morning" style="font-size:9px;padding:3px 8px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg-s);color:var(--text-s);cursor:pointer;font-family:inherit;font-weight:700">朝</button>
+        <button onclick="setTimePeriod('昼')" id="tp-noon" style="font-size:9px;padding:3px 8px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg-s);color:var(--text-s);cursor:pointer;font-family:inherit;font-weight:700">昼</button>
+        <button onclick="setTimePeriod('夜')" id="tp-night" style="font-size:9px;padding:3px 8px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg-s);color:var(--text-s);cursor:pointer;font-family:inherit;font-weight:700">夜</button>
+        <button onclick="setTimePeriod('その他')" id="tp-other" style="font-size:9px;padding:3px 8px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg-s);color:var(--text-s);cursor:pointer;font-family:inherit;font-weight:700">その他</button>
+      </div>
     </div>
     <div style="font-size:10px;color:var(--text-s);margin-bottom:9px" id="r-badge"></div>
     <div id="slist"></div>
@@ -802,7 +873,7 @@ body{
     </div>
     <div class="card">
       <div class="card-title">ベータ版について</div>
-      <p style="font-size:11px;color:var(--text-s);line-height:1.7">現在ソトメシはベータ版です。データ・機能は順次改善されます。ご意見は <a href="mailto:lupin3.1212@gmail.com" style="color:var(--blue)">lupin3.1212@gmail.com</a> までお寄せください。</p>
+      <p style="font-size:11px;color:var(--text-s);line-height:1.7">現在ソトメシはベータ版です。データ・機能は順次改善されます。</p>
     </div>
     <div class="card">
       <div class="card-title">初期設定をやり直す</div>
@@ -849,14 +920,14 @@ body{
   <button class="nb on" id="nb-home" onclick="sw('home')">
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M8 18v-6h4v6"/></svg>ホーム
   </button>
-  <button class="nb" id="nb-kiroku" onclick="sw('kiroku')">
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h6a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>記録
-  </button>
   <button class="nb" id="nb-suggest" onclick="sw('suggest')">
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="11" width="4" height="7" rx="1"/><rect x="8" y="7" width="4" height="11" rx="1"/><rect x="15" y="3" width="4" height="15" rx="1"/></svg>おすすめ
   </button>
+  <button class="nb" id="nb-kiroku" onclick="sw('kiroku')">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h6a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>食事記録
+  </button>
   <button class="nb" id="nb-weight" onclick="sw('weight')">
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 17 7 11 11 13 15 7 17 9"/></svg>からだ
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 17 7 11 11 13 15 7 17 9"/></svg>からだ記録
   </button>
   <button class="nb" id="nb-settings" onclick="sw('settings')">
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="3"/><path d="M10 1v2M10 17v2M1 10h2M17 10h2M3.22 3.22l1.42 1.42M15.36 15.36l1.42 1.42M3.22 16.78l1.42-1.42M15.36 4.64l1.42-1.42"/></svg>設定
@@ -1011,7 +1082,7 @@ function todayKey(){const d=new Date();return`${d.getFullYear()}-${String(d.getM
 function saveProfile(){try{localStorage.setItem(LS_PROFILE,JSON.stringify({...S,setupDone:true}))}catch(e){}}
 function loadProfile(){try{const p=JSON.parse(localStorage.getItem(LS_PROFILE)||'null');if(!p)return false;Object.assign(S,p);return!!p.setupDone}catch(e){return false}}
 function saveStep(n){try{localStorage.setItem(LS_SETUP,n)}catch(e){}}
-function loadStep(){try{return parseInt(localStorage.getItem(LS_SETUP)||'1')}catch(e){return 1}}
+function loadStep(){try{return parseInt(localStorage.getItem(LS_SETUP)||'0')}catch(e){return 0}}
 // 旧store名を新store名にマイグレート
 const STORE_MIGRATION={
   '和風料理':'お惣菜','洋風料理':'お惣菜','中国料理':'お惣菜','韓国料理':'お惣菜',
@@ -1136,13 +1207,76 @@ function calcMacros(t){
   return{protein:Math.round(t*.20/4),fat:Math.round(t*.25/9),carb:Math.round(t*.55/4)};
 }
 function tots(){return S.eaten.reduce((a,f)=>({kcal:a.kcal+f.kcal,protein:a.protein+f.protein,fat:a.fat+f.fat,carb:a.carb+f.carb}),{kcal:0,protein:0,fat:0,carb:0})}
+let _manualTimePeriod=null;
 function getTimePeriod(){
+  if(_manualTimePeriod)return _manualTimePeriod;
   const h=new Date().getHours();
-  if(h>=6&&h<10)return{label:'朝',maxKcal:500,preferLight:true};
-  if(h>=10&&h<14)return{label:'昼',maxKcal:900,preferLight:false};
-  if(h>=14&&h<17)return{label:'おやつ',maxKcal:350,preferLight:true};
-  if(h>=17&&h<21)return{label:'夜',maxKcal:900,preferLight:false};
-  return{label:'深夜',maxKcal:400,preferLight:true};
+  if(h>=5&&h<10)return{label:'朝',timeCode:'B',maxKcal:500,preferLight:true};
+  if(h>=10&&h<15)return{label:'昼',timeCode:'L',maxKcal:900,preferLight:false};
+  if(h>=15&&h<21)return{label:'夜',timeCode:'D',maxKcal:900,preferLight:false};
+  return{label:'その他',timeCode:'L',maxKcal:600,preferLight:false};
+}
+function setTimePeriod(label){
+  const map={
+    '朝':{label:'朝',timeCode:'B',maxKcal:500,preferLight:true},
+    '昼':{label:'昼',timeCode:'L',maxKcal:900,preferLight:false},
+    '夜':{label:'夜',timeCode:'D',maxKcal:900,preferLight:false},
+    'その他':{label:'その他',timeCode:'L',maxKcal:600,preferLight:false},
+  };
+  _manualTimePeriod=label?map[label]||null:null;
+  renderSuggest();
+}
+
+// ========== オンボーディング ==========
+let _onbStep=0;
+const ONB_TOTAL=4;
+
+function _onbUpdateUI(){
+  // スライド切り替え
+  document.querySelectorAll('.onb-slide').forEach((s,i)=>{
+    s.style.display=i===_onbStep?'block':'none';
+  });
+  // ドット
+  document.querySelectorAll('.onb-dot').forEach((d,i)=>{
+    d.style.width=i===_onbStep?'24px':'8px';
+    d.style.background=i===_onbStep?'var(--main-m)':'var(--border)';
+  });
+  // 次へボタン
+  const btn=document.getElementById('onb-btn');
+  if(_onbStep===ONB_TOTAL-1){
+    btn.textContent='初期設定をはじめる！';
+    btn.style.background='linear-gradient(135deg,#FCD34D,#F59E0B)';
+    btn.style.color='#7C3AED';
+  }else{
+    btn.textContent='次へ →';
+    btn.style.background='#fff';
+    btn.style.color='#7C3AED';
+  }
+  // 戻るボタン
+  const back=document.getElementById('onb-back-btn');
+  if(back)back.style.display=_onbStep>0?'block':'none';
+}
+
+function onbNext(){
+  if(_onbStep<ONB_TOTAL-1){
+    _onbStep++;
+    _onbUpdateUI();
+  }else{
+    onbSkip();
+  }
+}
+
+function onbBack(){
+  if(_onbStep>0){
+    _onbStep--;
+    _onbUpdateUI();
+  }
+}
+
+function onbSkip(){
+  document.getElementById('s0').classList.remove('active');
+  document.getElementById('s1').classList.add('active');
+  saveStep(1);
 }
 
 // ========== 設定フロー ==========
@@ -1449,21 +1583,56 @@ function renderHome(){
 // ========== 記録タブ描画 ==========
 function renderKiroku(){
   const t=tots();const tgt=S.tgt;const m=S.macros;
-  const pct=Math.min(100,Math.round(t.kcal/tgt*100));
-  // バランスバー
-  const bars=[{l:'カロリー',v:Math.round(t.kcal),mx:tgt,u:'kcal',c:'fb',int:true},{l:'タンパク質',v:t.protein,mx:m.protein,u:'g',c:'fg'},{l:'脂質',v:t.fat,mx:m.fat,u:'g',c:'fa'},{l:'糖質',v:t.carb,mx:m.carb,u:'g',c:'fb'}];
-  document.getElementById('nbars').innerHTML=bars.map(b=>{const p=Math.min(100,Math.round(b.v/b.mx*100));const dv=b.int?Math.round(b.v):b.v.toFixed(1);return`<div class="bw"><div class="bm"><span>${b.l}</span><span>${dv}/${b.mx}${b.u}</span></div><div class="bbg"><div class="bf ${p>110?'fr':b.c}" style="width:${p}%"></div></div></div>`}).join('');
-  // 食事リスト（最後追加が上）
-  const reversed=[...S.eaten].reverse();
-  document.getElementById('mlist').innerHTML=reversed.length===0
-    ?`<p style="font-size:12px;color:var(--text-h);padding:4px 0">まだ記録がありません</p>`
-    :reversed.map((f,ri)=>{const i=S.eaten.length-1-ri;const mt=f.mealTime||'';const mtColor={朝食:'#F59E0B',昼食:'#22C55E',夕食:'#6366F1',間食:'#EC4899',深夜:'#1E1B4B'}[mt]||'#9CA3AF';return`<div class="mi"><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">${mt?`<span style="font-size:9px;padding:2px 7px;border-radius:20px;background:${mtColor}20;color:${mtColor};border:1px solid ${mtColor}40;font-weight:700">${mt}</span>`:''}<div class="mn">${f.name}</div></div><div class="ms"><span class="tag ${f.type==='chain'?'tc':f.type==='super'?'ts2':'tr'}">${f.store}</span> ${f.kcal} kcal${String(f.id).startsWith('db-')?` <span class="db-badge">DB</span>`:''}</div></div><button onclick="rmF(${i})" style="background:none;border:none;color:var(--text-h);cursor:pointer;font-size:18px;line-height:1;flex-shrink:0">×</button></div>`}).join('');
+
+  // 時間帯順にグループ化
+  const groups={朝食:[],昼食:[],夕食:[],その他:[]};
+  const timeToGroup={朝食:'朝食',昼食:'昼食',夕食:'夕食',間食:'その他',深夜:'その他','':'その他'};
+  [...S.eaten].forEach((f,i)=>{
+    const g=timeToGroup[f.mealTime||'']||'その他';
+    groups[g].push({f,i});
+  });
+
+  const mtColor={朝食:'#F59E0B',昼食:'#22C55E',夕食:'#6366F1',その他:'#9CA3AF'};
+  const groupOrder=['朝食','昼食','夕食','その他'];
+
+  const hasAny=S.eaten.length>0;
+  const mlistEl=document.getElementById('mlist');
+  if(!mlistEl)return;
+
+  if(!hasAny){
+    mlistEl.innerHTML=`<p style="font-size:12px;color:var(--text-h);padding:4px 0">まだ記録がありません</p>`;
+    return;
+  }
+
+  mlistEl.innerHTML=groupOrder.map(g=>{
+    const items=groups[g];
+    if(!items.length)return'';
+    const col=mtColor[g];
+    const rows=items.map(({f,i})=>`
+      <div class="mi">
+        <div style="flex:1;min-width:0">
+          <div class="mn">${f.name}</div>
+          <div class="ms">
+            <span class="tag ${f.type==='chain'?'tc':f.type==='super'?'ts2':'tr'}">${f.store}</span>
+            ${f.kcal} kcal${String(f.id).startsWith('db-')?` <span class="db-badge">DB</span>`:''}
+          </div>
+        </div>
+        <button onclick="rmF(${i})" style="background:none;border:none;color:var(--text-h);cursor:pointer;font-size:18px;line-height:1;flex-shrink:0">×</button>
+      </div>`).join('');
+    return`
+      <div style="margin-bottom:10px">
+        <div style="font-size:10px;font-weight:700;color:${col};padding:4px 0 4px;border-bottom:2px solid ${col}30;margin-bottom:4px;display:flex;align-items:center;gap:5px">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${col}"></span>${g}
+        </div>
+        ${rows}
+      </div>`;
+  }).join('');
 }
 
 // ========== スコアリング ==========
 function applyHardFilters(foods,t,remK){
   const period=getTimePeriod();
-  const timeMap={朝:'B',昼:'L',おやつ:'S',夜:'D',深夜:'S'};
+  const timeMap={朝:'B',昼:'L',夜:'D','その他':'L'};
   const curTime=timeMap[period.label]||'L';
   return foods.filter(f=>{
     if(S.restrictions.includes('no_gluten')&&f.gluten)return false;
@@ -1480,7 +1649,7 @@ function scoreFood(f,t,m,remK,recentIds){
   let score=0;const reasons=[];
   const remP=m.protein-t.protein;const remF=m.fat-t.fat;
   // meal_timeスコア（時間帯一致で加点、不一致で減点）
-  const timeMap={朝:'B',昼:'L',おやつ:'S',夜:'D',深夜:'S'};
+  const timeMap={朝:'B',昼:'L',夜:'D','その他':'L'};
   const period=getTimePeriod();
   const curTime=timeMap[period.label]||'L';
   if(f.meal_time){
@@ -1518,13 +1687,25 @@ function renderSuggest(){
   const lbl={'low_carb':'糖質制限','high_protein':'高タンパク','low_fat':'低脂質','low_cal':'低カロリー','no_gluten':'グルテンフリー','vegetarian':'ベジ'};
   const badges=S.restrictions.map(r=>`<span style="background:var(--blue-l);color:var(--blue-d);font-size:9px;padding:2px 6px;border-radius:20px;margin-right:3px;font-weight:500">${lbl[r]||r}</span>`).join('');
   document.getElementById('r-badge').innerHTML=badges?`適用中: ${badges}`:'';
-  document.getElementById('time-badge').textContent=`${period.label}モード`;
+  const tpMap={'朝':'tp-morning','昼':'tp-noon','夜':'tp-night','その他':'tp-other'};
+  ['tp-auto','tp-morning','tp-noon','tp-night','tp-other'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const isActive=_manualTimePeriod?tpMap[period.label]===id:id==='tp-auto';
+    el.style.background=isActive?'linear-gradient(135deg,var(--pk-l),var(--pu-l))':'var(--bg-s)';
+    el.style.borderColor=isActive?'var(--pk-b)':'var(--border)';
+    el.style.color=isActive?'var(--main-m)':'var(--text-s)';
+  });
   const remP=m.protein-t.protein;const remF=m.fat-t.fat;
   const alts=[];
-  if(remK<0)alts.push({type:'warn',msg:`カロリーを ${Math.abs(remK)} kcal 超えています`});
-  else if(remF<-10)alts.push({type:'warn',msg:`脂質を ${Math.abs(Math.round(remF))}g 超えています`});
-  else if(remP>15)alts.push({type:'info',msg:`タンパク質があと ${Math.round(remP)}g 不足しています`});
-  else alts.push({type:'ok',msg:'栄養バランス良好です'});
+  const remC=m.carb-t.carb;
+  if(remK<0)alts.push({type:'warn',msg:`カロリーを ${Math.abs(Math.round(remK))} kcal 超過しています`});
+  if(remF<-10)alts.push({type:'warn',msg:`脂質を ${Math.abs(Math.round(remF))}g 超過しています`});
+  if(remC<-20)alts.push({type:'warn',msg:`糖質を ${Math.abs(Math.round(remC))}g 超過しています`});
+  if(remP<-5)alts.push({type:'warn',msg:`タンパク質を ${Math.abs(Math.round(remP))}g 超過しています`});
+  if(alts.length===0){
+    if(remP>15)alts.push({type:'info',msg:`タンパク質があと ${Math.round(remP)}g 不足しています`});
+    else alts.push({type:'ok',msg:'栄養バランス良好です'});
+  }
   document.getElementById('s-alerts').innerHTML=alts.map(a=>`<div class="alt a${a.type}">${a.type==='warn'?'⚠️':a.type==='ok'?'✅':'ℹ️'} ${a.msg}</div>`).join('');
   const filtered=applyHardFilters(ALL_FOODS,t,remK);
   const scored=filtered.map(f=>scoreFood(f,t,m,remK,recentIds)).filter(f=>f.score>-5).sort((a,b)=>b.score-a.score).slice(0,20);
@@ -1562,7 +1743,11 @@ function renderSuggest(){
     },
   };
 
-  document.getElementById('slist').innerHTML=scored.length===0?`<p style="font-size:12px;color:var(--text-h);padding:8px 0">条件に合うメニューがありません</p>`:scored.map((f,i)=>{
+  document.getElementById('slist').innerHTML=scored.length===0?`
+    <div style="text-align:center;padding:24px 0 16px">
+      <img src="${MESHINEKO_IMGS.sad}" style="width:120px;height:120px;object-fit:contain;mix-blend-mode:multiply;display:block;margin:0 auto 12px">
+      <div style="font-size:13px;font-weight:700;color:var(--main-m);line-height:1.7">おすすめできる料理が<br>見つからなかったにゃ…</div>
+    </div>`:scored.map((f,i)=>{
     const rank=i+1;
     const ts=topStyles[rank];
     const estTag=f.estimated?`<span class="chip chip-warn">推定値</span>`:'';
@@ -1699,6 +1884,37 @@ function rmF(i){
 }
 
 // ========== 食品登録モーダル ==========
+function toggleMtLabel(code){
+  const el=document.getElementById('mt-label-'+code);
+  const cb=document.getElementById('reg-mt-'+code);
+  if(!el||!cb)return;
+  if(cb.checked){
+    el.style.background='var(--pu-l)';
+    el.style.borderColor='var(--main-m)';
+    el.style.color='var(--main-m)';
+    el.style.fontWeight='700';
+  }else{
+    el.style.background='var(--bg-s)';
+    el.style.borderColor='var(--border)';
+    el.style.color='';
+    el.style.fontWeight='';
+  }
+}
+
+function getRegMealTime(){
+  const codes=['B','L','D','S'];
+  const selected=codes.filter(c=>document.getElementById('reg-mt-'+c)?.checked);
+  return selected.length>0?selected:null;
+}
+
+function resetMealTimeUI(){
+  ['B','L','D','S'].forEach(c=>{
+    const cb=document.getElementById('reg-mt-'+c);
+    if(cb)cb.checked=false;
+    toggleMtLabel(c);
+  });
+}
+
 function openRegModal(){document.getElementById('reg-modal').classList.add('open')}
 function closeRegModal(){
   document.getElementById('reg-modal').classList.remove('open');
@@ -1716,17 +1932,17 @@ async function submitFood(){
   const name=document.getElementById('reg-name').value.trim();
   const store=document.getElementById('reg-store').value.trim();
   const type=document.getElementById('reg-type').value;
-  const kcal=parseInt(document.getElementById('reg-kcal').value);
-  const protein=parseFloat(document.getElementById('reg-protein').value);
-  const fat=parseFloat(document.getElementById('reg-fat').value);
-  const carb=parseFloat(document.getElementById('reg-carb').value);
+  const kcal=parseInt(document.getElementById('reg-kcal').value)||0;
+  const protein=parseFloat(document.getElementById('reg-protein').value)||0;
+  const fat=parseFloat(document.getElementById('reg-fat').value)||0;
+  const carb=parseFloat(document.getElementById('reg-carb').value)||0;
+  if(!(kcal||protein||fat||carb))document.getElementById('reg-estimated').checked=true;
   const desc=document.getElementById('reg-desc').value.trim()||null;
   const gluten=document.getElementById('reg-gluten').checked;
   const meat=document.getElementById('reg-meat').checked;
   const estimated=document.getElementById('reg-estimated').checked;
   const errEl=document.getElementById('reg-err');
   if(!name||!store){errEl.textContent='メニュー名と店名は必須です';errEl.style.display='block';return}
-  if(isNaN(kcal)||isNaN(protein)||isNaN(fat)||isNaN(carb)){errEl.textContent='栄養成分を正しく入力してください';errEl.style.display='block';return}
   errEl.style.display='none';
   const btn=document.getElementById('reg-submit-btn');btn.disabled=true;btn.textContent='登録中...';
   try{
@@ -1736,12 +1952,13 @@ async function submitFood(){
       const{error:upErr}=await sb.storage.from('food-images').upload(path,regImageFile,{contentType:regImageFile.type});
       if(!upErr){const{data:urlData}=sb.storage.from('food-images').getPublicUrl(path);image_url=urlData.publicUrl}
     }
-    const{error}=await sb.from('foods').insert([{name,store,type,kcal,protein,fat,carb,gluten,meat,estimated,desc,image_url}]);
+    const{error}=await sb.from('foods').insert([{name,store,type,kcal,protein,fat,carb,gluten,meat,estimated,desc,image_url,meal_time:getRegMealTime()}]);
     if(error)throw error;
     closeRegModal();btn.disabled=false;btn.textContent='データベースに登録する';
     showToast('登録しました！ありがとうございます');
     ['reg-name','reg-store','reg-kcal','reg-protein','reg-fat','reg-carb','reg-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
     document.getElementById('reg-gluten').checked=false;document.getElementById('reg-meat').checked=false;document.getElementById('reg-estimated').checked=false;
+    resetMealTimeUI();
   }catch(e){errEl.textContent='登録に失敗しました: '+e.message;errEl.style.display='block';btn.disabled=false;btn.textContent='データベースに登録する';}
 }
 
@@ -1866,11 +2083,13 @@ function resetSetup(){
   S.gender='male';S.age=30;S.ht=170;S.wt=65;S.act=1.2;S.goal='maintain';
   S.restrictions=[];S.autoMacro=true;S.preferredChains=[];
   gV='male';aV=1.2;goalV='maintain';agreedToTerms=false;
-  // ステップ1に戻す
+  // オンボーディング画面から開始
   document.getElementById('bnav').style.display='none';
-  ['s-main'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('active')});
-  ['s1','s2','s3','s4','s5'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('active')});
-  document.getElementById('s1').classList.add('active');
+  ['s-main','s1','s2','s3','s4','s5'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('active');});
+  // オンボーディングをリセットして表示
+  _onbStep=0;
+  _onbUpdateUI();
+  document.getElementById('s0').classList.add('active');
   // 同意チェックをリセット
   const chk=document.getElementById('agree-chk');
   if(chk){chk.classList.remove('on');chk.textContent='';}
@@ -2310,15 +2529,20 @@ function checkVersion(){
   } else {
     // 途中のステップから再開（s-mainは非表示のまま）
     const step=loadStep();
-    const targetStep=step>=1&&step<=5?step:1;
-    ['s1','s2','s3','s4','s5','s-main'].forEach(id=>{
+    // プロフィール未登録かつ初回のみオンボーディングを表示
+    const targetStep=step>=1&&step<=5?step:0;
+    ['s0','s1','s2','s3','s4','s5','s-main'].forEach(id=>{
       const el=document.getElementById(id);
       if(el)el.classList.remove('active');
     });
     if(targetStep===3)buildGoalOptions();
     if(targetStep===5)buildChainSelect();
-    const target=document.getElementById('s'+targetStep);
-    if(target)target.classList.add('active');
+    if(targetStep===0){
+      document.getElementById('s0').classList.add('active');
+    }else{
+      const target=document.getElementById('s'+targetStep);
+      if(target)target.classList.add('active');
+    }
   }
 
 // 時刻を1分ごとに更新
