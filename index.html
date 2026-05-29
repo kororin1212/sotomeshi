@@ -1828,7 +1828,6 @@ let _pendingFoodCallback=null;
 
 function _addFood(id,mealTime){
   const f=ALL_FOODS.find(f=>String(f.id)===String(id));
-  console.log("[addFood]",id,"found:",!!f,"ALL_FOODS:",ALL_FOODS.length);
   if(!f)return null;
   // 時間帯を付与して保存
   const entry={...f,mealTime:mealTime||_guessCurrentMealTime(),addedAt:new Date().toISOString()};
