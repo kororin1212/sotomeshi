@@ -1893,6 +1893,17 @@ function cancelMealTime(){
 }
 function confirmMealTime(mealTime){
   document.getElementById('mealtime-modal').classList.remove('open');
+  // 新規登録からの場合：newFoodを直接追加
+  if(window._regNewFood){
+    const f=window._regNewFood;
+    window._regNewFood=null;
+    const entry={...f,mealTime,addedAt:new Date().toISOString()};
+    S.eaten.push(entry);
+    S.weeklyTotals.protein+=f.protein;S.weeklyTotals.fat+=f.fat;S.weeklyTotals.carb+=f.carb;S.weeklyTotals.kcal+=f.kcal;
+    saveMeals();saveProfile();
+    renderHome();renderKiroku();
+    return;
+  }
   if(_pendingFoodId&&_addFood(_pendingFoodId,mealTime)){
     if(_pendingFoodCallback)_pendingFoodCallback();
   }
@@ -1988,11 +1999,20 @@ async function submitFood(){
     renderDayPlan();filterF(document.getElementById('fsearch')?.value||'');
     closeRegModal();btn.disabled=false;btn.textContent='データベースに登録する';
     showToast('登録しました！');
-    // 少し遅延してから時間帯モーダルを表示（closeRegModalのアニメーション後）
-    setTimeout(()=>showMealTimeModal(tmpId,()=>{renderHome();renderKiroku();}),300);
+    // フォームリセット
     ['reg-name','reg-store','reg-kcal','reg-protein','reg-fat','reg-carb','reg-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
     document.getElementById('reg-gluten').checked=false;document.getElementById('reg-meat').checked=false;document.getElementById('reg-estimated').checked=false;
     resetMealTimeUI();
+    // 時間帯モーダルを表示し、newFoodを直接食事記録に追加（tmpIdに依存しない）
+    setTimeout(()=>{
+      document.getElementById('mealtime-food-name').textContent=newFood.name;
+      document.getElementById('mealtime-food-store').textContent=newFood.store;
+      _pendingFoodId=null;
+      _pendingFoodCallback=null;
+      // confirmMealTimeで直接newFoodを使うよう上書き
+      window._regNewFood=newFood;
+      document.getElementById('mealtime-modal').classList.add('open');
+    },300);
   }catch(e){errEl.textContent='登録に失敗しました: '+e.message;errEl.style.display='block';btn.disabled=false;btn.textContent='データベースに登録する';}
 }
 
