@@ -432,7 +432,7 @@ body{
       <button class="mealtime-btn" onclick="confirmMealTime('朝食')" style="padding:14px;background:linear-gradient(135deg,#FFF7E6,#FEF3C7);border:2px solid #FCD34D;border-radius:var(--r);font-size:14px;font-weight:700;color:#92400E;cursor:pointer;font-family:inherit">🌅 朝食</button>
       <button class="mealtime-btn" onclick="confirmMealTime('昼食')" style="padding:14px;background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:2px solid #86EFAC;border-radius:var(--r);font-size:14px;font-weight:700;color:#166534;cursor:pointer;font-family:inherit">☀️ 昼食</button>
       <button class="mealtime-btn" onclick="confirmMealTime('夕食')" style="padding:14px;background:linear-gradient(135deg,#EEF2FF,#E0E7FF);border:2px solid #A5B4FC;border-radius:var(--r);font-size:14px;font-weight:700;color:#3730A3;cursor:pointer;font-family:inherit">🌙 夕食</button>
-      <button class="mealtime-btn" onclick="confirmMealTime('その他')" style="padding:14px;background:linear-gradient(135deg,#F3F4F6,#E5E7EB);border:2px solid #9CA3AF;border-radius:var(--r);font-size:14px;font-weight:700;color:#4B5563;cursor:pointer;font-family:inherit;grid-column:1/-1">🍽️ その他</button>
+      <button class="mealtime-btn" onclick="confirmMealTime('その他')" style="padding:14px;background:linear-gradient(135deg,#F3F4F6,#E5E7EB);border:2px solid #9CA3AF;border-radius:var(--r);font-size:14px;font-weight:700;color:#4B5563;cursor:pointer;font-family:inherit">🍽️ その他</button>
     </div>
     <button onclick="cancelMealTime()" style="width:100%;padding:10px;background:none;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;font-weight:700;color:var(--text-s);cursor:pointer;font-family:inherit">← 選択をやめる</button>
   </div>
@@ -1828,6 +1828,7 @@ let _pendingFoodCallback=null;
 
 function _addFood(id,mealTime){
   const f=ALL_FOODS.find(f=>String(f.id)===String(id));
+  console.log("[addFood]",id,"found:",!!f,"ALL_FOODS:",ALL_FOODS.length);
   if(!f)return null;
   // 時間帯を付与して保存
   const entry={...f,mealTime:mealTime||_guessCurrentMealTime(),addedAt:new Date().toISOString()};
@@ -1854,7 +1855,7 @@ function showMealTimeModal(id,callback){
   // デフォルト時間帯をハイライト
   const guess=_guessCurrentMealTime();
   document.querySelectorAll('.mealtime-btn').forEach(b=>{
-    const label=b.textContent.replace(/[🌅☀️🌙🍩🌃\s]/g,'');
+    const label=b.textContent.replace(/[🌅☀️🌙🍽️\s]/g,'');
     b.style.opacity=label===guess?'1':'0.7';
     b.style.transform=label===guess?'scale(1.03)':'scale(1)';
   });
@@ -1953,18 +1954,18 @@ async function submitFood(){
     }
     const{error}=await sb.from('foods').insert([{name,store,type,kcal,protein,fat,carb,gluten,meat,estimated,desc,image_url,meal_time:getRegMealTime()}]);
     if(error)throw error;
-    // 登録したデータをALL_FOODSに即時追加（プレフィックスなしで直接追加）
+    // 登録したデータをALL_FOODSに即時追加
     const tmpId='db-tmp-'+Date.now();
+    const mealTimeVal=getRegMealTime();
     const newFood={name,store,type,kcal,protein,fat,carb,gluten,meat,estimated,
-      meal_time:getRegMealTime()||['L','D'],role:'main',id:tmpId};
-    ALL_FOODS.push(newFood); // mergeFoodsを経由せず直接追加
+      meal_time:mealTimeVal||['L','D'],role:'main',id:tmpId};
+    ALL_FOODS.push(newFood);
     updateDBCount();
-    // 画面を更新
     renderDayPlan();filterF(document.getElementById('fsearch')?.value||'');
     closeRegModal();btn.disabled=false;btn.textContent='データベースに登録する';
     showToast('登録しました！');
-    // 時間帯モーダルを出して食事記録に追加
-    showMealTimeModal(tmpId,()=>{renderHome();renderKiroku();});
+    // 少し遅延してから時間帯モーダルを表示（closeRegModalのアニメーション後）
+    setTimeout(()=>showMealTimeModal(tmpId,()=>{renderHome();renderKiroku();}),300);
     ['reg-name','reg-store','reg-kcal','reg-protein','reg-fat','reg-carb','reg-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
     document.getElementById('reg-gluten').checked=false;document.getElementById('reg-meat').checked=false;document.getElementById('reg-estimated').checked=false;
     resetMealTimeUI();
