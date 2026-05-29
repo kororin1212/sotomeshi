@@ -1347,8 +1347,8 @@ async function goMain(){
   await loadFoodsFromDB();
   subscribeRealtime();
   checkDateAndShowReview();
-  // DBロード完了後におすすめを更新
-  if(document.getElementById("t-suggest").style.display!=="none")renderSuggest();
+  renderSuggest();
+  document.getElementById('total-count').textContent=ALL_FOODS.length;
 }
 
 // ========== 1日の食事プラン生成（調査データに基づく） ==========
@@ -1357,11 +1357,16 @@ function renderDayPlan(){
   if(!el){return;}
   console.log('[DayPlan] ALL_FOODS='+ALL_FOODS.length);
 
-  // セッション内で一度生成した献立を保持（リロードで変わらない）
-  const savedKey='sotomeshi_dayplan_'+new Date().toDateString();
+  // 当日の献立をlocalStorageに保存（リロードで変わらない）
+  const planKey='sotomeshi_dayplan_'+new Date().toDateString();
   try{
-    const saved=sessionStorage.getItem(savedKey);
-    if(saved&&window._currentPlans){renderPlanHTML(window._currentPlans);return;}
+    const saved=localStorage.getItem(planKey);
+    if(saved){
+      const plans=JSON.parse(saved);
+      window._currentPlans=plans;
+      renderPlanHTML(plans);
+      return;
+    }
   }catch(e){}
 
   const tgt=S.tgt||2000;
@@ -1444,6 +1449,8 @@ function renderDayPlan(){
   // グローバルに保持（個別シャッフル用）
   window._currentPlans=plans;
   window._pickMealFn=pickMeal;
+  // localStorageに保存（リロードで変わらない）
+  try{localStorage.setItem('sotomeshi_dayplan_'+new Date().toDateString(),JSON.stringify(plans));}catch(e){}
   renderPlanHTML(plans);
 }
 
@@ -1483,7 +1490,7 @@ function renderPlanHTML(plans){
 }
 
 function reshuffleAll(){
-  try{sessionStorage.removeItem('sotomeshi_dayplan_'+new Date().toDateString());}catch(e){}
+  try{localStorage.removeItem('sotomeshi_dayplan_'+new Date().toDateString());}catch(e){}
   window._currentPlans=null;
   const el=document.getElementById('day-plan-wrap');
   if(!el)return;
@@ -1561,6 +1568,7 @@ function _doReshuffleMeal(idx){
   }
   plans[idx].meal={main:mainPick,side:sidePick,kcal:(mainPick.kcal+(sidePick?sidePick.kcal:0))};
   window._currentPlans=plans;
+  try{localStorage.setItem('sotomeshi_dayplan_'+new Date().toDateString(),JSON.stringify(plans));}catch(e){}
   renderPlanHTML(plans);
   showToast(`${md.lbl}を変えたにゃ！`);
 }
@@ -2545,9 +2553,13 @@ function checkVersion(){
     document.getElementById('m-f').value=S.macros.fat;document.getElementById('m-c').value=S.macros.carb;
     document.getElementById('total-count').textContent=INIT_FOODS.length+MEXT_FOODS.length;
     renderHome();renderDayPlan();renderKiroku();updateMeshiko();
-    loadFoodsFromDB().then(()=>{subscribeRealtime();checkDateAndShowReview();
-      // DBロード完了後にALL_FOODSが増えたのでおすすめを再描画
-      if(document.getElementById('t-suggest')&&document.getElementById('t-suggest').style.display!=='none')renderSuggest();
+    loadFoodsFromDB().then(()=>{
+      subscribeRealtime();
+      checkDateAndShowReview();
+      // DBロード完了後は常にrenderSuggestを更新（タブが非表示でもデータを準備）
+      renderSuggest();
+      // 件数表示も更新
+      document.getElementById('total-count').textContent=ALL_FOODS.length;
     });
   } else {
     // 途中のステップから再開（s-mainは非表示のまま）
