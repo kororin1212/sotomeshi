@@ -1142,7 +1142,7 @@ function loadWeightLogs(){try{return JSON.parse(localStorage.getItem(LS_WEIGHT)|
 async function loadFoodsFromDB(){
   try{const{data,error}=await sb.from('foods').select('*').order('created_at',{ascending:false});if(error)throw error;dbFoods=data||[];mergeFoods();updateDBCount()}catch(e){console.warn(e.message)}
 }
-function mergeFoods(){ALL_FOODS=[...INIT_FOODS,...MEXT_FOODS,...dbFoods.map(f=>({...f,id:'db-'+f.id,meal_time:f.meal_time||['L','D']}))]}
+function mergeFoods(){ALL_FOODS=[...INIT_FOODS,...MEXT_FOODS,...dbFoods.map(f=>({...f,id:'db-'+f.id,meal_time:f.meal_time||['L','D'],role:f.role||'main'}))]}
 function updateDBCount(){const el=document.getElementById('db-count');if(el)el.textContent=dbFoods.length}
 function subscribeRealtime(){
   sb.channel('foods').on('postgres_changes',{event:'INSERT',schema:'public',table:'foods'},payload=>{
