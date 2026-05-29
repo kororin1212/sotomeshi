@@ -309,6 +309,8 @@ body{
 .chain-select{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
 .chain-opt{padding:7px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;color:var(--text-s);background:var(--bg-s);font-family:inherit;font-weight:700;transition:all .2s}
 .chain-opt.on{background:linear-gradient(135deg,#7C3AED,#C084FC);color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(124,58,237,0.3)}
+.reg-cat-label{padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;color:var(--text-s);background:var(--bg-s);font-weight:700;transition:all .2s;user-select:none}
+.reg-cat-label.on{background:linear-gradient(135deg,var(--main-m),var(--pu));color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(124,58,237,0.25)}
 
 /* ===== 食事プランカード ===== */
 .plan-card{
@@ -381,7 +383,7 @@ body{
 <div class="modal-bg" id="review-modal">
   <div class="modal" style="padding-bottom:36px">
     <div style="text-align:center;margin-bottom:16px">
-      <img id="review-meshineko" src="" style="width:90px;height:90px;object-fit:contain;mix-blend-mode:multiply;margin-bottom:4px">
+      <img id="review-meshineko" src="" style="width:90px;height:90px;object-fit:contain;margin-bottom:4px">
       <div id="review-meshineko-msg" style="font-size:13px;font-weight:700;color:var(--main-m);line-height:1.6"></div>
     </div>
     <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px;text-align:center">📋 昨日の振り返り</div>
@@ -453,6 +455,27 @@ body{
     <div class="fld"><label>種別</label>
       <select id="reg-type"><option value="chain">チェーン店</option><option value="super">お惣菜</option><option value="conv">コンビニ</option><option value="recipe">自炊</option><option value="other">その他</option></select>
     </div>
+
+    <!-- カテゴリ（複数選択可） -->
+    <div class="fld">
+      <label>カテゴリ（複数選択可）</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px" id="reg-category-wrap">
+        <label class="reg-cat-label" data-cat="donburi"><input type="checkbox" value="donburi" style="display:none"> 🍚 丼もの</label>
+        <label class="reg-cat-label" data-cat="teishoku"><input type="checkbox" value="teishoku" style="display:none"> 🍱 定食</label>
+        <label class="reg-cat-label" data-cat="noodle"><input type="checkbox" value="noodle" style="display:none"> 🍜 麺類</label>
+        <label class="reg-cat-label" data-cat="curry"><input type="checkbox" value="curry" style="display:none"> 🍛 カレー</label>
+        <label class="reg-cat-label" data-cat="sushi"><input type="checkbox" value="sushi" style="display:none"> 🍣 寿司</label>
+        <label class="reg-cat-label" data-cat="rice"><input type="checkbox" value="rice" style="display:none"> 🍙 ご飯・おにぎり</label>
+        <label class="reg-cat-label" data-cat="bread"><input type="checkbox" value="bread" style="display:none"> 🥪 パン・サンド</label>
+        <label class="reg-cat-label" data-cat="salad"><input type="checkbox" value="salad" style="display:none"> 🥗 サラダ・野菜</label>
+        <label class="reg-cat-label" data-cat="soup"><input type="checkbox" value="soup" style="display:none"> 🍵 スープ・汁物</label>
+        <label class="reg-cat-label" data-cat="side"><input type="checkbox" value="side" style="display:none"> 🍟 サイド・単品</label>
+        <label class="reg-cat-label" data-cat="sweet"><input type="checkbox" value="sweet" style="display:none"> 🍰 スイーツ</label>
+        <label class="reg-cat-label" data-cat="drink"><input type="checkbox" value="drink" style="display:none"> ☕ ドリンク</label>
+        <label class="reg-cat-label" data-cat="other"><input type="checkbox" value="other" style="display:none"> 🍽️ その他</label>
+      </div>
+    </div>
+
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
       <div class="fld"><label>カロリー (kcal)</label><input type="number" id="reg-kcal" placeholder="例: 687" min="0"></div>
       <div class="fld"><label>タンパク質 (g)</label><input type="number" id="reg-protein" placeholder="例: 17.1" step="0.1"></div>
@@ -479,9 +502,13 @@ body{
       </div>
     </div>
     <div class="fld"><label>備考（任意）</label><input type="text" id="reg-desc" placeholder="例: みそ汁付き"></div>
-    <div style="display:flex;gap:14px;margin-bottom:11px">
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:11px">
       <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="reg-gluten" style="width:15px;height:15px"> グルテン含む</label>
-      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="reg-meat" style="width:15px;height:15px"> 肉・魚含む</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="reg-meat" style="width:15px;height:15px"> 肉類含む</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="reg-fish" style="width:15px;height:15px"> 魚介含む</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="reg-veg" style="width:15px;height:15px"> 野菜主体</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="reg-sweet" style="width:15px;height:15px"> スイーツ系</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="reg-takeout" style="width:15px;height:15px"> テイクアウト可</label>
       <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="reg-estimated" style="width:15px;height:15px"> 推定値</label>
     </div>
     <div class="fld"><label>写真（任意）</label>
@@ -517,25 +544,25 @@ body{
   <div id="onb-slides">
     <!-- スライド1 -->
     <div class="onb-slide" id="onb-0" style="display:block;background:#fff;border-radius:var(--rl);border:1.5px solid var(--border);box-shadow:var(--sh-s);margin-bottom:12px;padding:24px 20px">
-      <div style="text-align:center"><img src="https://raw.githubusercontent.com/kororin1212/sotomeshi/main/meshineko_joy.png" style="width:140px;height:auto;mix-blend-mode:multiply"></div>
+      <div style="text-align:center"><img src="https://raw.githubusercontent.com/kororin1212/sotomeshi/main/meshineko_joy.png" style="width:auto;height:140px;object-fit:contain"></div>
       <div style="text-align:center;font-size:17px;font-weight:800;color:var(--main-m);margin:12px 0 8px">ようこそ、ソトメシへ！</div>
       <div style="text-align:center;font-size:14px;color:var(--text);line-height:1.9;font-weight:600">メシネコがあなたの食事を<br>サポートするにゃ！</div>
     </div>
     <!-- スライド2 -->
     <div class="onb-slide" id="onb-1" style="display:none;background:#fff;border-radius:var(--rl);border:1.5px solid var(--border);box-shadow:var(--sh-s);margin-bottom:12px;padding:24px 20px">
-      <div style="text-align:center"><img src="https://raw.githubusercontent.com/kororin1212/sotomeshi/main/meshineko_balance.png" style="width:120px;height:auto;mix-blend-mode:multiply"></div>
+      <div style="text-align:center"><img src="https://raw.githubusercontent.com/kororin1212/sotomeshi/main/meshineko_balance.png" style="width:auto;height:120px;object-fit:contain"></div>
       <div style="text-align:center;font-size:16px;font-weight:800;color:var(--main-m);margin:12px 0 8px">おすすめ食事を提案</div>
       <div style="text-align:center;font-size:14px;color:var(--text);line-height:1.9;font-weight:600">あなたの目標・制限に合わせて<br>毎日の食事をおすすめするにゃ！<br>栄養バランスも自動で管理するにゃ！</div>
     </div>
     <!-- スライド3 -->
     <div class="onb-slide" id="onb-2" style="display:none;background:#fff;border-radius:var(--rl);border:1.5px solid var(--border);box-shadow:var(--sh-s);margin-bottom:12px;padding:24px 20px">
-      <div style="text-align:center"><img src="https://raw.githubusercontent.com/kororin1212/sotomeshi/main/meshineko_joy.png" style="width:120px;height:auto;mix-blend-mode:multiply"></div>
+      <div style="text-align:center"><img src="https://raw.githubusercontent.com/kororin1212/sotomeshi/main/meshineko_joy.png" style="width:auto;height:120px;object-fit:contain"></div>
       <div style="text-align:center;font-size:16px;font-weight:800;color:var(--main-m);margin:12px 0 8px">将来の夢</div>
       <div style="text-align:center;font-size:14px;color:var(--text);line-height:1.9;font-weight:600">ゆくゆくは位置情報と連携して<br>近くの飲食店メニューから<br>おすすめを出せるようにしたいにゃ！</div>
     </div>
     <!-- スライド4 -->
     <div class="onb-slide" id="onb-3" style="display:none;background:#fff;border-radius:var(--rl);border:1.5px solid var(--border);box-shadow:var(--sh-s);margin-bottom:12px;padding:24px 20px">
-      <div style="text-align:center"><img src="https://raw.githubusercontent.com/kororin1212/sotomeshi/main/meshineko_fun.png" style="width:120px;height:auto;mix-blend-mode:multiply"></div>
+      <div style="text-align:center"><img src="https://raw.githubusercontent.com/kororin1212/sotomeshi/main/meshineko_fun.png" style="width:auto;height:120px;object-fit:contain"></div>
       <div style="text-align:center;font-size:16px;font-weight:800;color:var(--main-m);margin:12px 0 8px">データ登録のお願い</div>
       <div style="text-align:center;font-size:14px;color:var(--text);line-height:1.9;font-weight:600">そのためには食品データが必要にゃ。<br>知っているメニューがあれば<br>ぜひ登録してほしいにゃ！<br><span style="font-size:12px;color:var(--text-h)">（もちろん使うだけでも大歓迎にゃ！）</span></div>
     </div>
@@ -625,11 +652,17 @@ body{
   <div class="card">
     <div class="card-title">よく行くチェーン・店を登録</div>
     <div style="font-size:11px;color:var(--text-s);margin-bottom:10px">登録したチェーンのメニューを提案で優先します</div>
+
+    <!-- 選択済みリスト（常に上部に表示） -->
+    <div style="font-size:11px;font-weight:700;color:var(--text-s);margin-bottom:6px">登録済み</div>
+    <div id="chain-selected-list" style="display:flex;flex-wrap:wrap;gap:6px;min-height:36px;padding:8px;background:var(--bg-s);border-radius:var(--r);border:1px dashed var(--border);margin-bottom:12px"></div>
+
+    <!-- 検索 -->
+    <div style="font-size:11px;font-weight:700;color:var(--text-s);margin-bottom:6px">店名で追加</div>
     <div style="display:flex;gap:7px;margin-bottom:8px">
-      <input type="text" id="chain-search-in" placeholder="例：松屋、マクドナルド、吉野家..." style="flex:1;padding:8px 10px;border:0.5px solid var(--border-s);border-radius:var(--r);font-size:12px;background:var(--bg);color:var(--text);outline:none;font-family:inherit" oninput="searchChain(this.value)">
+      <input type="text" id="chain-search-in" placeholder="例：松屋、大戸屋、サイゼリヤ..." style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-size:12px;background:var(--bg);color:var(--text);outline:none;font-family:inherit" oninput="searchChain(this.value)">
     </div>
     <div id="chain-suggestions" style="margin-bottom:8px"></div>
-    <div id="chain-selected-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
     <div style="padding:8px 10px;background:var(--amber-l);border-radius:var(--r);font-size:10px;color:var(--amber);margin-top:4px">
       ⚠️ GPS機能は現在ご利用いただけません。アプリ版で対応予定です。
     </div>
@@ -747,7 +780,7 @@ body{
         </div>
       </div>
       <!-- メシネコ：常にこの位置（吹き出しの有無で動かない） -->
-      <img id="meshineko-img" src="" alt="メシネコ" style="width:240px;height:auto;display:block;margin:0 auto;mix-blend-mode:multiply">
+      <img id="meshineko-img" src="" alt="メシネコ" style="width:auto;height:220px;display:block;margin:0 auto;object-fit:contain;image-rendering:auto">
     </div>
 
     <!-- ④ キャラ変更ボタン（小さく） -->
@@ -901,23 +934,71 @@ body{
   </div>
 
   <!-- ランキングタブ -->
-  <div id="t-suggest" style="display:none;padding:14px 18px 0">
-    <div id="s-alerts"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <div>
-        <div style="font-size:14px;font-weight:700">🏆 おすすめランキング</div>
-        <div style="font-size:10px;color:var(--text-s);margin-top:2px" id="ranking-sub"></div>
+  <div id="t-suggest" style="display:none;padding:0">
+
+    <!-- アキネーター質問UI -->
+    <div id="akinator-wrap" style="min-height:100%;padding:14px 18px 20px">
+
+      <!-- フェーズ1：スタート画面 -->
+      <div id="aki-start" style="text-align:center;padding:20px 0 10px">
+        <div id="aki-chara-start" style="opacity:0;transform:translateY(20px);transition:all .5s cubic-bezier(.34,1.56,.64,1)">
+          <img id="aki-meshineko" src="" style="width:auto;height:180px;display:block;margin:0 auto 0;object-fit:contain">
+          <div id="aki-bubble-start" style="
+            background:linear-gradient(135deg,#fff,#FDF2F8);border:2.5px solid var(--pk);
+            border-radius:20px;padding:14px 18px;margin:10px auto;max-width:280px;
+            font-size:14px;font-weight:800;color:#6B21A8;line-height:1.8;
+            font-family:'Zen Maru Gothic',sans-serif;box-shadow:0 6px 24px rgba(244,114,182,0.2)
+          ">今日は何食べたいにゃ？<br>一緒に選ぶにゃ！🍽️</div>
+        </div>
+        <button onclick="startAkinator()" style="
+          background:linear-gradient(135deg,var(--main-m),var(--pu));color:#fff;
+          border:none;border-radius:30px;padding:14px 40px;font-size:15px;
+          font-weight:800;cursor:pointer;font-family:inherit;
+          box-shadow:0 6px 20px rgba(124,58,237,0.35);
+          transition:all .2s;letter-spacing:.5px;margin-top:8px
+        ">🍴 料理を選ぶ！</button>
       </div>
-      <div style="display:flex;gap:4px" id="time-period-btns">
-        <button onclick="setTimePeriod(null)" id="tp-auto" style="font-size:9px;padding:3px 8px;border-radius:20px;border:1.5px solid var(--pk-b);background:linear-gradient(135deg,var(--pk-l),var(--pu-l));color:var(--main-m);cursor:pointer;font-family:inherit;font-weight:700">自動</button>
-        <button onclick="setTimePeriod('朝')" id="tp-morning" style="font-size:9px;padding:3px 8px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg-s);color:var(--text-s);cursor:pointer;font-family:inherit;font-weight:700">朝</button>
-        <button onclick="setTimePeriod('昼')" id="tp-noon" style="font-size:9px;padding:3px 8px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg-s);color:var(--text-s);cursor:pointer;font-family:inherit;font-weight:700">昼</button>
-        <button onclick="setTimePeriod('夜')" id="tp-night" style="font-size:9px;padding:3px 8px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg-s);color:var(--text-s);cursor:pointer;font-family:inherit;font-weight:700">夜</button>
-        <button onclick="setTimePeriod('その他')" id="tp-other" style="font-size:9px;padding:3px 8px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg-s);color:var(--text-s);cursor:pointer;font-family:inherit;font-weight:700">その他</button>
+
+      <!-- フェーズ2：質問UI -->
+      <div id="aki-questions" style="display:none">
+
+        <!-- 進行バー -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+          <div id="aki-back-btn" onclick="akiBack()" style="
+            display:none;cursor:pointer;font-size:12px;font-weight:700;
+            color:var(--text-s);padding:5px 10px;background:var(--bg-s);
+            border-radius:20px;border:1.5px solid var(--border);
+          ">← 戻る</div>
+          <div style="flex:1;display:flex;gap:4px" id="aki-progress-dots"></div>
+        </div>
+
+        <!-- キャラ＋吹き出し -->
+        <div style="text-align:center;margin-bottom:4px">
+          <img id="aki-q-img" src="" style="width:auto;height:150px;object-fit:contain;display:block;margin:0 auto;transition:opacity .3s">
+          <div id="aki-q-bubble" style="
+            background:linear-gradient(135deg,#fff,#FDF2F8);border:2.5px solid var(--pk);
+            border-radius:20px;padding:12px 18px;margin:8px auto;max-width:290px;
+            font-size:14px;font-weight:800;color:#6B21A8;line-height:1.8;
+            font-family:'Zen Maru Gothic',sans-serif;box-shadow:0 4px 16px rgba(244,114,182,0.2);
+            opacity:0;transform:translateY(8px);transition:all .35s ease
+          "></div>
+        </div>
+
+        <!-- 選択肢 -->
+        <div id="aki-choices" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
       </div>
+
+      <!-- フェーズ3：ランキング結果 -->
+      <div id="aki-result" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <button onclick="resetAkinator()" style="font-size:12px;font-weight:700;color:var(--text-s);padding:5px 12px;background:var(--bg-s);border-radius:20px;border:1.5px solid var(--border);cursor:pointer;font-family:inherit">← やり直す</button>
+          <div style="font-size:13px;font-weight:700;color:var(--text)" id="aki-result-title">🏆 おすすめランキング</div>
+        </div>
+        <div style="font-size:10px;color:var(--text-s);margin-bottom:9px" id="aki-result-badge"></div>
+        <div id="aki-slist"></div>
+      </div>
+
     </div>
-    <div style="font-size:10px;color:var(--text-s);margin-bottom:9px" id="r-badge"></div>
-    <div id="slist"></div>
   </div>
 
   <!-- 店舗タブ -->
@@ -949,7 +1030,7 @@ body{
 
     <!-- メシネココメントエリア -->
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-      <img id="wt-meshineko-img" src="" style="width:108px;height:108px;object-fit:contain;mix-blend-mode:multiply;flex-shrink:0">
+      <img id="wt-meshineko-img" src="" style="width:108px;height:108px;object-fit:contain;flex-shrink:0">
       <div id="wt-meshineko-msg" style="background:linear-gradient(135deg,#fff,#FDF2F8);border:2px solid #FBCFE8;border-radius:16px;padding:10px 14px;font-size:12px;color:#6B21A8;font-weight:700;line-height:1.6;position:relative;flex:1">
         <div style="position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-right:10px solid #FBCFE8"></div>
         <div style="position:absolute;left:-7px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-right:9px solid #FDF2F8"></div>
@@ -1066,6 +1147,7 @@ body{
       </div>
       <div class="fld"><label>目標</label>
         <select id="st-goal" style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);background:var(--bg-s);outline:none;font-family:inherit">
+          <option value="none">特になし</option>
           <option value="lose">体重を減らしたい</option>
           <option value="maintain">現状維持したい</option>
           <option value="muscle">筋肉をつけたい</option>
@@ -1073,6 +1155,16 @@ body{
         </select>
       </div>
       <button class="btn-p" style="margin-top:2px" onclick="applyProfile()">プロフィールを更新</button>
+
+      <!-- よく行く店の再設定 -->
+      <div style="margin-top:20px;padding-top:16px;border-top:1px dashed var(--border)">
+        <div class="card-title" style="margin-bottom:8px">よく行くチェーン・店</div>
+        <div id="st-chain-selected" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;min-height:28px"></div>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="st-chain-search" placeholder="店名で検索して追加..." style="flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--r);font-size:12px;color:var(--text);background:var(--bg-s);outline:none;font-family:inherit" oninput="searchChainSt(this.value)">
+        </div>
+        <div id="st-chain-suggestions" style="margin-top:6px"></div>
+      </div>
     </div>
     <div class="card">
       <div class="card-title">利用規約</div>
@@ -1128,7 +1220,7 @@ body{
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M8 18v-6h4v6"/></svg>ホーム
   </button>
   <button class="nb" id="nb-suggest" onclick="sw('suggest')">
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="11" width="4" height="7" rx="1"/><rect x="8" y="7" width="4" height="11" rx="1"/><rect x="15" y="3" width="4" height="15" rx="1"/></svg>おすすめ
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2l2.5 5 5.5.8-4 3.9.9 5.5L10 14.5l-4.9 2.7.9-5.5L2 7.8l5.5-.8z"/></svg>料理を選ぶ！
   </button>
   <button class="nb" id="nb-kiroku" onclick="sw('kiroku')">
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h6a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>食事記録
@@ -1308,12 +1400,347 @@ const expStyle = document.createElement('style');
 expStyle.textContent = `@keyframes expToastIn{from{opacity:0;transform:translate(-50%,-60%)}to{opacity:1;transform:translate(-50%,-50%)}}`;
 document.head.appendChild(expStyle);
 
-// ========== チェーン一覧（検索候補） ==========
-const CHAINS=['松屋','マクドナルド','吉野家','すき家','なか卯','CoCo壱番屋','お惣菜','コンビニ','自炊'];
+// ========== アキネーター ==========
+const AKI_QUESTIONS = {
+  q1: {
+    q: '今、どんな気分にゃ？',
+    e: 'fun',
+    choices: [
+      { label: '🍖 がっつり食べたい', next: 'q2a' },
+      { label: '🥗 さっぱりしたい',   next: 'q2b' },
+      { label: '🥦 栄養バランスを気にしたい', next: 'q2c' },
+      { label: '🍰 甘いものが食べたい', next: 'q3', tag: 'sweet' },
+    ]
+  },
+  q2a: {
+    q: 'どんなジャンルが食べたいにゃ？',
+    e: 'joy',
+    choices: [
+      { label: '🥩 お肉系',       next: 'q3', tag: 'meat' },
+      { label: '🍜 ラーメン・麺類', next: 'q3', tag: 'noodle' },
+      { label: '🍚 丼・定食',      next: 'q3', tag: 'donburi' },
+      { label: '🤷 なんでもいい',  next: 'q3', tag: 'gattsuri' },
+    ]
+  },
+  q2b: {
+    q: 'どのくらい軽めにしたいにゃ？',
+    e: 'balance',
+    choices: [
+      { label: '🥗 サラダ・野菜多め', next: 'q3', tag: 'salad' },
+      { label: '🐟 魚・和食系',       next: 'q3', tag: 'fish' },
+      { label: '🍵 麺・スープ系',     next: 'q3', tag: 'soup' },
+      { label: '🤷 なんでもいい',     next: 'q3', tag: 'light' },
+    ]
+  },
+  q2c: {
+    q: '特に意識したいのはどれにゃ？',
+    e: 'ganba',
+    choices: [
+      { label: '💪 たんぱく質を摂りたい', next: 'q3', tag: 'high_protein' },
+      { label: '🔥 カロリーを抑えたい',   next: 'q3', tag: 'low_cal' },
+      { label: '🫒 脂質を抑えたい',       next: 'q3', tag: 'low_fat' },
+      { label: '🌾 糖質を抑えたい',       next: 'q3', tag: 'low_carb' },
+      { label: '⚖️ バランスよく摂りたい', next: 'q3', tag: 'balance' },
+    ]
+  },
+  q3: {
+    q: 'どこで食べるにゃ？',
+    e: 'fun',
+    choices: [
+      { label: '🏠 家で食べたい（自炊する）',    next: 'result', tag: 'cook' },
+      { label: '📦 家で食べたい（テイクアウト）', next: 'result', tag: 'takeout' },
+      { label: '🍽️ 外食したい',                  next: 'result', tag: 'dine' },
+    ]
+  },
+};
+
+let _akiHistory = []; // 戻る用履歴 [{qKey, choiceIdx, tag}]
+let _akiTags = [];    // 選択されたタグ群
+
+function startAkinator() {
+  _akiHistory = [];
+  _akiTags = [];
+  document.getElementById('aki-start').style.display = 'none';
+  document.getElementById('aki-questions').style.display = 'block';
+  document.getElementById('aki-result').style.display = 'none';
+  showAkiQuestion('q1');
+}
+
+function resetAkinator() {
+  _akiHistory = [];
+  _akiTags = [];
+  document.getElementById('aki-start').style.display = 'block';
+  document.getElementById('aki-questions').style.display = 'none';
+  document.getElementById('aki-result').style.display = 'none';
+  // スタート画面のキャラを再アニメ
+  setTimeout(()=>initAkiStart(), 100);
+}
+
+function showAkiQuestion(qKey) {
+  const q = AKI_QUESTIONS[qKey];
+  if(!q) return;
+
+  // 進行ドット更新
+  const totalSteps = 3;
+  const step = _akiHistory.length + 1;
+  const dots = document.getElementById('aki-progress-dots');
+  dots.innerHTML = Array.from({length: totalSteps}, (_,i) =>
+    `<div style="flex:1;height:5px;border-radius:3px;background:${i < step ? 'var(--pk)' : 'var(--border)'}; transition:background .3s"></div>`
+  ).join('');
+
+  // 戻るボタン
+  document.getElementById('aki-back-btn').style.display = _akiHistory.length > 0 ? 'block' : 'none';
+
+  // キャラ画像
+  const img = document.getElementById('aki-q-img');
+  img.style.opacity = '0';
+  setTimeout(() => {
+    img.src = MESHINEKO_IMGS[q.e] || MESHINEKO_IMGS.fun;
+    img.style.opacity = '1';
+  }, 150);
+
+  // 吹き出しアニメ
+  const bubble = document.getElementById('aki-q-bubble');
+  bubble.style.opacity = '0';
+  bubble.style.transform = 'translateY(8px)';
+  bubble.textContent = q.q;
+  setTimeout(() => {
+    bubble.style.opacity = '1';
+    bubble.style.transform = 'translateY(0)';
+  }, 200);
+
+  // 選択肢アニメ（順番にフェードイン）
+  const choicesEl = document.getElementById('aki-choices');
+  choicesEl.innerHTML = '';
+  q.choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.style.cssText = `
+      width:100%;padding:13px 16px;border-radius:14px;border:1.5px solid var(--border);
+      background:var(--bg);font-size:13px;font-weight:700;color:var(--text);
+      cursor:pointer;font-family:inherit;text-align:left;
+      box-shadow:0 2px 8px rgba(0,0,0,0.06);
+      opacity:0;transform:translateX(16px);
+      transition:all .25s ease, opacity .3s ease, transform .3s ease;
+    `;
+    btn.textContent = c.label;
+    btn.onmouseover = () => { btn.style.borderColor = 'var(--pk)'; btn.style.background = 'var(--pk-l)'; };
+    btn.onmouseout  = () => { btn.style.borderColor = 'var(--border)'; btn.style.background = 'var(--bg)'; };
+    btn.onclick = () => selectAkiChoice(qKey, i, c);
+    choicesEl.appendChild(btn);
+    setTimeout(() => {
+      btn.style.opacity = '1';
+      btn.style.transform = 'translateX(0)';
+    }, 300 + i * 80);
+  });
+}
+
+function selectAkiChoice(qKey, choiceIdx, choice) {
+  _akiHistory.push({ qKey, choiceIdx });
+  if(choice.tag) _akiTags.push(choice.tag);
+
+  if(choice.next === 'result') {
+    showAkiResult();
+  } else {
+    showAkiQuestion(choice.next);
+  }
+}
+
+function akiBack() {
+  if(_akiHistory.length === 0) return;
+  const last = _akiHistory.pop();
+  // 最後に追加したtagを除去
+  if(_akiTags.length > 0) _akiTags.pop();
+  showAkiQuestion(last.qKey);
+}
+
+function showAkiResult() {
+  document.getElementById('aki-questions').style.display = 'none';
+
+  // タグからフィルタ条件を組み立て
+  const tags = new Set(_akiTags);
+  const isDine    = tags.has('dine');
+  const isCook    = tags.has('cook');
+  const isTakeout = tags.has('takeout');
+  const isSweet   = tags.has('sweet');
+
+  const t = tots(); const m = S.macros; const tgt = S.tgt;
+  const recentIds = new Set(S.eaten.slice(-3).map(e=>String(e.id)));
+  const period = getTimePeriod();
+
+  let foods = ALL_FOODS.filter(f => !recentIds.has(String(f.id)));
+
+  // 場所フィルタ
+  if(isDine)    foods = foods.filter(f => f.store !== '自炊');
+  if(isCook)    foods = foods.filter(f => f.store === '自炊' || f.role === 'recipe');
+  if(isTakeout) foods = foods.filter(f => f.store !== '自炊');
+
+  // スコアリング
+  const scored = foods.map(f => {
+    let score = 0;
+    const remP = m.protein - t.protein;
+    const remF = m.fat - t.fat;
+    const remC = m.carb - t.carb;
+    const remK = tgt - t.kcal;
+    if(f.kcal <= remK * 1.1 && f.kcal > 0) score += 3;
+    if(tags.has('high_protein') && f.protein >= 20) score += 5;
+    if(tags.has('low_cal')      && f.kcal <= 500)   score += 5;
+    if(tags.has('low_fat')      && f.fat <= 15)      score += 5;
+    if(tags.has('low_carb')     && f.carb <= 30)     score += 5;
+    if(tags.has('balance')) {
+      if(f.protein>=15 && f.fat<=20 && f.carb>=20 && f.carb<=70) score += 6;
+    }
+    if(tags.has('meat')    && f.meat)                                             score += 4;
+    if(tags.has('noodle')  && f.category?.includes('noodle'))                    score += 4;
+    if(tags.has('donburi') && (f.category?.includes('donburi')||f.category?.includes('teishoku'))) score += 4;
+    if(tags.has('salad')   && (f.category?.includes('salad')||f.veg))            score += 4;
+    if(tags.has('fish')    && f.fish)                                             score += 4;
+    if(tags.has('soup')    && (f.category?.includes('soup')||f.category?.includes('noodle'))) score += 4;
+    if(tags.has('sweet')   && (f.category?.includes('sweet')||f.sweet))          score += 4;
+    if(tags.has('gattsuri')&& f.kcal >= 600) score += 3;
+    if(tags.has('light')   && f.kcal <= 400) score += 3;
+    if(tags.has('cook')    && f.store==='自炊') score += 4;
+    if(tags.has('takeout') && f.takeout) score += 2;
+    if(S.preferredChains.includes(f.store)) score += 3;
+    if(f.meal_time?.includes(period.slot)) score += 2;
+    return { ...f, _score: score };
+  });
+
+  const top20 = scored.sort((a,b) => b._score - a._score).slice(0, 20);
+
+  // タグバッジ
+  const tagLabels = {
+    high_protein:'高タンパク', low_cal:'低カロリー', low_fat:'低脂質',
+    low_carb:'低糖質', balance:'バランス', meat:'お肉系', noodle:'麺類',
+    donburi:'丼・定食', salad:'野菜多め', fish:'魚・和食', soup:'スープ系',
+    sweet:'甘いもの', gattsuri:'がっつり', light:'さっぱり',
+    dine:'外食', cook:'自炊', takeout:'テイクアウト',
+  };
+  const labelBadges = _akiTags.map(t => tagLabels[t]||t)
+    .map(l=>`<span style="background:var(--pk-l);color:var(--pk-d);font-size:9px;padding:2px 7px;border-radius:20px;font-weight:700;margin-right:3px">${l}</span>`).join('');
+
+  // === カットインアニメーション ===
+  // 1. キャラが中央にカットイン
+  const cutin = document.createElement('div');
+  cutin.id = 'aki-cutin';
+  cutin.style.cssText = `
+    position:fixed;inset:0;z-index:9000;
+    background:linear-gradient(135deg,rgba(124,58,237,0.92),rgba(236,72,153,0.88));
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    opacity:0;transition:opacity .3s;
+  `;
+  cutin.innerHTML = `
+    <div id="cutin-inner" style="text-align:center;transform:scale(.6);transition:transform .4s cubic-bezier(.34,1.56,.64,1)">
+      <img src="${MESHINEKO_IMGS.surprised}" style="width:auto;height:200px;object-fit:contain;display:block;margin:0 auto;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.3))">
+      <div style="
+        background:#fff;border-radius:24px;padding:14px 24px;margin:12px auto 0;max-width:280px;
+        font-size:16px;font-weight:800;color:#6B21A8;line-height:1.7;
+        font-family:'Zen Maru Gothic',sans-serif;
+        box-shadow:0 8px 32px rgba(0,0,0,0.2);
+      ">これがおすすめにゃ！！<br>ランキング発表にゃ✨</div>
+    </div>
+  `;
+  document.body.appendChild(cutin);
+
+  // フェードイン → スケールアップ
+  requestAnimationFrame(() => {
+    cutin.style.opacity = '1';
+    setTimeout(() => {
+      document.getElementById('cutin-inner').style.transform = 'scale(1)';
+    }, 50);
+  });
+
+  // 2. 1.8秒後にフェードアウトしてランキング表示
+  setTimeout(() => {
+    cutin.style.opacity = '0';
+    setTimeout(() => {
+      cutin.remove();
+      // ランキング描画
+      _renderAkiRanking(top20, labelBadges);
+    }, 300);
+  }, 1800);
+}
+
+function _renderAkiRanking(top20, labelBadges) {
+  const resultEl = document.getElementById('aki-result');
+  resultEl.style.display = 'block';
+  resultEl.style.opacity = '0';
+  resultEl.style.transform = 'translateY(16px)';
+  resultEl.style.transition = 'all .4s ease';
+
+  document.getElementById('aki-result-badge').innerHTML = labelBadges;
+
+  const listEl = document.getElementById('aki-slist');
+  if(top20.length === 0) {
+    listEl.innerHTML = `<div style="text-align:center;padding:32px 0">
+      <img src="${MESHINEKO_IMGS.sad}" style="width:auto;height:120px;object-fit:contain;margin-bottom:12px;display:block;margin:0 auto 12px">
+      <div style="font-size:13px;font-weight:700;color:var(--main-m)">条件に合う料理が<br>見つからなかったにゃ…<br>条件を変えてみてにゃ</div>
+    </div>`;
+  } else {
+    listEl.innerHTML = top20.map((f, i) => {
+      const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':`<span style="font-size:11px;color:var(--text-h);font-weight:800">${i+1}</span>`;
+      const pct = Math.min(100, Math.round(f._score / (top20[0]._score||1) * 100));
+      return `<div style="
+        background:var(--bg);border-radius:var(--r);border:1px solid var(--border);
+        padding:11px 13px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,.04);
+        opacity:0;transform:translateX(20px);transition:all .35s ease;
+      " data-aki-item="${i}">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:${i<3?'22':'14'}px;min-width:28px;text-align:center">${medal}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${f.name}</div>
+            <div style="font-size:10px;color:var(--text-s);margin-top:1px">${f.store||''} · ${f.kcal}kcal · P${f.protein}g · F${f.fat}g · C${f.carb}g</div>
+            <div style="height:3px;background:var(--border);border-radius:2px;margin-top:5px;overflow:hidden">
+              <div style="height:3px;background:linear-gradient(90deg,var(--pk),var(--pu));border-radius:2px;width:0%;transition:width .8s ease" data-aki-bar="${pct}"></div>
+            </div>
+          </div>
+          <button onclick="addFS('${f.id}')" style="background:linear-gradient(135deg,var(--main-m),var(--pu));color:#fff;border:none;border-radius:10px;padding:7px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">記録</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // 結果全体フェードイン
+  requestAnimationFrame(() => {
+    resultEl.style.opacity = '1';
+    resultEl.style.transform = 'translateY(0)';
+  });
+
+  // 各アイテムを順番にスライドイン
+  top20.forEach((_, i) => {
+    setTimeout(() => {
+      const el = listEl.querySelector(`[data-aki-item="${i}"]`);
+      if(!el) return;
+      el.style.opacity = '1';
+      el.style.transform = 'translateX(0)';
+      // スコアバーも順次アニメ
+      const bar = el.querySelector('[data-aki-bar]');
+      if(bar) bar.style.width = bar.getAttribute('data-aki-bar') + '%';
+    }, i * 60);
+  });
+}
+
+// タブ切り替え時にスタート画面初期化
+function initAkiStart() {
+  const img = document.getElementById('aki-meshineko');
+  if(img) img.src = MESHINEKO_IMGS.fun;
+  const wrap = document.getElementById('aki-chara-start');
+  if(!wrap) return;
+  wrap.style.opacity = '0';
+  wrap.style.transform = 'translateY(20px)';
+  setTimeout(() => {
+    wrap.style.opacity = '1';
+    wrap.style.transform = 'translateY(0)';
+  }, 150);
+  document.getElementById('aki-start').style.display = 'block';
+  document.getElementById('aki-questions').style.display = 'none';
+  document.getElementById('aki-result').style.display = 'none';
+}
+
 
 // ========== 目標定義（男女別） ==========
 const GOALS={
   male:[
+    {id:'none',label:'特になし',desc:'目標は設定せず、食事を記録・把握することを楽しむ',kcalAdj:0},
     {id:'lose',label:'体重を減らしたい',desc:'カロリーをコントロールして体重を落とす',kcalAdj:-300},
     {id:'slim',label:'引き締めたい（体型維持）',desc:'体重は変えず、筋肉と脂肪のバランスを整える',kcalAdj:0},
     {id:'maintain',label:'健康を維持したい',desc:'現在の体重・体調を無理なく保つ',kcalAdj:0},
@@ -1322,6 +1749,7 @@ const GOALS={
     {id:'perform',label:'パフォーマンスを上げたい',desc:'集中力・持久力を食事でサポート',kcalAdj:100},
   ],
   female:[
+    {id:'none',label:'特になし',desc:'目標は設定せず、食事を記録・把握することを楽しむ',kcalAdj:0},
     {id:'lose',label:'体重を減らしたい',desc:'カロリーをコントロールして体重を落とす',kcalAdj:-300},
     {id:'slim',label:'引き締めたい（体型維持）',desc:'体重は変えず、体のラインを整える',kcalAdj:0},
     {id:'maintain',label:'健康を維持したい',desc:'現在の体重・体調を無理なく保つ',kcalAdj:0},
@@ -1333,44 +1761,44 @@ const GOALS={
 
 // ========== 初期データ ==========
 const INIT_FOODS=[
-  {id:'local-101',name:'牛めし 小盛',store:'松屋',type:'chain',kcal:507,protein:13.1,fat:22.8,carb:59.6,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-102',name:'牛めし 並盛',store:'松屋',type:'chain',kcal:687,protein:17.1,fat:28.9,carb:85.5,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-103',name:'牛めし 大盛',store:'松屋',type:'chain',kcal:933,protein:22.3,fat:35.9,carb:124.3,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-104',name:'牛めし 特盛',store:'松屋',type:'chain',kcal:1237,protein:31.0,fat:56.3,carb:145.1,gluten:true,meat:true,estimated:false,meal_time:['D'],role:'main'},
-  {id:'local-105',name:'ネギたっぷり旨辛ネギたま牛めし 並盛',store:'松屋',type:'chain',kcal:818,protein:24.7,fat:36.2,carb:94.1,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-106',name:'鬼おろしポン酢牛めし 並盛',store:'松屋',type:'chain',kcal:714,protein:18.3,fat:29.1,carb:90.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-107',name:'キムチ牛めし 並盛',store:'松屋',type:'chain',kcal:736,protein:18.9,fat:29.7,carb:94.4,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-108',name:'チーズ牛めし 並盛',store:'松屋',type:'chain',kcal:846,protein:25.3,fat:42.3,carb:87.1,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-109',name:'創業ビーフカレー',store:'松屋',type:'chain',kcal:769,protein:17.9,fat:28.8,carb:102.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-110',name:'牛焼肉定食',store:'松屋',type:'chain',kcal:806,protein:23.3,fat:41.3,carb:86.5,gluten:false,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-111',name:'炙り焼鮭定食',store:'松屋',type:'chain',kcal:698,protein:25.7,fat:24.0,carb:91.0,gluten:true,meat:true,estimated:false,meal_time:['B','L','D'],role:'main'},
-  {id:'local-112',name:'厚切り豚ロースグリル定食',store:'松屋',type:'chain',kcal:963,protein:38.0,fat:36.0,carb:88.0,gluten:false,meat:true,estimated:false,meal_time:['D'],role:'main'},
-  {id:'local-201',name:'ビッグマック',store:'マクドナルド',type:'chain',kcal:525,protein:26.1,fat:28.0,carb:42.1,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-202',name:'てりやきマックバーガー',store:'マクドナルド',type:'chain',kcal:477,protein:14.5,fat:30.2,carb:37.5,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-203',name:'てりやきチキンフィレオ',store:'マクドナルド',type:'chain',kcal:496,protein:20.1,fat:23.0,carb:52.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-204',name:'チキンフィレオ',store:'マクドナルド',type:'chain',kcal:479,protein:19.9,fat:23.8,carb:47.0,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-205',name:'エッグマックマフィン',store:'マクドナルド',type:'chain',kcal:310,protein:18.6,fat:13.6,carb:27.2,gluten:true,meat:true,estimated:false,meal_time:['B','L'],role:'main'},
-  {id:'local-206',name:'ダブルチーズバーガー',store:'マクドナルド',type:'chain',kcal:459,protein:26.4,fat:25.1,carb:31.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-207',name:'チーズバーガー',store:'マクドナルド',type:'chain',kcal:310,protein:15.9,fat:13.5,carb:31.0,gluten:true,meat:true,estimated:false,meal_time:['L','S'],role:'main'},
-  {id:'local-208',name:'サイドサラダ',store:'マクドナルド',type:'chain',kcal:23,protein:1.5,fat:0.2,carb:3.8,gluten:false,meat:false,estimated:false,meal_time:['B','L','D','S'],role:'side'},
-  {id:'local-209',name:'マックフライポテト M',store:'マクドナルド',type:'chain',kcal:454,protein:5.8,fat:22.0,carb:57.4,gluten:false,meat:false,estimated:false,meal_time:['L','S'],role:'side'},
-  {id:'local-301',name:'牛丼 並盛',store:'吉野家',type:'chain',kcal:633,protein:19.6,fat:23.6,carb:88.2,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-302',name:'牛丼 大盛',store:'吉野家',type:'chain',kcal:823,protein:24.8,fat:29.0,carb:119.5,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-303',name:'牛丼 特盛',store:'吉野家',type:'chain',kcal:1006,protein:33.5,fat:44.2,carb:122.3,gluten:true,meat:true,estimated:false,meal_time:['D'],role:'main'},
-  {id:'local-304',name:'牛カルビ丼 並盛',store:'吉野家',type:'chain',kcal:696,protein:21.3,fat:26.2,carb:96.4,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-305',name:'焼魚牛小鉢定食',store:'吉野家',type:'chain',kcal:622,protein:24.4,fat:19.6,carb:88.5,gluten:true,meat:true,estimated:false,meal_time:['B','L','D'],role:'main'},
-  {id:'local-401',name:'牛丼 並盛',store:'すき家',type:'chain',kcal:725,protein:23.3,fat:23.8,carb:104.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-402',name:'牛丼 大盛',store:'すき家',type:'chain',kcal:938,protein:30.0,fat:31.1,carb:135.1,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-403',name:'ねぎ玉牛丼 並盛',store:'すき家',type:'chain',kcal:802,protein:29.4,fat:29.9,carb:104.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-404',name:'牛丼ライト 並盛',store:'すき家',type:'chain',kcal:397,protein:22.8,fat:26.8,carb:16.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-405',name:'お食事サラダ',store:'すき家',type:'chain',kcal:247,protein:24.5,fat:7.8,carb:21.5,gluten:false,meat:true,estimated:false,meal_time:['L','D'],role:'side'},
-  {id:'local-501',name:'親子丼 並盛',store:'なか卯',type:'chain',kcal:620,protein:28.9,fat:12.1,carb:94.9,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-502',name:'和風牛丼 並盛',store:'なか卯',type:'chain',kcal:713,protein:18.7,fat:26.2,carb:95.2,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-503',name:'かけうどん 並',store:'なか卯',type:'chain',kcal:319,protein:8.1,fat:7.2,carb:55.6,gluten:true,meat:false,estimated:false,meal_time:['B','L'],role:'both'},
-  {id:'local-504',name:'からあげ定食',store:'なか卯',type:'chain',kcal:690,protein:33.0,fat:13.7,carb:106.0,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-601',name:'ポークカレー（普通）',store:'CoCo壱番屋',type:'chain',kcal:701,protein:11.0,fat:18.3,carb:126.9,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-602',name:'チキンにこみカレー（普通）',store:'CoCo壱番屋',type:'chain',kcal:769,protein:24.4,fat:19.7,carb:128.7,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
-  {id:'local-603',name:'低糖質カレー（カリフラワーライス）',store:'CoCo壱番屋',type:'chain',kcal:255,protein:8.0,fat:15.4,carb:19.7,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-101',name:'牛めし 小盛',store:'松屋',type:'chain',kcal:507,protein:13.1,fat:22.8,carb:59.6,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-102',name:'牛めし 並盛',store:'松屋',type:'chain',kcal:687,protein:17.1,fat:28.9,carb:85.5,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-103',name:'牛めし 大盛',store:'松屋',type:'chain',kcal:933,protein:22.3,fat:35.9,carb:124.3,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-104',name:'牛めし 特盛',store:'松屋',type:'chain',kcal:1237,protein:31.0,fat:56.3,carb:145.1,gluten:true,meat:true,estimated:false,meal_time:['D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-105',name:'ネギたっぷり旨辛ネギたま牛めし 並盛',store:'松屋',type:'chain',kcal:818,protein:24.7,fat:36.2,carb:94.1,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-106',name:'鬼おろしポン酢牛めし 並盛',store:'松屋',type:'chain',kcal:714,protein:18.3,fat:29.1,carb:90.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-107',name:'キムチ牛めし 並盛',store:'松屋',type:'chain',kcal:736,protein:18.9,fat:29.7,carb:94.4,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-108',name:'チーズ牛めし 並盛',store:'松屋',type:'chain',kcal:846,protein:25.3,fat:42.3,carb:87.1,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-109',name:'創業ビーフカレー',store:'松屋',type:'chain',kcal:769,protein:17.9,fat:28.8,carb:102.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["curry"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-110',name:'牛焼肉定食',store:'松屋',type:'chain',kcal:806,protein:23.3,fat:41.3,carb:86.5,gluten:false,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["teishoku"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-111',name:'炙り焼鮭定食',store:'松屋',type:'chain',kcal:698,protein:25.7,fat:24.0,carb:91.0,gluten:true,meat:true,estimated:false,meal_time:['B','L','D'],role:'main',category:["teishoku"],fish:true,veg:false,sweet:false,takeout:true},
+  {id:'local-112',name:'厚切り豚ロースグリル定食',store:'松屋',type:'chain',kcal:963,protein:38.0,fat:36.0,carb:88.0,gluten:false,meat:true,estimated:false,meal_time:['D'],role:'main',category:["teishoku"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-201',name:'ビッグマック',store:'マクドナルド',type:'chain',kcal:525,protein:26.1,fat:28.0,carb:42.1,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["bread"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-202',name:'てりやきマックバーガー',store:'マクドナルド',type:'chain',kcal:477,protein:14.5,fat:30.2,carb:37.5,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["bread"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-203',name:'てりやきチキンフィレオ',store:'マクドナルド',type:'chain',kcal:496,protein:20.1,fat:23.0,carb:52.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["bread"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-204',name:'チキンフィレオ',store:'マクドナルド',type:'chain',kcal:479,protein:19.9,fat:23.8,carb:47.0,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["bread"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-205',name:'エッグマックマフィン',store:'マクドナルド',type:'chain',kcal:310,protein:18.6,fat:13.6,carb:27.2,gluten:true,meat:true,estimated:false,meal_time:['B','L'],role:'main',category:["bread"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-206',name:'ダブルチーズバーガー',store:'マクドナルド',type:'chain',kcal:459,protein:26.4,fat:25.1,carb:31.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["bread"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-207',name:'チーズバーガー',store:'マクドナルド',type:'chain',kcal:310,protein:15.9,fat:13.5,carb:31.0,gluten:true,meat:true,estimated:false,meal_time:['L','S'],role:'main',category:["bread"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-208',name:'サイドサラダ',store:'マクドナルド',type:'chain',kcal:23,protein:1.5,fat:0.2,carb:3.8,gluten:false,meat:false,estimated:false,meal_time:['B','L','D','S'],role:'side',category:["salad"],fish:false,veg:true,sweet:false,takeout:true},
+  {id:'local-209',name:'マックフライポテト M',store:'マクドナルド',type:'chain',kcal:454,protein:5.8,fat:22.0,carb:57.4,gluten:false,meat:false,estimated:false,meal_time:['L','S'],role:'side',category:["side"],fish:false,veg:true,sweet:false,takeout:true},
+  {id:'local-301',name:'牛丼 並盛',store:'吉野家',type:'chain',kcal:633,protein:19.6,fat:23.6,carb:88.2,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-302',name:'牛丼 大盛',store:'吉野家',type:'chain',kcal:823,protein:24.8,fat:29.0,carb:119.5,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-303',name:'牛丼 特盛',store:'吉野家',type:'chain',kcal:1006,protein:33.5,fat:44.2,carb:122.3,gluten:true,meat:true,estimated:false,meal_time:['D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-304',name:'牛カルビ丼 並盛',store:'吉野家',type:'chain',kcal:696,protein:21.3,fat:26.2,carb:96.4,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-305',name:'焼魚牛小鉢定食',store:'吉野家',type:'chain',kcal:622,protein:24.4,fat:19.6,carb:88.5,gluten:true,meat:true,estimated:false,meal_time:['B','L','D'],role:'main',category:["teishoku"],fish:true,veg:false,sweet:false,takeout:true},
+  {id:'local-401',name:'牛丼 並盛',store:'すき家',type:'chain',kcal:725,protein:23.3,fat:23.8,carb:104.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-402',name:'牛丼 大盛',store:'すき家',type:'chain',kcal:938,protein:30.0,fat:31.1,carb:135.1,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-403',name:'ねぎ玉牛丼 並盛',store:'すき家',type:'chain',kcal:802,protein:29.4,fat:29.9,carb:104.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-404',name:'牛丼ライト 並盛',store:'すき家',type:'chain',kcal:397,protein:22.8,fat:26.8,carb:16.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-405',name:'お食事サラダ',store:'すき家',type:'chain',kcal:247,protein:24.5,fat:7.8,carb:21.5,gluten:false,meat:true,estimated:false,meal_time:['L','D'],role:'side',category:["salad"],fish:false,veg:true,sweet:false,takeout:true},
+  {id:'local-501',name:'親子丼 並盛',store:'なか卯',type:'chain',kcal:620,protein:28.9,fat:12.1,carb:94.9,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-502',name:'和風牛丼 並盛',store:'なか卯',type:'chain',kcal:713,protein:18.7,fat:26.2,carb:95.2,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["donburi"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-503',name:'かけうどん 並',store:'なか卯',type:'chain',kcal:319,protein:8.1,fat:7.2,carb:55.6,gluten:true,meat:false,estimated:false,meal_time:['B','L'],role:'both',category:["noodle", "soup"],fish:false,veg:true,sweet:false,takeout:true},
+  {id:'local-504',name:'からあげ定食',store:'なか卯',type:'chain',kcal:690,protein:33.0,fat:13.7,carb:106.0,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["teishoku"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-601',name:'ポークカレー（普通）',store:'CoCo壱番屋',type:'chain',kcal:701,protein:11.0,fat:18.3,carb:126.9,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["curry"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-602',name:'チキンにこみカレー（普通）',store:'CoCo壱番屋',type:'chain',kcal:769,protein:24.4,fat:19.7,carb:128.7,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["curry"],fish:false,veg:false,sweet:false,takeout:true},
+  {id:'local-603',name:'低糖質カレー（カリフラワーライス）',store:'CoCo壱番屋',type:'chain',kcal:255,protein:8.0,fat:15.4,carb:19.7,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main',category:["curry"],fish:false,veg:true,sweet:false,takeout:true},
   {id:'local-901',name:'卵かけごはん',store:'自炊',type:'recipe',kcal:310,protein:14,fat:9,carb:45,gluten:false,meat:false,estimated:false,desc:'5分',meal_time:['B'],role:'main'},
   {id:'local-902',name:'サラダチキン丼',store:'自炊',type:'recipe',kcal:380,protein:30,fat:4,carb:52,gluten:false,meat:true,estimated:false,desc:'3分',meal_time:['B','L','D'],role:'main'},
   {id:'local-903',name:'納豆ごはん',store:'自炊',type:'recipe',kcal:290,protein:16,fat:5,carb:44,gluten:false,meat:false,estimated:false,desc:'即完成',meal_time:['B'],role:'main'},
@@ -1438,6 +1866,15 @@ const LS_SETUP='sotomeshi_setup_step';
 let S={gender:'male',age:30,ht:170,wt:65,act:1.2,goal:'maintain',restrictions:[],autoMacro:true,eaten:[],tdee:0,tgt:0,macros:{protein:0,fat:0,carb:0},weeklyTotals:{protein:0,fat:0,carb:0,kcal:0,days:1},preferredChains:[],nickname:''};
 let gV='male',aV=1.2,goalV='maintain',agreedToTerms=false,searchTabMode='all';
 let ALL_FOODS=[...INIT_FOODS,...MEXT_FOODS];
+
+// CHAINSはINIT_FOODS・MEXT_FOODS定義後に初期化
+let CHAINS = [...new Set([...INIT_FOODS,...MEXT_FOODS].map(f=>f.store).filter(Boolean))].sort();
+
+// DB読込後にCHAINSを更新する関数
+function refreshChainList() {
+  const all = [...INIT_FOODS,...MEXT_FOODS,...dbFoods];
+  CHAINS = [...new Set(all.map(f=>f.store).filter(Boolean))].sort();
+}
 let dbFoods=[];
 let regImageFile=null;
 
@@ -1511,13 +1948,14 @@ async function loadFoodsFromDB(){
     dbFoods=data||[];
     mergeFoods();
     updateDBCount();
+    refreshChainList();
   }catch(e){console.warn('[DB]',e.message);}
 }
 function mergeFoods(){ALL_FOODS=[...INIT_FOODS,...MEXT_FOODS,...dbFoods.map(f=>({...f,id:'db-'+f.id,meal_time:f.meal_time||['L','D'],role:f.role||'main'}))]}
 function updateDBCount(){const el=document.getElementById('db-count');if(el)el.textContent=dbFoods.length}
 function subscribeRealtime(){
   sb.channel('foods').on('postgres_changes',{event:'INSERT',schema:'public',table:'foods'},payload=>{
-    dbFoods.unshift(payload.new);mergeFoods();updateDBCount();showToast('新しいメニューが追加されました');
+    dbFoods.unshift(payload.new);mergeFoods();updateDBCount();refreshChainList();showToast('新しいメニューが追加されました');
   }).subscribe();
 }
 function showToast(msg){
@@ -1528,30 +1966,57 @@ function showToast(msg){
 }
 
 // ========== チェーン検索UI ==========
-function buildChainSelect(){renderSelectedChains();}
+function buildChainSelect(){ refreshChainList(); renderSelectedChains(); }
 function togChain(){}
 function searchChain(q){
   const el=document.getElementById('chain-suggestions');
-  if(!q.trim()){el.innerHTML='';return}
+  if(!q.trim()){el.innerHTML='';return;}
   const matched=CHAINS.filter(c=>c.includes(q)&&!S.preferredChains.includes(c));
-  if(matched.length===0){
-    el.innerHTML=`<div style="font-size:11px;color:var(--text-h);padding:6px 0">ごめんなさい、情報がないです…まだ対応していないチェーンかもしれません</div>`;return;
+  let html='';
+  if(matched.length>0){
+    html+=matched.map(c=>`<div style="padding:8px 11px;border:0.5px solid var(--border-s);border-radius:var(--r);font-size:12px;cursor:pointer;margin-bottom:5px;background:var(--bg)" onclick="addChain('${c}')">${c} <span style="font-size:10px;color:var(--text-h)">タップして追加</span></div>`).join('');
   }
-  el.innerHTML=matched.map(c=>`<div style="padding:8px 11px;border:0.5px solid var(--border-s);border-radius:var(--r);font-size:12px;cursor:pointer;margin-bottom:5px" onclick="addChain('${c}')">${c} <span style="font-size:10px;color:var(--text-h)">タップして追加</span></div>`).join('');
+  // DB未登録でも自由追加できるオプションを常に表示
+  if(!S.preferredChains.includes(q)&&!matched.includes(q)){
+    html+=`<div style="padding:8px 11px;border:1.5px dashed var(--pk-b);border-radius:var(--r);font-size:12px;cursor:pointer;margin-bottom:5px;background:var(--pk-l)" onclick="addChain('${q}')">「${q}」を追加する <span style="font-size:10px;color:var(--text-h)">※メニューは未登録</span></div>`;
+  }
+  el.innerHTML=html||`<div style="font-size:11px;color:var(--text-h);padding:6px 0">候補が見つかりません</div>`;
 }
 function addChain(c){
   if(!S.preferredChains.includes(c))S.preferredChains.push(c);
-  document.getElementById('chain-search-in').value='';
+  const inp=document.getElementById('chain-search-in');
+  if(inp)inp.value='';
   document.getElementById('chain-suggestions').innerHTML='';
   renderSelectedChains();
+  // 設定タブにも反映
+  const stEl=document.getElementById('st-chain-selected');
+  if(stEl)renderSelectedChainsIn(stEl);
+  saveProfile();
 }
 function renderSelectedChains(){
-  const el=document.getElementById('chain-selected-list');if(!el)return;
-  el.innerHTML=S.preferredChains.length===0
-    ?`<div style="font-size:11px;color:var(--text-h)">まだ登録がありません（スキップ可）</div>`
-    :S.preferredChains.map(c=>`<div style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--blue);color:#fff;border-radius:20px;font-size:11px">${c}<span style="cursor:pointer;opacity:.8" onclick="removeChain('${c}')">×</span></div>`).join('');
+  const el=document.getElementById('chain-selected-list');
+  if(el)renderSelectedChainsIn(el);
+  const stEl=document.getElementById('st-chain-selected');
+  if(stEl)renderSelectedChainsIn(stEl);
 }
-function removeChain(c){S.preferredChains=S.preferredChains.filter(x=>x!==c);renderSelectedChains();}
+function renderSelectedChainsIn(el){
+  if(!el) return;
+  if(S.preferredChains.length===0){
+    el.innerHTML=`<div style="font-size:11px;color:var(--text-h);padding:4px 0;width:100%">まだ登録がありません。下の検索から追加してください</div>`;
+    return;
+  }
+  el.innerHTML=S.preferredChains.map(c=>`
+    <div style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 12px;background:linear-gradient(135deg,var(--main-m),var(--pu));color:#fff;border-radius:20px;font-size:12px;font-weight:700;margin:2px">
+      ${c}
+      <span onclick="removeChain('${c}')" style="cursor:pointer;background:rgba(255,255,255,0.3);border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;font-weight:800">×</span>
+    </div>
+  `).join('');
+}
+function removeChain(c){
+  S.preferredChains=S.preferredChains.filter(x=>x!==c);
+  renderSelectedChains();
+  saveProfile();
+}
 
 // ========== 目標オプションUI ==========
 function buildGoalOptions(){
@@ -2083,126 +2548,7 @@ function scoreFood(f,t,m,remK,recentIds){
   if(String(f.id).startsWith('db-')){score+=1;reasons.push('みんなが登録');}
   return{...f,score,reasons};
 }
-function renderSuggest(){
-  const t=tots();const remK=S.tgt-t.kcal;const m=S.macros;const period=getTimePeriod();
-  const recentIds=new Set(S.eaten.slice(-3).map(e=>String(e.id)));
-  const lbl={'low_carb':'糖質制限','high_protein':'高タンパク','low_fat':'低脂質','low_cal':'低カロリー','no_gluten':'グルテンフリー','vegetarian':'ベジ'};
-  const badges=S.restrictions.map(r=>`<span style="background:var(--blue-l);color:var(--blue-d);font-size:9px;padding:2px 6px;border-radius:20px;margin-right:3px;font-weight:500">${lbl[r]||r}</span>`).join('');
-  document.getElementById('r-badge').innerHTML=badges?`適用中: ${badges}`:'';
-  const tpMap={'朝':'tp-morning','昼':'tp-noon','夜':'tp-night','その他':'tp-other'};
-  ['tp-auto','tp-morning','tp-noon','tp-night','tp-other'].forEach(id=>{
-    const el=document.getElementById(id);if(!el)return;
-    const isActive=_manualTimePeriod?tpMap[period.label]===id:id==='tp-auto';
-    el.style.background=isActive?'linear-gradient(135deg,var(--pk-l),var(--pu-l))':'var(--bg-s)';
-    el.style.borderColor=isActive?'var(--pk-b)':'var(--border)';
-    el.style.color=isActive?'var(--main-m)':'var(--text-s)';
-  });
-  const remP=m.protein-t.protein;const remF=m.fat-t.fat;
-  const alts=[];
-  const remC=m.carb-t.carb;
-  if(remK<0)alts.push({type:'warn',msg:`カロリーを ${Math.abs(Math.round(remK))} kcal 超過しています`});
-  if(remF<-10)alts.push({type:'warn',msg:`脂質を ${Math.abs(Math.round(remF))}g 超過しています`});
-  if(remC<-20)alts.push({type:'warn',msg:`糖質を ${Math.abs(Math.round(remC))}g 超過しています`});
-  if(remP<-5)alts.push({type:'warn',msg:`タンパク質を ${Math.abs(Math.round(remP))}g 超過しています`});
-  if(alts.length===0){
-    if(remP>15)alts.push({type:'info',msg:`タンパク質があと ${Math.round(remP)}g 不足しています`});
-    else alts.push({type:'ok',msg:'栄養バランス良好です'});
-  }
-  document.getElementById('s-alerts').innerHTML=alts.map(a=>`<div class="alt a${a.type}">${a.type==='warn'?'⚠️':a.type==='ok'?'✅':'ℹ️'} ${a.msg}</div>`).join('');
-  const filtered=applyHardFilters(ALL_FOODS,t,remK);
-  const scored=filtered.map(f=>scoreFood(f,t,m,remK,recentIds)).filter(f=>f.score>-5).sort((a,b)=>b.score-a.score).slice(0,20);
-  const maxScore=scored.length>0?scored[0].score:1;
-  document.getElementById('ranking-sub').textContent=`${ALL_FOODS.length}品から算出 · 上位20件`;
-
-  // 1〜3位の背景スタイル定義
-  const topStyles={
-    1:{
-      bg:'linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 50%,#FFF7ED 100%)',
-      border:'2px solid #F59E0B',
-      shadow:'0 6px 20px rgba(245,158,11,0.2)',
-      badge:'linear-gradient(135deg,#F59E0B,#FCD34D)',
-      badgeShadow:'0 3px 8px rgba(245,158,11,0.5)',
-      label:'👑',
-      labelColor:'#92400E',
-    },
-    2:{
-      bg:'linear-gradient(135deg,#F8FAFC 0%,#F1F5F9 50%,#F8FAFC 100%)',
-      border:'2px solid #94A3B8',
-      shadow:'0 4px 14px rgba(148,163,184,0.2)',
-      badge:'linear-gradient(135deg,#64748B,#CBD5E1)',
-      badgeShadow:'0 2px 6px rgba(100,116,139,0.4)',
-      label:'🥈',
-      labelColor:'#475569',
-    },
-    3:{
-      bg:'linear-gradient(135deg,#FFF7F0 0%,#FFEDD5 50%,#FFF7F0 100%)',
-      border:'2px solid #D97706',
-      shadow:'0 4px 14px rgba(217,119,6,0.15)',
-      badge:'linear-gradient(135deg,#92400E,#D97706)',
-      badgeShadow:'0 2px 6px rgba(146,64,14,0.4)',
-      label:'🥉',
-      labelColor:'#92400E',
-    },
-  };
-
-  document.getElementById('slist').innerHTML=scored.length===0?`
-    <div style="text-align:center;padding:24px 0 16px">
-      <img src="${MESHINEKO_IMGS.sad}" style="width:120px;height:120px;object-fit:contain;mix-blend-mode:multiply;display:block;margin:0 auto 12px">
-      <div style="font-size:13px;font-weight:700;color:var(--main-m);line-height:1.7">おすすめできる料理が<br>見つからなかったにゃ…</div>
-    </div>`:scored.map((f,i)=>{
-    const rank=i+1;
-    const ts=topStyles[rank];
-    const estTag=f.estimated?`<span class="chip chip-warn">推定値</span>`:'';
-    const dbTag='';
-    const rtags=f.reasons.slice(0,2).map(r=>`<span class="reason-tag">${r}</span>`).join('');
-
-    if(ts){
-      // 1〜3位：特別カード
-      return`<div onclick="addFS('${f.id}')" style="background:${ts.bg};border:${ts.border};border-radius:var(--rl);padding:14px 15px;margin-bottom:10px;cursor:pointer;display:flex;gap:12px;align-items:flex-start;box-shadow:${ts.shadow};transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0">
-          <div style="font-size:18px;line-height:1">${ts.label}</div>
-          <div style="background:${ts.badge};color:#fff;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;box-shadow:${ts.badgeShadow};white-space:nowrap">${rank}位</div>
-        </div>
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
-            <div style="flex:1">
-              <div style="font-size:14px;font-weight:700;color:${ts.labelColor}">${f.name}</div>
-              <div style="font-size:12px;font-weight:700;color:var(--main-m);margin-top:2px">${f.store}</div>
-            </div>
-            <div style="font-size:13px;font-weight:700;color:${ts.labelColor};white-space:nowrap">${f.kcal} kcal</div>
-          </div>
-          <div style="margin-top:5px;display:flex;gap:4px;align-items:center;flex-wrap:wrap">${dbTag}${estTag}${rtags}</div>
-          <div class="chips" style="margin-top:5px">
-            <span class="chip ${f.protein>=20?'chipg':''}">タンパク質 ${f.protein.toFixed(1)}g</span>
-            <span class="chip">脂質 ${f.fat.toFixed(1)}g</span>
-            <span class="chip">糖質 ${f.carb.toFixed(1)}g</span>
-          </div>
-        </div>
-      </div>`;
-    }
-
-    // 4位以降：通常カード
-    const rankCls='rank-n';
-    return`<div class="si" onclick="addFS('${f.id}')">
-      <div class="rank-badge ${rankCls}">${rank}</div>
-      <div class="si-body">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
-          <div style="flex:1">
-            <div class="sn">${f.name}</div>
-            <div style="font-size:12px;font-weight:700;color:var(--main-m);margin-top:2px">${f.store}</div>
-          </div>
-          <div class="sk" style="white-space:nowrap">${f.kcal} kcal</div>
-        </div>
-        <div style="margin-top:4px;display:flex;gap:4px;align-items:center">${dbTag}${estTag}${rtags}</div>
-        <div class="chips" style="margin-top:5px">
-          <span class="chip ${f.protein>=20?'chipg':''}">タンパク質 ${f.protein.toFixed(1)}g</span>
-          <span class="chip">脂質 ${f.fat.toFixed(1)}g</span>
-          <span class="chip">糖質 ${f.carb.toFixed(1)}g</span>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
+function renderSuggest(){} // アキネーターに移行済み
 
 // ========== 食事追加（検索・過去履歴タブ） ==========
 function setSearchTab(mode,el){
@@ -2314,6 +2660,24 @@ function rmF(i){
 }
 
 // ========== 食品登録モーダル ==========
+function getRegCategories(){
+  const cats=[];
+  document.querySelectorAll('#reg-category-wrap .reg-cat-label.on input').forEach(el=>{
+    cats.push(el.value);
+  });
+  return cats;
+}
+
+function toggleRegCat(el){
+  el.classList.toggle('on');
+}
+
+// カテゴリラベルにクリックイベントを付与（動的）
+document.addEventListener('click', e=>{
+  const label = e.target.closest('.reg-cat-label');
+  if(label && label.closest('#reg-category-wrap')) toggleRegCat(label);
+});
+
 function toggleMtLabel(code){
   const el=document.getElementById('mt-label-'+code);
   const cb=document.getElementById('reg-mt-'+code);
@@ -2350,6 +2714,12 @@ function closeRegModal(){
   document.getElementById('reg-modal').classList.remove('open');
   regImageFile=null;
   document.getElementById('img-preview-box').innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-h)" stroke-width="1.5" style="width:32px;height:32px"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/></svg><input type="file" id="reg-image" accept="image/*" onchange="previewImage(this)">`;
+  // カテゴリのON状態をリセット
+  document.querySelectorAll('#reg-category-wrap .reg-cat-label').forEach(l=>l.classList.remove('on'));
+  // 新フラグのリセット
+  ['reg-fish','reg-veg','reg-sweet','reg-takeout'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.checked=false;
+  });
 }
 function previewImage(input){
   if(!input.files||!input.files[0])return;
@@ -2382,7 +2752,13 @@ async function submitFood(){
       const{error:upErr}=await sb.storage.from('food-images').upload(path,regImageFile,{contentType:regImageFile.type});
       if(!upErr){const{data:urlData}=sb.storage.from('food-images').getPublicUrl(path);image_url=urlData.publicUrl}
     }
-    const{error}=await sb.from('foods').insert([{name,store,type,kcal,protein,fat,carb,gluten,meat,estimated,desc,image_url,meal_time:getRegMealTime()}]);
+    const{error}=await sb.from('foods').insert([{name,store,type,kcal,protein,fat,carb,gluten,meat,estimated,desc,image_url,meal_time:getRegMealTime(),
+      fish:document.getElementById('reg-fish')?.checked||false,
+      veg:document.getElementById('reg-veg')?.checked||false,
+      sweet:document.getElementById('reg-sweet')?.checked||false,
+      takeout:document.getElementById('reg-takeout')?.checked||true,
+      category:getRegCategories(),
+    }]);
     if(error)throw error;
     // 登録したデータをALL_FOODSに即時追加
     const tmpId='db-tmp-'+Date.now();
@@ -2560,7 +2936,7 @@ function sw(tab){
     const b=document.getElementById('nb-'+t);if(b)b.className='nb'+(t===tab?' on':'')
   });
   if(tab==='home'){renderHome();renderDayPlan();window.scrollTo(0,0);}
-  if(tab==='suggest')renderSuggest();
+  if(tab==='suggest'){ initAkiStart(); renderSuggest(); }
   if(tab==='kiroku')renderKiroku();
   if(tab==='settings'){
     // プロフィール現在値をセット
@@ -2570,6 +2946,9 @@ function sw(tab){
     const stGender=document.getElementById('st-gender');if(stGender)stGender.value=S.gender||'male';
     const stAct=document.getElementById('st-act');if(stAct)stAct.value=S.act||1.2;
     const stGoal=document.getElementById('st-goal');if(stGoal)stGoal.value=S.goal||'maintain';
+    // よく行く店リストを更新
+    const stChain=document.getElementById('st-chain-selected');
+    if(stChain)renderSelectedChainsIn(stChain);
     // 食事制限トグルの状態を反映
     [['tog-lc','low_carb'],['tog-hp','high_protein'],['tog-lf','low_fat'],
      ['tog-lo','low_cal'],['tog-gl','no_gluten'],['tog-vg','vegetarian']
@@ -2909,6 +3288,27 @@ function saveNickname() {
   updateNicknameDisplay();
   document.getElementById('nickname-modal').classList.remove('open');
   showMeshikoBubble(`${S.nickname}、よろしくにゃ！`, 'joy');
+}
+
+// 設定タブ用チェーン検索（オンボーディングと同じロジック、IDだけ別）
+function searchChainSt(q) {
+  const el = document.getElementById('st-chain-suggestions');
+  if(!q.trim()){el.innerHTML='';return;}
+  const matched = CHAINS.filter(c=>c.includes(q)&&!S.preferredChains.includes(c));
+  let html = '';
+  if(matched.length>0){
+    html += matched.map(c=>`<div style="padding:8px 11px;border:0.5px solid var(--border-s);border-radius:var(--r);font-size:12px;cursor:pointer;margin-bottom:5px;background:var(--bg)" onclick="addChainSt('${c}')">${c} <span style="font-size:10px;color:var(--text-h)">タップして追加</span></div>`).join('');
+  }
+  if(!S.preferredChains.includes(q)&&!matched.includes(q)){
+    html += `<div style="padding:8px 11px;border:1.5px dashed var(--pk-b);border-radius:var(--r);font-size:12px;cursor:pointer;margin-bottom:5px;background:var(--pk-l)" onclick="addChainSt('${q}')">「${q}」を追加する <span style="font-size:10px;color:var(--text-h)">※メニューは未登録</span></div>`;
+  }
+  el.innerHTML = html || `<div style="font-size:11px;color:var(--text-h);padding:6px 0">候補が見つかりません</div>`;
+}
+function addChainSt(c) {
+  addChain(c);
+  const inp = document.getElementById('st-chain-search');
+  if(inp) inp.value = '';
+  document.getElementById('st-chain-suggestions').innerHTML = '';
 }
 
 function saveNicknameFromSettings() {
