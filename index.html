@@ -3068,8 +3068,12 @@ function getSerifB() {
   return SERIF_B[slot].lines.map(l=>({e:SERIF_B[slot].e, line:l}));
 }
 
-// A+B+Dプールからランダムに1つ選んで表示
+// A+B+Dプールからランダムに1つ選んで表示（セリフ表示中はスキップ）
 function pickAndShowSerif() {
+  // セリフ表示中（吹き出しが見えている）は上書きしない
+  const bubble = document.getElementById('meshineko-bubble');
+  if(bubble && bubble.style.visibility === 'visible') return;
+
   const pool = [...getSerifA(), ...getSerifB(), ...SERIF_D];
   const pick = pool[Math.floor(Math.random()*pool.length)];
   _applyEmotion(pick.e);
@@ -3184,6 +3188,9 @@ function getMeshinekoEmotion(){
 function updateMeshiko(){
   const img=document.getElementById('meshineko-img');
   if(!img)return;
+  // Cイベントポップアップ表示中は更新しない
+  const popup=document.getElementById('meshineko-event-popup');
+  if(popup && popup.innerHTML) return;
   pickAndShowSerif();
   img.onerror=()=>{
     img.onerror=null;
