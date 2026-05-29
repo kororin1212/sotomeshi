@@ -56,6 +56,11 @@ body{
 .hdr-prog-row{display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,0.8);margin-bottom:5px}
 .hdr-bar-bg{height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden}
 .hdr-bar-fill{height:6px;background:linear-gradient(90deg,#FCD34D,#FB7185);border-radius:3px;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+.exp-row{display:flex;align-items:center;gap:7px;margin-top:8px;padding:5px 8px;background:rgba(0,0,0,0.2);border-radius:10px}
+.exp-lv{font-size:10px;font-weight:800;color:#FCD34D;letter-spacing:.3px;white-space:nowrap;min-width:36px}
+.exp-bar-bg{flex:1;height:7px;background:rgba(255,255,255,.15);border-radius:4px;overflow:hidden}
+.exp-bar-fill{height:7px;background:linear-gradient(90deg,#FCD34D,#FBBF24);border-radius:4px;transition:width .8s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 6px rgba(252,211,77,0.6)}
+.exp-txt{font-size:9px;color:rgba(255,255,255,0.75);font-weight:700;white-space:nowrap;min-width:64px;text-align:right}
 
 /* ===== カード ===== */
 .card{
@@ -555,6 +560,11 @@ body{
   <div class="step-row"><div class="sdot on">1</div><div class="sline"></div><div class="sdot">2</div><div class="sline"></div><div class="sdot">3</div><div class="sline"></div><div class="sdot">4</div><div class="sline"></div><div class="sdot">5</div></div>
   <div class="card">
     <div class="card-title">基本情報</div>
+    <div class="fld">
+      <label>ニックネーム（任意）</label>
+      <input type="text" id="i-nickname" placeholder="例: たろう、メシ子..." maxlength="12" style="font-size:15px">
+      <div style="font-size:10px;color:var(--text-h);margin-top:4px">未入力の場合、男性は「メシニキ」女性は「メシネキ」になります</div>
+    </div>
     <div class="fld"><label>性別</label><div class="rg"><div class="ropt on" onclick="selG('male',this)">男性</div><div class="ropt" onclick="selG('female',this)">女性</div></div></div>
     <div class="fld"><label>年齢</label><input type="number" id="i-age" value="30" min="15" max="80"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -637,35 +647,87 @@ body{
 <!-- ========== メイン画面 ========== -->
 <div id="s-main" class="screen" style="padding:0 0 80px">
   <div class="hdr">
-    <div class="hdr-row">
-      <div><div class="hdr-title">ソトメシ <span class="beta-badge">β</span></div><div class="hdr-sub" id="hdr-date"></div></div>
-      <div class="hdr-tgt"><div class="hdr-tgt-lbl">目標</div><div class="hdr-tgt-val" id="hdr-tgt">-- kcal</div></div>
-    </div>
-    <div class="hdr-prog">
-      <div class="hdr-prog-row"><span id="hdr-eaten">0 kcal摂取</span><span id="hdr-rem"></span></div>
-      <div class="hdr-bar-bg"><div class="hdr-bar-fill" id="hdr-bar" style="width:0%"></div></div>
-    </div>
-    <!-- P/F/C ミニ表示 -->
-    <div style="display:flex;gap:10px;margin-top:8px">
-      <div style="flex:1;text-align:center;background:rgba(255,255,255,0.15);border-radius:10px;padding:4px 0">
-        <div style="font-size:8px;color:rgba(255,255,255,0.75);font-weight:700">タンパク質</div>
-        <div style="font-size:11px;font-weight:700;color:#fff" id="hdr-p">0g</div>
-        <div style="font-size:8px;color:rgba(255,255,255,0.6)" id="hdr-p-tgt"></div>
-        <div style="height:3px;background:rgba(255,255,255,0.2);border-radius:2px;margin-top:3px;overflow:hidden"><div id="hdr-p-bar" style="height:3px;background:#FCD34D;border-radius:2px;width:0%;transition:width .5s"></div></div>
+    <!-- 1行目：名前 ＋ アプリ名＋アイコン（中央） ＋ 時刻 -->
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4px;margin-bottom:8px">
+      <!-- 左：ニックネーム -->
+      <div>
+        <button onclick="openNicknameModal()" style="background:none;border:none;cursor:pointer;padding:0;text-align:left">
+          <div style="font-size:15px;font-weight:800;color:#fff;letter-spacing:.3px;line-height:1" id="hdr-nickname">メシニキ</div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.5);margin-top:2px;font-weight:700">タップで名前変更</div>
+        </button>
       </div>
-      <div style="flex:1;text-align:center;background:rgba(255,255,255,0.15);border-radius:10px;padding:4px 0">
-        <div style="font-size:8px;color:rgba(255,255,255,0.75);font-weight:700">脂質</div>
-        <div style="font-size:11px;font-weight:700;color:#fff" id="hdr-f">0g</div>
-        <div style="font-size:8px;color:rgba(255,255,255,0.6)" id="hdr-f-tgt"></div>
-        <div style="height:3px;background:rgba(255,255,255,0.2);border-radius:2px;margin-top:3px;overflow:hidden"><div id="hdr-f-bar" style="height:3px;background:#FB923C;border-radius:2px;width:0%;transition:width .5s"></div></div>
+      <!-- 中央：アイコン＋アプリ名 -->
+      <div style="display:flex;align-items:center;gap:5px">
+        <img src="https://raw.githubusercontent.com/kororin1212/sotomeshi/main/icon.png" alt="ソトメシ" style="width:28px;height:28px;border-radius:7px;box-shadow:0 2px 8px rgba(0,0,0,0.25)" onerror="this.style.display='none'">
+        <div style="font-size:15px;font-weight:800;color:#fff;letter-spacing:.5px;line-height:1">ソトメシ<span class="beta-badge" style="margin-left:4px">β</span></div>
       </div>
-      <div style="flex:1;text-align:center;background:rgba(255,255,255,0.15);border-radius:10px;padding:4px 0">
-        <div style="font-size:8px;color:rgba(255,255,255,0.75);font-weight:700">糖質</div>
-        <div style="font-size:11px;font-weight:700;color:#fff" id="hdr-c">0g</div>
-        <div style="font-size:8px;color:rgba(255,255,255,0.6)" id="hdr-c-tgt"></div>
-        <div style="height:3px;background:rgba(255,255,255,0.2);border-radius:2px;margin-top:3px;overflow:hidden"><div id="hdr-c-bar" style="height:3px;background:#A78BFA;border-radius:2px;width:0%;transition:width .5s"></div></div>
+      <!-- 右：時刻 -->
+      <div style="text-align:right">
+        <div style="font-size:18px;font-weight:800;color:#fff;letter-spacing:1px;line-height:1" id="hdr-time">--:--</div>
+        <div style="font-size:9px;color:rgba(255,255,255,0.6);margin-top:2px;font-weight:700" id="hdr-date"></div>
       </div>
     </div>
+
+    <!-- 2行目：EXPバー -->
+    <button onclick="openExpGuideModal()" style="background:none;border:none;padding:0;width:100%;cursor:pointer">
+      <div class="exp-row" style="margin-top:0">
+        <div class="exp-lv" id="exp-lv-label">Lv 1</div>
+        <div class="exp-bar-bg"><div class="exp-bar-fill" id="exp-bar" style="width:0%"></div></div>
+        <div class="exp-txt" id="exp-txt">-- EXP</div>
+        <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-left:2px">▶</div>
+      </div>
+    </button>
+
+    <!-- 3行目：カロリー＋PFC 4列 -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:8px">
+
+      <!-- カロリー -->
+      <div style="background:rgba(255,255,255,0.12);border-radius:9px;padding:7px 4px 6px;border:1px solid rgba(255,255,255,0.1)">
+        <div style="font-size:8px;color:rgba(255,255,255,0.6);font-weight:700;text-align:center;margin-bottom:3px">カロリー</div>
+        <div style="text-align:center;line-height:1">
+          <span style="font-size:13px;font-weight:800;color:#fff" id="hdr-eaten-val">0</span>
+          <span style="font-size:8px;color:rgba(255,255,255,0.5);font-weight:700"> / </span>
+          <span style="font-size:9px;color:rgba(255,255,255,0.65);font-weight:700" id="hdr-tgt">--</span>
+        </div>
+        <div style="height:3px;background:rgba(255,255,255,0.15);border-radius:2px;margin:5px 4px 0;overflow:hidden"><div id="hdr-kcal-bar2" style="height:3px;background:rgba(255,255,255,0.8);border-radius:2px;width:0%;transition:width .5s"></div></div>
+      </div>
+
+      <!-- たんぱく質 -->
+      <div style="background:rgba(255,255,255,0.12);border-radius:9px;padding:7px 4px 6px;border:1px solid rgba(255,255,255,0.1)">
+        <div style="font-size:8px;color:rgba(255,255,255,0.6);font-weight:700;text-align:center;margin-bottom:3px">たんぱく質</div>
+        <div style="text-align:center;line-height:1">
+          <span style="font-size:13px;font-weight:800;color:#fff" id="hdr-p">0g</span>
+          <span style="font-size:8px;color:rgba(255,255,255,0.5);font-weight:700"> / </span>
+          <span style="font-size:9px;color:rgba(255,255,255,0.65);font-weight:700" id="hdr-p-tgt"></span>
+        </div>
+        <div style="height:3px;background:rgba(255,255,255,0.15);border-radius:2px;margin:5px 4px 0;overflow:hidden"><div id="hdr-p-bar" style="height:3px;background:rgba(255,255,255,0.8);border-radius:2px;width:0%;transition:width .5s"></div></div>
+      </div>
+
+      <!-- 脂質 -->
+      <div style="background:rgba(255,255,255,0.12);border-radius:9px;padding:7px 4px 6px;border:1px solid rgba(255,255,255,0.1)">
+        <div style="font-size:8px;color:rgba(255,255,255,0.6);font-weight:700;text-align:center;margin-bottom:3px">脂質</div>
+        <div style="text-align:center;line-height:1">
+          <span style="font-size:13px;font-weight:800;color:#fff" id="hdr-f">0g</span>
+          <span style="font-size:8px;color:rgba(255,255,255,0.5);font-weight:700"> / </span>
+          <span style="font-size:9px;color:rgba(255,255,255,0.65);font-weight:700" id="hdr-f-tgt"></span>
+        </div>
+        <div style="height:3px;background:rgba(255,255,255,0.15);border-radius:2px;margin:5px 4px 0;overflow:hidden"><div id="hdr-f-bar" style="height:3px;background:rgba(255,255,255,0.8);border-radius:2px;width:0%;transition:width .5s"></div></div>
+      </div>
+
+      <!-- 糖質 -->
+      <div style="background:rgba(255,255,255,0.12);border-radius:9px;padding:7px 4px 6px;border:1px solid rgba(255,255,255,0.1)">
+        <div style="font-size:8px;color:rgba(255,255,255,0.6);font-weight:700;text-align:center;margin-bottom:3px">糖質</div>
+        <div style="text-align:center;line-height:1">
+          <span style="font-size:13px;font-weight:800;color:#fff" id="hdr-c">0g</span>
+          <span style="font-size:8px;color:rgba(255,255,255,0.5);font-weight:700"> / </span>
+          <span style="font-size:9px;color:rgba(255,255,255,0.65);font-weight:700" id="hdr-c-tgt"></span>
+        </div>
+        <div style="height:3px;background:rgba(255,255,255,0.15);border-radius:2px;margin:5px 4px 0;overflow:hidden"><div id="hdr-c-bar" style="height:3px;background:rgba(255,255,255,0.8);border-radius:2px;width:0%;transition:width .5s"></div></div>
+      </div>
+
+    </div>
+    <!-- 旧カロリーバー（JS互換用・非表示） -->
+    <div style="display:none"><div id="hdr-bar" style="width:0%"></div></div>
   </div>
 
   <!-- ホームタブ -->
@@ -686,6 +748,145 @@ body{
       </div>
       <!-- メシネコ：常にこの位置（吹き出しの有無で動かない） -->
       <img id="meshineko-img" src="" alt="メシネコ" style="width:240px;height:auto;display:block;margin:0 auto;mix-blend-mode:multiply">
+    </div>
+
+    <!-- ④ キャラ変更ボタン（小さく） -->
+    <div style="text-align:center;margin:6px 0 8px">
+      <button onclick="openCharaModal()" style="
+        background:rgba(255,255,255,0.7);border:1.5px solid var(--border);
+        border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;
+        color:var(--text-s);cursor:pointer;font-family:inherit;
+        display:inline-flex;align-items:center;gap:5px;
+        backdrop-filter:blur(8px);transition:all .2s;
+      ">
+        🐱 メシネコ
+        <span style="font-size:9px;color:var(--text-h)">▼ キャラ変更</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ニックネーム変更モーダル -->
+  <div class="modal-bg" id="nickname-modal">
+    <div class="modal" style="padding-bottom:32px">
+      <div class="modal-title">ニックネームを変更<button onclick="document.getElementById('nickname-modal').classList.remove('open')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-h)">×</button></div>
+      <div class="fld">
+        <label>新しいニックネーム</label>
+        <input type="text" id="nickname-input" placeholder="例: たろう、メシ子..." maxlength="12" style="font-size:16px;font-weight:700">
+        <div style="font-size:10px;color:var(--text-h);margin-top:5px">最大12文字。空欄の場合はデフォルト名に戻ります。</div>
+      </div>
+      <button class="btn-p" onclick="saveNickname()">保存する</button>
+    </div>
+  </div>
+
+  <!-- EXPガイドモーダル -->
+  <div class="modal-bg" id="exp-guide-modal">
+    <div class="modal" style="padding-bottom:32px">
+      <div class="modal-title">⚡ レベルシステム<button onclick="document.getElementById('exp-guide-modal').classList.remove('open')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-h)">×</button></div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">📌 EXPの獲得方法</div>
+      <div style="background:var(--bg-s);border-radius:var(--r);padding:12px 14px;margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border);font-size:12px"><span>🍽️ 食事を1食記録（朝/昼/夕 各1回）</span><span style="font-weight:800;color:var(--main-m)">+30 EXP</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border);font-size:12px"><span>🎯 3食コンプリートボーナス</span><span style="font-weight:800;color:var(--main-m)">+50 EXP</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border);font-size:12px"><span>🔥 連続記録ボーナス（2日目〜）</span><span style="font-weight:800;color:var(--main-m)">+20 EXP</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px"><span>📝 食品をDBに登録</span><span style="font-weight:800;color:var(--main-m)">+10 EXP</span></div>
+      </div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">🎁 レベルアップ報酬</div>
+      <div style="background:var(--bg-s);border-radius:var(--r);padding:12px 14px;margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed var(--border);font-size:12px"><span>🌟 <b>Lv 5</b></span><span style="color:var(--text-s)">メシネコ新セリフ解禁</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed var(--border);font-size:12px"><span>👗 <b>Lv 10</b></span><span style="color:var(--text-s)">着せ替え「サマー」解禁</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed var(--border);font-size:12px"><span>❄️ <b>Lv 20</b></span><span style="color:var(--text-s)">着せ替え「クール」解禁</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed var(--border);font-size:12px"><span>💬 <b>Lv 30</b></span><span style="color:var(--text-s)">隠しセリフ解禁</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:12px"><span>👑 <b>Lv 50</b></span><span style="color:var(--text-s)">称号「メシマスター」獲得</span></div>
+      </div>
+
+      <div style="background:linear-gradient(135deg,var(--yel-l),#fff);border:1.5px solid var(--yel);border-radius:var(--r);padding:10px 12px;font-size:11px;color:var(--yel-d);font-weight:700;line-height:1.6">
+        💡 毎日3食記録＋連続ボーナスで最大160 EXP/日！<br>Lv10まで約3日、Lv30まで約10日で到達できます。
+      </div>
+      <button class="btn-p" style="margin-top:14px" onclick="document.getElementById('exp-guide-modal').classList.remove('open')">閉じる</button>
+    </div>
+  </div>
+
+  <!-- キャラ選択モーダル -->
+  <div class="modal-bg" id="chara-modal">
+    <div class="modal" style="padding-bottom:32px">
+      <div class="modal-title">パートナーを選ぶ<button onclick="document.getElementById('chara-modal').classList.remove('open')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-h)">×</button></div>
+      <p style="font-size:11px;color:var(--text-h);margin-bottom:14px;font-weight:700">今のパートナー：メシネコ</p>
+
+      <!-- メシネコ（解放済み） -->
+      <div onclick="selectChara('meshineko')" style="
+        display:flex;align-items:center;gap:12px;padding:12px 14px;
+        border-radius:var(--r);border:2px solid var(--pk);
+        background:linear-gradient(135deg,var(--pk-l),#fff);
+        margin-bottom:10px;cursor:pointer;position:relative;
+      ">
+        <div style="font-size:32px;flex-shrink:0">🐱</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:800;color:var(--pk-d)">メシネコ</div>
+          <div style="font-size:10px;color:var(--text-s);margin-top:2px">ゆる〜く寄り添う食いしん坊ネコ！</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#EC4899,#F472B6);color:#fff;font-size:9px;font-weight:800;padding:3px 9px;border-radius:20px;flex-shrink:0">使用中</div>
+      </div>
+
+      <!-- なな（Coming Soon） -->
+      <div onclick="showComingSoon('おにぎりなな')" style="
+        display:flex;align-items:center;gap:12px;padding:12px 14px;
+        border-radius:var(--r);border:1.5px solid #e0e0e0;
+        background:#fafafa;margin-bottom:10px;cursor:pointer;opacity:0.75;
+      ">
+        <div style="font-size:32px;flex-shrink:0;filter:grayscale(1) opacity(0.5)">🍙</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:800;color:#aaa">おにぎりなな</div>
+          <div style="font-size:10px;color:#bbb;margin-top:2px">管理栄養士の卵の頑張り屋さん♪</div>
+        </div>
+        <div style="background:#e8e8e8;color:#aaa;font-size:9px;font-weight:800;padding:3px 9px;border-radius:20px;flex-shrink:0">🔒 近日公開</div>
+      </div>
+
+      <!-- 颯（Coming Soon） -->
+      <div onclick="showComingSoon('めしや颯')" style="
+        display:flex;align-items:center;gap:12px;padding:12px 14px;
+        border-radius:var(--r);border:1.5px solid #e0e0e0;
+        background:#fafafa;margin-bottom:10px;cursor:pointer;opacity:0.75;
+      ">
+        <div style="font-size:32px;flex-shrink:0;filter:grayscale(1) opacity(0.5)">⚡</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:800;color:#aaa">めしや颯</div>
+          <div style="font-size:10px;color:#bbb;margin-top:2px">クールな栄養士。ストイックに導いてくれる。</div>
+        </div>
+        <div style="background:#e8e8e8;color:#aaa;font-size:9px;font-weight:800;padding:3px 9px;border-radius:20px;flex-shrink:0">🔒 近日公開</div>
+      </div>
+
+      <!-- 大地（Coming Soon） -->
+      <div onclick="showComingSoon('ごはん島大地')" style="
+        display:flex;align-items:center;gap:12px;padding:12px 14px;
+        border-radius:var(--r);border:1.5px solid #e0e0e0;
+        background:#fafafa;margin-bottom:16px;cursor:pointer;opacity:0.75;
+      ">
+        <div style="font-size:32px;flex-shrink:0;filter:grayscale(1) opacity(0.5)">🌿</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:800;color:#aaa">ごはん島大地</div>
+          <div style="font-size:10px;color:#bbb;margin-top:2px">経験豊富な大人。人生も食事もワンランク上へ。</div>
+        </div>
+        <div style="background:#e8e8e8;color:#aaa;font-size:9px;font-weight:800;padding:3px 9px;border-radius:20px;flex-shrink:0">🔒 近日公開</div>
+      </div>
+
+      <button class="btn-p" onclick="document.getElementById('chara-modal').classList.remove('open')">閉じる</button>
+    </div>
+  </div>
+
+  <!-- Coming Soonモーダル -->
+  <div class="modal-bg" id="coming-soon-modal">
+    <div class="modal" style="padding-bottom:32px;text-align:center">
+      <div style="font-size:48px;margin-bottom:8px" id="cs-emoji">🔒</div>
+      <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px" id="cs-name">キャラ名</div>
+      <div style="font-size:13px;color:var(--text-s);line-height:1.8;margin-bottom:20px" id="cs-desc">もうすぐ登場します！</div>
+      <div style="background:linear-gradient(135deg,var(--pk-l),var(--pu-l));border:1.5px solid var(--pk-b);border-radius:var(--r);padding:12px 16px;margin-bottom:20px">
+        <div style="font-size:11px;color:var(--main-m);font-weight:700;margin-bottom:4px">🎁 リリース予定</div>
+        <div style="font-size:13px;font-weight:800;color:var(--text)">Coming Soon...</div>
+        <div style="font-size:10px;color:var(--text-h);margin-top:4px">課金キャラとして実装予定です</div>
+      </div>
+      <button class="btn-p" onclick="document.getElementById('coming-soon-modal').classList.remove('open')">閉じる</button>
     </div>
   </div>
 
@@ -835,6 +1036,13 @@ body{
     </div>
     <div class="card">
       <div class="card-title">プロフィール更新</div>
+      <div class="fld" style="margin-bottom:12px">
+        <label>ニックネーム</label>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="st-nickname" placeholder="例: たろう、メシ子..." maxlength="12" style="flex:1">
+          <button onclick="saveNicknameFromSettings()" style="padding:10px 14px;background:linear-gradient(135deg,#7C3AED,#C084FC);color:#fff;border:none;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">変更</button>
+        </div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px">
         <div class="fld"><label>体重 (kg)</label><input type="number" id="st-wt" step="1"></div>
         <div class="fld"><label>年齢</label><input type="number" id="st-age"></div>
@@ -942,6 +1150,163 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
   auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false},
   global:{fetch:(...args)=>fetch(...args)}
 });
+
+// ========== EXP・レベルシステム ==========
+const LS_EXP = 'sotomeshi_exp_v1';
+
+// Lv→次のLvまでの必要EXP（base=46, power=0.1で設計）
+// Lv10=3日, Lv30=10日（毎日MAX160EXP想定）
+function expNeeded(lv) {
+  return Math.max(8, Math.round(46 * Math.pow(lv, 0.1)));
+}
+
+// 累積EXPからLv・現Lv内EXP・次Lvまでの必要EXPを返す
+function calcLevel(totalExp) {
+  let lv = 1, accumulated = 0;
+  while (true) {
+    const needed = expNeeded(lv);
+    if (accumulated + needed > totalExp) {
+      return { lv, current: totalExp - accumulated, needed };
+    }
+    accumulated += needed;
+    lv++;
+  }
+}
+
+function loadExp() {
+  try { return JSON.parse(localStorage.getItem(LS_EXP)) || { total: 0, streak: 0, lastDate: '', mealsToday: new Set() }; }
+  catch { return { total: 0, streak: 0, lastDate: '', mealsToday: [] }; }
+}
+function saveExp(data) {
+  // SetはJSONにならないので配列に変換
+  const save = { ...data, mealsToday: [...(data.mealsToday || [])] };
+  localStorage.setItem(LS_EXP, JSON.stringify(save));
+}
+
+function updateExpUI() {
+  const data = loadExp();
+  const { lv, current, needed } = calcLevel(data.total);
+  const pct = Math.min(100, Math.round(current / needed * 100));
+  const lvEl = document.getElementById('exp-lv-label');
+  const barEl = document.getElementById('exp-bar');
+  const txtEl = document.getElementById('exp-txt');
+  if (lvEl) lvEl.textContent = `Lv ${lv}`;
+  if (barEl) setTimeout(() => { barEl.style.width = pct + '%'; }, 100);
+  if (txtEl) txtEl.textContent = `${current.toLocaleString()} / ${needed.toLocaleString()} EXP`;
+}
+
+// EXP付与のメイン関数
+function gainExp(amount, reason) {
+  const data = loadExp();
+  const before = calcLevel(data.total);
+  data.total += amount;
+  const after = calcLevel(data.total);
+  saveExp(data);
+  updateExpUI();
+
+  // レベルアップ検出
+  if (after.lv > before.lv) {
+    onLevelUp(after.lv);
+  } else {
+    // 通常EXP獲得のトースト
+    showExpToast(`+${amount} EXP（${reason}）`);
+  }
+}
+
+// 食事記録時のEXP（重複防止付き）
+function gainExpForMeal(mealTime) {
+  const data = loadExp();
+  const today = new Date().toISOString().slice(0, 10);
+  // mealsToday をSetに復元
+  const mealsSet = new Set(Array.isArray(data.mealsToday) ? data.mealsToday : []);
+
+  // 連続記録ストリーク更新
+  if (data.lastDate !== today) {
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    data.streak = data.lastDate === yesterday ? (data.streak || 0) + 1 : 1;
+    data.lastDate = today;
+    mealsSet.clear(); // 日付変わったらリセット
+  }
+  data.mealsToday = mealsSet;
+  saveExp(data);
+
+  // 1食記録：+30 EXP（同じ時間帯は1日1回まで）
+  const key = `${today}_${mealTime}`;
+  if (!mealsSet.has(key)) {
+    mealsSet.add(key);
+    data.mealsToday = mealsSet;
+    saveExp(data);
+    gainExp(30, `${mealTime}記録`);
+
+    // 3食コンプリートボーナス
+    const slots = ['朝食', '昼食', '夕食'];
+    const done = slots.filter(s => mealsSet.has(`${today}_${s}`));
+    if (done.length === 3) {
+      setTimeout(() => gainExp(50, '3食コンプリート🎉'), 600);
+    }
+    // 連続記録ボーナス
+    if (data.streak >= 2 && !mealsSet.has(`${today}_streak`)) {
+      mealsSet.add(`${today}_streak`);
+      data.mealsToday = mealsSet;
+      saveExp(data);
+      setTimeout(() => gainExp(20, `${data.streak}日連続🔥`), 1200);
+    }
+  }
+}
+
+// 食品DB登録時のEXP
+function gainExpForRegister() {
+  gainExp(10, 'DB登録');
+}
+
+// レベルアップ処理
+function onLevelUp(newLv) {
+  // メシネコが喜ぶ
+  showMeshikoBubble(`レベルアップにゃ！！\nLv ${newLv} になったにゃ！✨`, 'joy');
+  showExpToast(`🎉 Lv ${newLv} にレベルアップ！`, true);
+
+  // 解禁コンテンツのメッセージ
+  const unlocks = {
+    5:  '新しいセリフが解禁されたにゃ！',
+    10: '着せ替え「サマー」が解禁されたにゃ！',
+    20: '着せ替え「クール」が解禁されたにゃ！',
+    30: '隠しセリフが解禁されたにゃ！',
+    50: '称号「メシマスター」獲得にゃ！！',
+  };
+  if (unlocks[newLv]) {
+    setTimeout(() => showMeshikoBubble(`✨ ${unlocks[newLv]}`, 'joy'), 2000);
+  }
+}
+
+// EXPトースト（既存のshowToastとは別にEXP専用）
+function showExpToast(msg, isLevelUp = false) {
+  const existing = document.getElementById('exp-toast');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'exp-toast';
+  el.style.cssText = `
+    position:fixed;top:${isLevelUp ? '50%' : '72px'};left:50%;transform:translate(-50%,${isLevelUp ? '-50%' : '0'});
+    background:${isLevelUp ? 'linear-gradient(135deg,#F59E0B,#FCD34D)' : 'rgba(30,20,50,0.85)'};
+    color:${isLevelUp ? '#fff' : '#FCD34D'};
+    font-size:${isLevelUp ? '18px' : '12px'};font-weight:800;
+    padding:${isLevelUp ? '18px 32px' : '7px 16px'};
+    border-radius:${isLevelUp ? '20px' : '20px'};
+    box-shadow:${isLevelUp ? '0 8px 32px rgba(245,158,11,0.5)' : '0 4px 16px rgba(0,0,0,0.3)'};
+    z-index:9999;pointer-events:none;
+    font-family:'Zen Maru Gothic',sans-serif;
+    animation:expToastIn .4s cubic-bezier(.34,1.56,.64,1);
+    text-align:center;letter-spacing:.5px;
+  `;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  const dur = isLevelUp ? 2500 : 1800;
+  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .4s'; setTimeout(() => el.remove(), 400); }, dur);
+}
+
+// CSS アニメーション追加
+const expStyle = document.createElement('style');
+expStyle.textContent = `@keyframes expToastIn{from{opacity:0;transform:translate(-50%,-60%)}to{opacity:1;transform:translate(-50%,-50%)}}`;
+document.head.appendChild(expStyle);
 
 // ========== チェーン一覧（検索候補） ==========
 const CHAINS=['松屋','マクドナルド','吉野家','すき家','なか卯','CoCo壱番屋','お惣菜','コンビニ','自炊'];
@@ -1070,7 +1435,7 @@ const LS_MEALS='sotomeshi_meals_v2';
 const LS_WEIGHT='sotomeshi_weight_v2';
 const LS_SETUP='sotomeshi_setup_step';
 
-let S={gender:'male',age:30,ht:170,wt:65,act:1.2,goal:'maintain',restrictions:[],autoMacro:true,eaten:[],tdee:0,tgt:0,macros:{protein:0,fat:0,carb:0},weeklyTotals:{protein:0,fat:0,carb:0,kcal:0,days:1},preferredChains:[]};
+let S={gender:'male',age:30,ht:170,wt:65,act:1.2,goal:'maintain',restrictions:[],autoMacro:true,eaten:[],tdee:0,tgt:0,macros:{protein:0,fat:0,carb:0},weeklyTotals:{protein:0,fat:0,carb:0,kcal:0,days:1},preferredChains:[],nickname:''};
 let gV='male',aV=1.2,goalV='maintain',agreedToTerms=false,searchTabMode='all';
 let ALL_FOODS=[...INIT_FOODS,...MEXT_FOODS];
 let dbFoods=[];
@@ -1322,6 +1687,8 @@ function go(n){
     S.age=+document.getElementById('i-age').value||30;
     S.ht=+document.getElementById('i-ht').value||170;
     S.wt=+document.getElementById('i-wt').value||65;
+    const rawNick = document.getElementById('i-nickname')?.value.trim();
+    S.nickname = rawNick || (S.gender==='female' ? 'メシネキ' : 'メシニキ');
     document.getElementById('s2').classList.add('active');
   }else if(n===3){
     S.act=aV;
@@ -1343,13 +1710,14 @@ async function goMain(){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('s-main').classList.add('active');
   document.getElementById('bnav').style.display='grid';
-  const now=new Date();
-  document.getElementById('hdr-date').textContent=`${now.getMonth()+1}月${now.getDate()}日（${'日月火水木金土'[now.getDay()]}） ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  updateHeaderTime();
+  updateNicknameDisplay();
   document.getElementById('st-wt').value=S.wt;document.getElementById('st-age').value=S.age;
   document.getElementById('m-k').value=S.tgt;document.getElementById('m-p').value=S.macros.protein;
   document.getElementById('m-f').value=S.macros.fat;document.getElementById('m-c').value=S.macros.carb;
   document.getElementById('total-count').textContent=INIT_FOODS.length+MEXT_FOODS.length;
   renderHome();renderDayPlan();renderKiroku();updateMeshiko();
+  updateExpUI();
   await loadFoodsFromDB();
   subscribeRealtime();
   checkDateAndShowReview();
@@ -1583,23 +1951,32 @@ function _doReshuffleMeal(idx){
 function renderHome(){
   const t=tots();const tgt=S.tgt;
   const pct=Math.min(100,Math.round(t.kcal/tgt*100));
-  document.getElementById('hdr-tgt').textContent=tgt+' kcal';
-  document.getElementById('hdr-eaten').textContent=Math.round(t.kcal)+' kcal摂取';
-  document.getElementById('hdr-rem').textContent='残り '+Math.round(tgt-t.kcal)+' kcal';
-  document.getElementById('hdr-bar').style.width=pct+'%';
-  // P/F/C ミニ表示
-  const hp=document.getElementById('hdr-p');
-  const hf=document.getElementById('hdr-f');
-  const hc=document.getElementById('hdr-c');
-  if(hp)hp.textContent=t.protein.toFixed(1)+'g';
-  if(hf)hf.textContent=t.fat.toFixed(1)+'g';
-  if(hc)hc.textContent=t.carb.toFixed(1)+'g';
-  const hpt=document.getElementById('hdr-p-tgt');if(hpt)hpt.textContent='目標'+S.macros.protein+'g';
-  const hft=document.getElementById('hdr-f-tgt');if(hft)hft.textContent='目標'+S.macros.fat+'g';
-  const hct=document.getElementById('hdr-c-tgt');if(hct)hct.textContent='目標'+S.macros.carb+'g';
+
+  // kcalカード
+  const hEatenVal=document.getElementById('hdr-eaten-val');
+  if(hEatenVal)hEatenVal.textContent=Math.round(t.kcal);
+  const hTgt=document.getElementById('hdr-tgt');
+  if(hTgt)hTgt.textContent=tgt+'kcal';
+  const hBar=document.getElementById('hdr-bar');
+  if(hBar)hBar.style.width=pct+'%';
+  const hKcalBar2=document.getElementById('hdr-kcal-bar2');
+  if(hKcalBar2)hKcalBar2.style.width=pct+'%';
+
+  // P/F/C（現在値）
+  const hp=document.getElementById('hdr-p');if(hp)hp.textContent=t.protein.toFixed(1)+'g';
+  const hf=document.getElementById('hdr-f');if(hf)hf.textContent=t.fat.toFixed(1)+'g';
+  const hc=document.getElementById('hdr-c');if(hc)hc.textContent=t.carb.toFixed(1)+'g';
+
+  // P/F/C（目標値）
+  const hpt=document.getElementById('hdr-p-tgt');if(hpt)hpt.textContent=S.macros.protein+'g';
+  const hft=document.getElementById('hdr-f-tgt');if(hft)hft.textContent=S.macros.fat+'g';
+  const hct=document.getElementById('hdr-c-tgt');if(hct)hct.textContent=S.macros.carb+'g';
+
+  // バー
   const hpb=document.getElementById('hdr-p-bar');if(hpb)hpb.style.width=Math.min(100,Math.round(t.protein/S.macros.protein*100))+'%';
   const hfb=document.getElementById('hdr-f-bar');if(hfb)hfb.style.width=Math.min(100,Math.round(t.fat/S.macros.fat*100))+'%';
   const hcb=document.getElementById('hdr-c-bar');if(hcb)hcb.style.width=Math.min(100,Math.round(t.carb/S.macros.carb*100))+'%';
+
   updateMeshiko();
   checkKcalSecret();
 }
@@ -1858,7 +2235,10 @@ function _addFood(id,mealTime){
   const entry={...f,mealTime:mealTime||_guessCurrentMealTime(),addedAt:new Date().toISOString()};
   S.eaten.push(entry);
   S.weeklyTotals.protein+=f.protein;S.weeklyTotals.fat+=f.fat;S.weeklyTotals.carb+=f.carb;S.weeklyTotals.kcal+=f.kcal;
-  saveMeals();saveProfile();return entry;
+  saveMeals();saveProfile();
+  // EXP付与（食事記録）
+  gainExpForMeal(entry.mealTime);
+  return entry;
 }
 
 function _guessCurrentMealTime(){
@@ -2002,6 +2382,7 @@ async function submitFood(){
     renderDayPlan();filterF(document.getElementById('fsearch')?.value||'');
     closeRegModal();btn.disabled=false;btn.textContent='データベースに登録する';
     showToast('登録しました！');
+    gainExpForRegister(); // DB登録EXP
     // フォームリセット
     ['reg-name','reg-store','reg-kcal','reg-protein','reg-fat','reg-carb','reg-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
     document.getElementById('reg-gluten').checked=false;document.getElementById('reg-meat').checked=false;document.getElementById('reg-estimated').checked=false;
@@ -2311,6 +2692,132 @@ function showMeshikoBubble(comment,emotionOverride){
 let _tapCount=0;
 let _tapTimer=null;
 
+// ========== キャラクター選択 ==========
+const CHARA_DATA = {
+  meshineko: {
+    name: 'メシネコ',
+    emoji: '🐱',
+    locked: false,
+    desc: 'ゆる〜く寄り添う食いしん坊ネコ！\nムリせず楽しく続けようにゃ〜',
+  },
+  nana: {
+    name: 'おにぎりなな',
+    emoji: '🍙',
+    locked: true,
+    desc: '管理栄養士の卵の頑張り屋さん♪\nあなたの毎日を全力サポート！',
+    teaser: '「一緒に理想の自分を目指そうね！」',
+  },
+  sou: {
+    name: 'めしや颯',
+    emoji: '⚡',
+    locked: true,
+    desc: 'クールな栄養士。ストイックに、\nでも優しくあなたを導いてくれる。',
+    teaser: '「君の選択が、未来の君をつくる。」',
+  },
+  daichi: {
+    name: 'ごはん島大地',
+    emoji: '🌿',
+    locked: true,
+    desc: '経験豊富な大人の男。余裕のある\nアドバイスで人生も食事もワンランク上へ。',
+    teaser: '「焦るな、うまくいってるさ。」',
+  },
+};
+
+// ========== ニックネーム・時刻・EXPガイド ==========
+function updateHeaderTime() {
+  const now = new Date();
+  const timeEl = document.getElementById('hdr-time');
+  const dateEl = document.getElementById('hdr-date');
+  if (timeEl) timeEl.textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  if (dateEl) dateEl.textContent = `${now.getMonth()+1}月${now.getDate()}日（${'日月火水木金土'[now.getDay()]}）`;
+}
+
+function updateNicknameDisplay() {
+  const el = document.getElementById('hdr-nickname');
+  if (el) el.textContent = S.nickname || (S.gender === 'female' ? 'メシネキ' : 'メシニキ');
+  // 設定タブのニックネーム入力欄も更新
+  const stNick = document.getElementById('st-nickname');
+  if (stNick) stNick.value = S.nickname || '';
+}
+
+function openNicknameModal() {
+  const input = document.getElementById('nickname-input');
+  if (input) input.value = S.nickname || '';
+  document.getElementById('nickname-modal').classList.add('open');
+  setTimeout(() => input && input.focus(), 300);
+}
+
+function saveNickname() {
+  const val = document.getElementById('nickname-input')?.value.trim();
+  S.nickname = val || (S.gender === 'female' ? 'メシネキ' : 'メシニキ');
+  saveProfile();
+  updateNicknameDisplay();
+  document.getElementById('nickname-modal').classList.remove('open');
+  showMeshikoBubble(`${S.nickname}、よろしくにゃ！`, 'joy');
+}
+
+function saveNicknameFromSettings() {
+  const val = document.getElementById('st-nickname')?.value.trim();
+  S.nickname = val || (S.gender === 'female' ? 'メシネキ' : 'メシニキ');
+  saveProfile();
+  updateNicknameDisplay();
+  showToast('ニックネームを変更しました！');
+}
+
+function openExpGuideModal() {
+  document.getElementById('exp-guide-modal').classList.add('open');
+}
+
+function openCharaModal() {
+  document.getElementById('chara-modal').classList.add('open');
+}
+
+function selectChara(id) {
+  const chara = CHARA_DATA[id];
+  if (!chara || chara.locked) return;
+  // 選択状態の更新
+  document.querySelectorAll('.chara-card').forEach(el => {
+    el.style.border = '2px solid #e0e0e0';
+    el.style.boxShadow = 'none';
+    el.querySelectorAll('[style*="使用中"]').forEach(b => b.remove());
+  });
+  const card = document.getElementById('chara-' + id);
+  if (card) {
+    card.style.border = '2px solid var(--pk)';
+    card.style.boxShadow = '0 4px 12px rgba(244,114,182,0.25)';
+    const badge = document.createElement('div');
+    badge.style.cssText = 'position:absolute;top:-6px;right:-4px;background:linear-gradient(135deg,#EC4899,#F472B6);color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:20px;box-shadow:0 2px 6px rgba(236,72,153,0.4)';
+    badge.textContent = '使用中';
+    card.appendChild(badge);
+  }
+  // キャラ切り替えアニメ
+  const img = document.getElementById('meshineko-img');
+  if (img) {
+    img.style.transition = 'opacity .25s';
+    img.style.opacity = '0';
+    setTimeout(() => {
+      updateMeshiko();
+      img.style.opacity = '1';
+    }, 250);
+  }
+  showMeshikoBubble('よろしくにゃ！\n今日も一緒に頑張るにゃ！');
+  document.getElementById('chara-modal').classList.remove('open');
+}
+
+const CS_INFO = {
+  'おにぎりなな': { emoji: '🍙', desc: '管理栄養士の卵の頑張り屋さん♪\nあなたの毎日を全力サポート！\n\n💬「一緒に理想の自分を目指そうね！」' },
+  'めしや颯':     { emoji: '⚡', desc: 'クールな栄養士。ストイックに、\nでも優しくあなたを導いてくれる。\n\n💬「君の選択が、未来の君をつくる。」' },
+  'ごはん島大地': { emoji: '🌿', desc: '経験豊富な大人の男。余裕のある\nアドバイスで人生も食事もワンランク上へ。\n\n💬「焦るな、うまくいってるさ。」' },
+};
+
+function showComingSoon(name) {
+  const info = CS_INFO[name] || { emoji: '🔒', desc: 'もうすぐ登場します！' };
+  document.getElementById('cs-emoji').textContent = info.emoji;
+  document.getElementById('cs-name').textContent = name;
+  document.getElementById('cs-desc').innerHTML = info.desc.replace(/\n/g, '<br>');
+  document.getElementById('coming-soon-modal').classList.add('open');
+}
+
 function meshinekoTap(){
   _tapCount++;
   if(_tapTimer)clearTimeout(_tapTimer);
@@ -2575,13 +3082,14 @@ function checkVersion(){
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
     document.getElementById('s-main').classList.add('active');
     document.getElementById('bnav').style.display='grid';
-    const now=new Date();
-    document.getElementById('hdr-date').textContent=`${now.getMonth()+1}月${now.getDate()}日（${'日月火水木金土'[now.getDay()]}） ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    updateHeaderTime();
+    updateNicknameDisplay();
     document.getElementById('st-wt').value=S.wt;document.getElementById('st-age').value=S.age;
     document.getElementById('m-k').value=S.tgt;document.getElementById('m-p').value=S.macros.protein;
     document.getElementById('m-f').value=S.macros.fat;document.getElementById('m-c').value=S.macros.carb;
     document.getElementById('total-count').textContent=INIT_FOODS.length+MEXT_FOODS.length;
     renderHome();renderDayPlan();renderKiroku();updateMeshiko();
+    updateExpUI();
     loadFoodsFromDB().then(()=>{
       subscribeRealtime();
       checkDateAndShowReview();
@@ -2610,11 +3118,7 @@ function checkVersion(){
   }
 
 // 時刻を1分ごとに更新
-setInterval(()=>{
-  const now=new Date();
-  const el=document.getElementById('hdr-date');
-  if(el)el.textContent=`${now.getMonth()+1}月${now.getDate()}日（${'日月火水木金土'[now.getDay()]}） ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-},60000);
+setInterval(updateHeaderTime, 60000);
 })();
 </script>
 </body>
