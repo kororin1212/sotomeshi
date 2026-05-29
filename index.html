@@ -1889,9 +1889,11 @@ function showMealTimeModal(id,callback){
 function cancelMealTime(){
   document.getElementById('mealtime-modal').classList.remove('open');
   _pendingFoodId=null;_pendingFoodCallback=null;
+  window._regNewFood=null;
   showToast('追加をキャンセルしました');
 }
 function confirmMealTime(mealTime){
+  console.log('[confirmMealTime]', mealTime, '_regNewFood:', !!window._regNewFood, '_pendingFoodId:', _pendingFoodId);
   document.getElementById('mealtime-modal').classList.remove('open');
   // 新規登録からの場合：newFoodを直接追加
   if(window._regNewFood){
@@ -1902,6 +1904,7 @@ function confirmMealTime(mealTime){
     S.weeklyTotals.protein+=f.protein;S.weeklyTotals.fat+=f.fat;S.weeklyTotals.carb+=f.carb;S.weeklyTotals.kcal+=f.kcal;
     saveMeals();saveProfile();
     renderHome();renderKiroku();
+    console.log('[confirmMealTime] 食事記録に追加完了:', entry.name);
     return;
   }
   if(_pendingFoodId&&_addFood(_pendingFoodId,mealTime)){
