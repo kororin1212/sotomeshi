@@ -31,18 +31,19 @@
 body{
   font-family:'Zen Maru Gothic',-apple-system,BlinkMacSystemFont,'Hiragino Sans',sans-serif;
   background:var(--bg-t);color:var(--text);min-height:100vh;
+  scrollbar-gutter:stable;
   background-image:
     radial-gradient(circle at 20% 20%, rgba(196,181,253,0.3) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(251,207,232,0.3) 0%, transparent 50%),
     radial-gradient(circle at 50% 50%, rgba(252,211,77,0.1) 0%, transparent 70%);
 }
-.app{max-width:430px;margin:0 auto;background:transparent;min-height:100vh}
+.app{max-width:430px;margin:0 auto;background:transparent;min-height:100vh;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
 .screen{display:none;padding:16px 16px 90px}.screen.active{display:block}
 
 /* ===== ヘッダー ===== */
 .hdr{
   background:linear-gradient(135deg,#7C3AED 0%,#A855F7 50%,#C084FC 100%);
-  padding:14px 18px 16px;position:sticky;top:0;z-index:10;
+  padding:14px 20px 16px;position:sticky;top:0;z-index:10;
   box-shadow:0 4px 20px rgba(124,58,237,0.35);
 }
 .hdr-row{display:flex;justify-content:space-between;align-items:flex-start}
@@ -321,7 +322,15 @@ body{
   /* スタイルはインラインで管理 */
 }
 
-/* ===== タブ切り替えフェード ===== */
+/* ===== 献立カードフリップアニメーション ===== */
+@keyframes cardFlip{
+  0%{transform:rotateY(0deg);opacity:1}
+  45%{transform:rotateY(90deg);opacity:0}
+  55%{transform:rotateY(90deg);opacity:0}
+  100%{transform:rotateY(0deg);opacity:1}
+}
+.card-flip{animation:cardFlip 0.5s ease-in-out}
+
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .tab-fade{animation:fadeIn 0.5s ease-out}
 </style>
@@ -350,6 +359,16 @@ body{
       本規約は予告なく改定される場合があります。<br>お問い合わせ：lupin3.1212@gmail.com
     </div>
     <button class="btn-p" onclick="closeTerms()">閉じる</button>
+  </div>
+</div>
+
+<!-- ========== 今日のプランモーダル ========== -->
+<div class="modal-bg" id="today-plan-modal">
+  <div class="modal" style="padding-bottom:36px">
+    <div class="modal-title">🌅 今日のおすすめプラン<button onclick="closeTodayPlanModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-h)">×</button></div>
+    <p style="font-size:11px;color:var(--text-h);margin-bottom:12px;font-weight:700">あくまで目安です。実際に食べたものを記録して記録して栄養バランスを整えてにゃ！</p>
+    <div id="today-plan-body"></div>
+    <button class="btn-p" style="margin-top:14px" onclick="closeTodayPlanModal()">よし、今日も頑張るにゃ！</button>
   </div>
 </div>
 
@@ -405,16 +424,18 @@ body{
 
 <!-- ========== 時間帯選択モーダル ========== -->
 <div class="modal-bg" id="mealtime-modal">
-  <div class="modal" style="padding-bottom:40px">
-    <div class="modal-title">いつ食べましたか？</div>
-    <div id="mealtime-food-name" style="font-size:14px;font-weight:700;color:var(--main-m);margin-bottom:16px;text-align:center"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+  <div class="modal" style="padding-bottom:32px">
+    <div class="modal-title">いつ食べましたか？<button onclick="cancelMealTime()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-h)">×</button></div>
+    <div id="mealtime-food-name" style="font-size:15px;font-weight:700;color:var(--main-m);text-align:center;margin-bottom:4px"></div>
+    <div id="mealtime-food-store" style="font-size:11px;color:var(--text-h);text-align:center;margin-bottom:16px;font-weight:700"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
       <button class="mealtime-btn" onclick="confirmMealTime('朝食')" style="padding:14px;background:linear-gradient(135deg,#FFF7E6,#FEF3C7);border:2px solid #FCD34D;border-radius:var(--r);font-size:14px;font-weight:700;color:#92400E;cursor:pointer;font-family:inherit">🌅 朝食</button>
       <button class="mealtime-btn" onclick="confirmMealTime('昼食')" style="padding:14px;background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:2px solid #86EFAC;border-radius:var(--r);font-size:14px;font-weight:700;color:#166534;cursor:pointer;font-family:inherit">☀️ 昼食</button>
       <button class="mealtime-btn" onclick="confirmMealTime('夕食')" style="padding:14px;background:linear-gradient(135deg,#EEF2FF,#E0E7FF);border:2px solid #A5B4FC;border-radius:var(--r);font-size:14px;font-weight:700;color:#3730A3;cursor:pointer;font-family:inherit">🌙 夕食</button>
       <button class="mealtime-btn" onclick="confirmMealTime('間食')" style="padding:14px;background:linear-gradient(135deg,#FDF2F8,#FCE7F3);border:2px solid #F9A8D4;border-radius:var(--r);font-size:14px;font-weight:700;color:#9D174D;cursor:pointer;font-family:inherit">🍩 間食</button>
       <button class="mealtime-btn" onclick="confirmMealTime('深夜')" style="padding:14px;background:linear-gradient(135deg,#1E1B4B,#312E81);border:2px solid #6366F1;border-radius:var(--r);font-size:14px;font-weight:700;color:#C7D2FE;cursor:pointer;font-family:inherit;grid-column:1/-1">🌃 深夜</button>
     </div>
+    <button onclick="cancelMealTime()" style="width:100%;padding:10px;background:none;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;font-weight:700;color:var(--text-s);cursor:pointer;font-family:inherit">← 選択をやめる</button>
   </div>
 </div>
 
@@ -426,7 +447,7 @@ body{
     <div class="fld"><label>メニュー名 *</label><input type="text" id="reg-name" placeholder="例: 牛めし 並盛"></div>
     <div class="fld"><label>店名 *</label><input type="text" id="reg-store" placeholder="例: 松屋"></div>
     <div class="fld"><label>種別</label>
-      <select id="reg-type"><option value="chain">チェーン店</option><option value="super">スーパー・コンビニ</option><option value="recipe">自炊レシピ</option></select>
+      <select id="reg-type"><option value="chain">チェーン店</option><option value="super">お惣菜</option><option value="conv">コンビニ</option><option value="recipe">自炊</option><option value="other">その他</option></select>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
       <div class="fld"><label>カロリー (kcal) *</label><input type="number" id="reg-kcal" placeholder="例: 687" min="0"></div>
@@ -478,6 +499,7 @@ body{
 
 <!-- ========== ステップ2 活動レベル（6段階） ========== -->
 <div id="s2" class="screen" style="padding-top:20px">
+  <button onclick="goBack(1)" class="btn-g" style="margin-bottom:8px">← 戻る</button>
   <div class="step-row"><div class="sdot ok">✓</div><div class="sline ok"></div><div class="sdot on">2</div><div class="sline"></div><div class="sdot">3</div><div class="sline"></div><div class="sdot">4</div><div class="sline"></div><div class="sdot">5</div></div>
   <div class="card">
     <div class="card-title">活動レベル</div>
@@ -493,6 +515,7 @@ body{
 
 <!-- ========== ステップ3 目標（男女別） ========== -->
 <div id="s3" class="screen" style="padding-top:20px">
+  <button onclick="goBack(2)" class="btn-g" style="margin-bottom:8px">← 戻る</button>
   <div class="step-row"><div class="sdot ok">✓</div><div class="sline ok"></div><div class="sdot ok">✓</div><div class="sline ok"></div><div class="sdot on">3</div><div class="sline"></div><div class="sdot">4</div><div class="sline"></div><div class="sdot">5</div></div>
   <div class="card">
     <div class="card-title">目標を教えてください</div>
@@ -503,6 +526,7 @@ body{
 
 <!-- ========== ステップ4 食事制限（糖質制限チェックなし） ========== -->
 <div id="s4" class="screen" style="padding-top:20px">
+  <button onclick="goBack(3)" class="btn-g" style="margin-bottom:8px">← 戻る</button>
   <div class="step-row"><div class="sdot ok">✓</div><div class="sline ok"></div><div class="sdot ok">✓</div><div class="sline ok"></div><div class="sdot ok">✓</div><div class="sline ok"></div><div class="sdot on">4</div><div class="sline"></div><div class="sdot">5</div></div>
   <div class="card">
     <div class="card-title">食事制限（複数可）</div>
@@ -518,6 +542,7 @@ body{
 
 <!-- ========== ステップ5 よく行くチェーン＋規約 ========== -->
 <div id="s5" class="screen" style="padding-top:20px">
+  <button onclick="goBack(4)" class="btn-g" style="margin-bottom:8px">← 戻る</button>
   <div class="step-row"><div class="sdot ok">✓</div><div class="sline ok"></div><div class="sdot ok">✓</div><div class="sline ok"></div><div class="sdot ok">✓</div><div class="sline ok"></div><div class="sdot ok">✓</div><div class="sline ok"></div><div class="sdot on">5</div></div>
   <div class="card">
     <div class="card-title">よく行くチェーン・店を登録</div>
@@ -576,12 +601,10 @@ body{
   </div>
 
   <!-- ホームタブ -->
-  <div id="t-home" style="display:block">
+  <div id="t-home" style="display:block;padding:14px 18px 0">
 
     <!-- ① 献立 -->
-    <div style="padding:10px 16px 0">
-      <div id="day-plan-wrap"></div>
-    </div>
+    <div id="day-plan-wrap"></div>
 
     <!-- ② 吹き出し + ③ メシネコ（縦並び・間隔なし） -->
     <div id="meshineko-stage" onclick="meshinekoTap()" style="cursor:pointer;text-align:center;padding:8px 16px 0">
@@ -599,7 +622,7 @@ body{
   </div>
 
   <!-- 記録タブ（食事記録・栄養バランス） -->
-  <div id="t-kiroku" style="display:none;padding:14px 16px 0">
+  <div id="t-kiroku" style="display:none;padding:14px 18px 0">
     <div class="card">
       <div class="card-title">栄養バランス</div>
       <div id="nbars"></div>
@@ -613,7 +636,7 @@ body{
   </div>
 
   <!-- ランキングタブ -->
-  <div id="t-suggest" style="display:none">
+  <div id="t-suggest" style="display:none;padding:14px 18px 0">
     <div id="s-alerts"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <div>
@@ -651,7 +674,7 @@ body{
   </div>
 
   <!-- 体重タブ -->
-  <div id="t-weight" style="display:none;padding:14px 16px 0">
+  <div id="t-weight" style="display:none;padding:14px 18px 0">
 
     <!-- メシネココメントエリア -->
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
@@ -712,7 +735,14 @@ body{
   </div>
 
   <!-- 設定タブ -->
-  <div id="t-settings" style="display:none">
+  <div id="t-settings" style="display:none;padding:14px 18px 0">
+    <!-- フィードバック -->
+    <div class="card">
+      <div class="card-title">💬 フィードバックを送る</div>
+      <p style="font-size:11px;color:var(--text-s);margin-bottom:10px;line-height:1.7">使いにくい点・欲しい機能・バグ報告など、何でもお気軽にどうぞ。開発の参考にさせていただきます。</p>
+      <textarea id="feedback-text" placeholder="例：〇〇の画面がわかりにくい、△△機能が欲しい..." style="width:100%;height:100px;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);background:var(--bg-s);outline:none;font-family:inherit;resize:vertical;line-height:1.6"></textarea>
+      <button class="btn-p" style="margin-top:8px" onclick="sendFeedback()">送信する</button>
+    </div>
     <div class="card">
       <div class="card-title">マクロ目標設定</div>
       <div class="trow"><div><div class="tl">自動計算</div><div class="td">TDEE・目標から自動で算出</div></div><div class="tog on" id="auto-tog" onclick="togAuto(this)"></div></div>
@@ -730,12 +760,39 @@ body{
       <div class="trow"><div><div class="tl">高タンパク重視</div><div class="td">タンパク質 20g 以上を優先</div></div><div class="tog" id="tog-hp" onclick="togS('high_protein',this)"></div></div>
       <div class="trow"><div><div class="tl">低脂質</div><div class="td">脂質 15g 以下を優先</div></div><div class="tog" id="tog-lf" onclick="togS('low_fat',this)"></div></div>
       <div class="trow"><div><div class="tl">低カロリー重視</div><div class="td">1食 500 kcal 以下を優先</div></div><div class="tog" id="tog-lo" onclick="togS('low_cal',this)"></div></div>
+      <div class="trow"><div><div class="tl">グルテンフリー</div><div class="td">小麦を含むメニューを除外</div></div><div class="tog" id="tog-gl" onclick="togS('no_gluten',this)"></div></div>
+      <div class="trow"><div><div class="tl">ベジタリアン</div><div class="td">肉・魚を含むメニューを除外</div></div><div class="tog" id="tog-vg" onclick="togS('vegetarian',this)"></div></div>
     </div>
     <div class="card">
       <div class="card-title">プロフィール更新</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
-        <div class="fld"><label>体重 (kg)</label><input type="number" id="st-wt" step="0.1"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px">
+        <div class="fld"><label>体重 (kg)</label><input type="number" id="st-wt" step="1"></div>
         <div class="fld"><label>年齢</label><input type="number" id="st-age"></div>
+        <div class="fld"><label>身長 (cm)</label><input type="number" id="st-ht" step="1"></div>
+        <div class="fld"><label>性別</label>
+          <select id="st-gender" style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);background:var(--bg-s);outline:none;font-family:inherit">
+            <option value="male">男性</option>
+            <option value="female">女性</option>
+          </select>
+        </div>
+      </div>
+      <div class="fld"><label>活動レベル</label>
+        <select id="st-act" style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);background:var(--bg-s);outline:none;font-family:inherit">
+          <option value="1.2">ほぼ座って過ごす（デスクワーク中心）</option>
+          <option value="1.375">軽い運動あり（週1〜2回）</option>
+          <option value="1.46">中程度の運動（週2〜3回）</option>
+          <option value="1.55">活発な運動（週4〜5回）</option>
+          <option value="1.65">ほぼ毎日の運動</option>
+          <option value="1.725">ハードな運動・肉体労働</option>
+        </select>
+      </div>
+      <div class="fld"><label>目標</label>
+        <select id="st-goal" style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);background:var(--bg-s);outline:none;font-family:inherit">
+          <option value="lose">体重を減らしたい</option>
+          <option value="maintain">現状維持したい</option>
+          <option value="muscle">筋肉をつけたい</option>
+          <option value="beauty">健康的な食生活を送りたい</option>
+        </select>
       </div>
       <button class="btn-p" style="margin-top:2px" onclick="applyProfile()">プロフィールを更新</button>
     </div>
@@ -755,7 +812,7 @@ body{
   </div>
 
   <!-- 食事追加タブ（タブなし・検索のみ・新規登録を最上部） -->
-  <div id="t-add" style="display:none">
+  <div id="t-add" style="display:none;padding:14px 18px 0">
     <button class="btn-g" onclick="sw('home')">← 戻る</button>
     <!-- 新規登録を最上部に固定 -->
     <div class="si" onclick="openRegModal()" style="background:var(--blue-l);border-color:var(--blue-b);margin-bottom:4px">
@@ -796,7 +853,7 @@ body{
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h6a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>記録
   </button>
   <button class="nb" id="nb-suggest" onclick="sw('suggest')">
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="11" width="4" height="7" rx="1"/><rect x="8" y="7" width="4" height="11" rx="1"/><rect x="15" y="3" width="4" height="15" rx="1"/></svg>ランキング
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="11" width="4" height="7" rx="1"/><rect x="8" y="7" width="4" height="11" rx="1"/><rect x="15" y="3" width="4" height="15" rx="1"/></svg>おすすめ
   </button>
   <button class="nb" id="nb-weight" onclick="sw('weight')">
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 17 7 11 11 13 15 7 17 9"/></svg>からだ
@@ -841,100 +898,100 @@ const GOALS={
 
 // ========== 初期データ ==========
 const INIT_FOODS=[
-  {id:'local-101',name:'牛めし 小盛',store:'松屋',type:'chain',kcal:507,protein:13.1,fat:22.8,carb:59.6,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-102',name:'牛めし 並盛',store:'松屋',type:'chain',kcal:687,protein:17.1,fat:28.9,carb:85.5,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-103',name:'牛めし 大盛',store:'松屋',type:'chain',kcal:933,protein:22.3,fat:35.9,carb:124.3,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-104',name:'牛めし 特盛',store:'松屋',type:'chain',kcal:1237,protein:31.0,fat:56.3,carb:145.1,gluten:true,meat:true,estimated:false,meal_time:['D']},
-  {id:'local-105',name:'ネギたっぷり旨辛ネギたま牛めし 並盛',store:'松屋',type:'chain',kcal:818,protein:24.7,fat:36.2,carb:94.1,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-106',name:'鬼おろしポン酢牛めし 並盛',store:'松屋',type:'chain',kcal:714,protein:18.3,fat:29.1,carb:90.8,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-107',name:'キムチ牛めし 並盛',store:'松屋',type:'chain',kcal:736,protein:18.9,fat:29.7,carb:94.4,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-108',name:'チーズ牛めし 並盛',store:'松屋',type:'chain',kcal:846,protein:25.3,fat:42.3,carb:87.1,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-109',name:'創業ビーフカレー',store:'松屋',type:'chain',kcal:769,protein:17.9,fat:28.8,carb:102.8,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-110',name:'牛焼肉定食',store:'松屋',type:'chain',kcal:806,protein:23.3,fat:41.3,carb:86.5,gluten:false,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-111',name:'炙り焼鮭定食',store:'松屋',type:'chain',kcal:698,protein:25.7,fat:24.0,carb:91.0,gluten:true,meat:true,estimated:false,meal_time:['B','L','D']},
-  {id:'local-112',name:'厚切り豚ロースグリル定食',store:'松屋',type:'chain',kcal:963,protein:38.0,fat:36.0,carb:88.0,gluten:false,meat:true,estimated:false,meal_time:['D']},
-  {id:'local-201',name:'ビッグマック',store:'マクドナルド',type:'chain',kcal:525,protein:26.1,fat:28.0,carb:42.1,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-202',name:'てりやきマックバーガー',store:'マクドナルド',type:'chain',kcal:477,protein:14.5,fat:30.2,carb:37.5,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-203',name:'てりやきチキンフィレオ',store:'マクドナルド',type:'chain',kcal:496,protein:20.1,fat:23.0,carb:52.8,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-204',name:'チキンフィレオ',store:'マクドナルド',type:'chain',kcal:479,protein:19.9,fat:23.8,carb:47.0,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-205',name:'エッグマックマフィン',store:'マクドナルド',type:'chain',kcal:310,protein:18.6,fat:13.6,carb:27.2,gluten:true,meat:true,estimated:false,meal_time:['B','L']},
-  {id:'local-206',name:'ダブルチーズバーガー',store:'マクドナルド',type:'chain',kcal:459,protein:26.4,fat:25.1,carb:31.8,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-207',name:'チーズバーガー',store:'マクドナルド',type:'chain',kcal:310,protein:15.9,fat:13.5,carb:31.0,gluten:true,meat:true,estimated:false,meal_time:['L','S']},
-  {id:'local-208',name:'サイドサラダ',store:'マクドナルド',type:'chain',kcal:23,protein:1.5,fat:0.2,carb:3.8,gluten:false,meat:false,estimated:false,meal_time:['B','L','D','S']},
-  {id:'local-209',name:'マックフライポテト M',store:'マクドナルド',type:'chain',kcal:454,protein:5.8,fat:22.0,carb:57.4,gluten:false,meat:false,estimated:false,meal_time:['L','S']},
-  {id:'local-301',name:'牛丼 並盛',store:'吉野家',type:'chain',kcal:633,protein:19.6,fat:23.6,carb:88.2,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-302',name:'牛丼 大盛',store:'吉野家',type:'chain',kcal:823,protein:24.8,fat:29.0,carb:119.5,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-303',name:'牛丼 特盛',store:'吉野家',type:'chain',kcal:1006,protein:33.5,fat:44.2,carb:122.3,gluten:true,meat:true,estimated:false,meal_time:['D']},
-  {id:'local-304',name:'牛カルビ丼 並盛',store:'吉野家',type:'chain',kcal:696,protein:21.3,fat:26.2,carb:96.4,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-305',name:'焼魚牛小鉢定食',store:'吉野家',type:'chain',kcal:622,protein:24.4,fat:19.6,carb:88.5,gluten:true,meat:true,estimated:false,meal_time:['B','L','D']},
-  {id:'local-401',name:'牛丼 並盛',store:'すき家',type:'chain',kcal:725,protein:23.3,fat:23.8,carb:104.8,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-402',name:'牛丼 大盛',store:'すき家',type:'chain',kcal:938,protein:30.0,fat:31.1,carb:135.1,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-403',name:'ねぎ玉牛丼 並盛',store:'すき家',type:'chain',kcal:802,protein:29.4,fat:29.9,carb:104.8,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-404',name:'牛丼ライト 並盛',store:'すき家',type:'chain',kcal:397,protein:22.8,fat:26.8,carb:16.8,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-405',name:'お食事サラダ',store:'すき家',type:'chain',kcal:247,protein:24.5,fat:7.8,carb:21.5,gluten:false,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-501',name:'親子丼 並盛',store:'なか卯',type:'chain',kcal:620,protein:28.9,fat:12.1,carb:94.9,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-502',name:'和風牛丼 並盛',store:'なか卯',type:'chain',kcal:713,protein:18.7,fat:26.2,carb:95.2,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-503',name:'かけうどん 並',store:'なか卯',type:'chain',kcal:319,protein:8.1,fat:7.2,carb:55.6,gluten:true,meat:false,estimated:false,meal_time:['B','L']},
-  {id:'local-504',name:'からあげ定食',store:'なか卯',type:'chain',kcal:690,protein:33.0,fat:13.7,carb:106.0,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-601',name:'ポークカレー（普通）',store:'CoCo壱番屋',type:'chain',kcal:701,protein:11.0,fat:18.3,carb:126.9,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-602',name:'チキンにこみカレー（普通）',store:'CoCo壱番屋',type:'chain',kcal:769,protein:24.4,fat:19.7,carb:128.7,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-603',name:'低糖質カレー（カリフラワーライス）',store:'CoCo壱番屋',type:'chain',kcal:255,protein:8.0,fat:15.4,carb:19.7,gluten:true,meat:true,estimated:false,meal_time:['L','D']},
-  {id:'local-901',name:'卵かけごはん',store:'自炊',type:'recipe',kcal:310,protein:14,fat:9,carb:45,gluten:false,meat:false,estimated:false,desc:'5分',meal_time:['B']},
-  {id:'local-902',name:'サラダチキン丼',store:'自炊',type:'recipe',kcal:380,protein:30,fat:4,carb:52,gluten:false,meat:true,estimated:false,desc:'3分',meal_time:['B','L','D']},
-  {id:'local-903',name:'納豆ごはん',store:'自炊',type:'recipe',kcal:290,protein:16,fat:5,carb:44,gluten:false,meat:false,estimated:false,desc:'即完成',meal_time:['B']},
+  {id:'local-101',name:'牛めし 小盛',store:'松屋',type:'chain',kcal:507,protein:13.1,fat:22.8,carb:59.6,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-102',name:'牛めし 並盛',store:'松屋',type:'chain',kcal:687,protein:17.1,fat:28.9,carb:85.5,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-103',name:'牛めし 大盛',store:'松屋',type:'chain',kcal:933,protein:22.3,fat:35.9,carb:124.3,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-104',name:'牛めし 特盛',store:'松屋',type:'chain',kcal:1237,protein:31.0,fat:56.3,carb:145.1,gluten:true,meat:true,estimated:false,meal_time:['D'],role:'main'},
+  {id:'local-105',name:'ネギたっぷり旨辛ネギたま牛めし 並盛',store:'松屋',type:'chain',kcal:818,protein:24.7,fat:36.2,carb:94.1,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-106',name:'鬼おろしポン酢牛めし 並盛',store:'松屋',type:'chain',kcal:714,protein:18.3,fat:29.1,carb:90.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-107',name:'キムチ牛めし 並盛',store:'松屋',type:'chain',kcal:736,protein:18.9,fat:29.7,carb:94.4,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-108',name:'チーズ牛めし 並盛',store:'松屋',type:'chain',kcal:846,protein:25.3,fat:42.3,carb:87.1,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-109',name:'創業ビーフカレー',store:'松屋',type:'chain',kcal:769,protein:17.9,fat:28.8,carb:102.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-110',name:'牛焼肉定食',store:'松屋',type:'chain',kcal:806,protein:23.3,fat:41.3,carb:86.5,gluten:false,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-111',name:'炙り焼鮭定食',store:'松屋',type:'chain',kcal:698,protein:25.7,fat:24.0,carb:91.0,gluten:true,meat:true,estimated:false,meal_time:['B','L','D'],role:'main'},
+  {id:'local-112',name:'厚切り豚ロースグリル定食',store:'松屋',type:'chain',kcal:963,protein:38.0,fat:36.0,carb:88.0,gluten:false,meat:true,estimated:false,meal_time:['D'],role:'main'},
+  {id:'local-201',name:'ビッグマック',store:'マクドナルド',type:'chain',kcal:525,protein:26.1,fat:28.0,carb:42.1,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-202',name:'てりやきマックバーガー',store:'マクドナルド',type:'chain',kcal:477,protein:14.5,fat:30.2,carb:37.5,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-203',name:'てりやきチキンフィレオ',store:'マクドナルド',type:'chain',kcal:496,protein:20.1,fat:23.0,carb:52.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-204',name:'チキンフィレオ',store:'マクドナルド',type:'chain',kcal:479,protein:19.9,fat:23.8,carb:47.0,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-205',name:'エッグマックマフィン',store:'マクドナルド',type:'chain',kcal:310,protein:18.6,fat:13.6,carb:27.2,gluten:true,meat:true,estimated:false,meal_time:['B','L'],role:'main'},
+  {id:'local-206',name:'ダブルチーズバーガー',store:'マクドナルド',type:'chain',kcal:459,protein:26.4,fat:25.1,carb:31.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-207',name:'チーズバーガー',store:'マクドナルド',type:'chain',kcal:310,protein:15.9,fat:13.5,carb:31.0,gluten:true,meat:true,estimated:false,meal_time:['L','S'],role:'main'},
+  {id:'local-208',name:'サイドサラダ',store:'マクドナルド',type:'chain',kcal:23,protein:1.5,fat:0.2,carb:3.8,gluten:false,meat:false,estimated:false,meal_time:['B','L','D','S'],role:'side'},
+  {id:'local-209',name:'マックフライポテト M',store:'マクドナルド',type:'chain',kcal:454,protein:5.8,fat:22.0,carb:57.4,gluten:false,meat:false,estimated:false,meal_time:['L','S'],role:'side'},
+  {id:'local-301',name:'牛丼 並盛',store:'吉野家',type:'chain',kcal:633,protein:19.6,fat:23.6,carb:88.2,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-302',name:'牛丼 大盛',store:'吉野家',type:'chain',kcal:823,protein:24.8,fat:29.0,carb:119.5,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-303',name:'牛丼 特盛',store:'吉野家',type:'chain',kcal:1006,protein:33.5,fat:44.2,carb:122.3,gluten:true,meat:true,estimated:false,meal_time:['D'],role:'main'},
+  {id:'local-304',name:'牛カルビ丼 並盛',store:'吉野家',type:'chain',kcal:696,protein:21.3,fat:26.2,carb:96.4,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-305',name:'焼魚牛小鉢定食',store:'吉野家',type:'chain',kcal:622,protein:24.4,fat:19.6,carb:88.5,gluten:true,meat:true,estimated:false,meal_time:['B','L','D'],role:'main'},
+  {id:'local-401',name:'牛丼 並盛',store:'すき家',type:'chain',kcal:725,protein:23.3,fat:23.8,carb:104.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-402',name:'牛丼 大盛',store:'すき家',type:'chain',kcal:938,protein:30.0,fat:31.1,carb:135.1,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-403',name:'ねぎ玉牛丼 並盛',store:'すき家',type:'chain',kcal:802,protein:29.4,fat:29.9,carb:104.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-404',name:'牛丼ライト 並盛',store:'すき家',type:'chain',kcal:397,protein:22.8,fat:26.8,carb:16.8,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-405',name:'お食事サラダ',store:'すき家',type:'chain',kcal:247,protein:24.5,fat:7.8,carb:21.5,gluten:false,meat:true,estimated:false,meal_time:['L','D'],role:'side'},
+  {id:'local-501',name:'親子丼 並盛',store:'なか卯',type:'chain',kcal:620,protein:28.9,fat:12.1,carb:94.9,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-502',name:'和風牛丼 並盛',store:'なか卯',type:'chain',kcal:713,protein:18.7,fat:26.2,carb:95.2,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-503',name:'かけうどん 並',store:'なか卯',type:'chain',kcal:319,protein:8.1,fat:7.2,carb:55.6,gluten:true,meat:false,estimated:false,meal_time:['B','L'],role:'both'},
+  {id:'local-504',name:'からあげ定食',store:'なか卯',type:'chain',kcal:690,protein:33.0,fat:13.7,carb:106.0,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-601',name:'ポークカレー（普通）',store:'CoCo壱番屋',type:'chain',kcal:701,protein:11.0,fat:18.3,carb:126.9,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-602',name:'チキンにこみカレー（普通）',store:'CoCo壱番屋',type:'chain',kcal:769,protein:24.4,fat:19.7,carb:128.7,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-603',name:'低糖質カレー（カリフラワーライス）',store:'CoCo壱番屋',type:'chain',kcal:255,protein:8.0,fat:15.4,carb:19.7,gluten:true,meat:true,estimated:false,meal_time:['L','D'],role:'main'},
+  {id:'local-901',name:'卵かけごはん',store:'自炊',type:'recipe',kcal:310,protein:14,fat:9,carb:45,gluten:false,meat:false,estimated:false,desc:'5分',meal_time:['B'],role:'main'},
+  {id:'local-902',name:'サラダチキン丼',store:'自炊',type:'recipe',kcal:380,protein:30,fat:4,carb:52,gluten:false,meat:true,estimated:false,desc:'3分',meal_time:['B','L','D'],role:'main'},
+  {id:'local-903',name:'納豆ごはん',store:'自炊',type:'recipe',kcal:290,protein:16,fat:5,carb:44,gluten:false,meat:false,estimated:false,desc:'即完成',meal_time:['B'],role:'main'},
 ];
 
 // 文部科学省「日本食品標準成分表（八訂）増補2023年」第18群 調理済み流通食品類から引用
 // 出典：日本食品標準成分表（八訂）増補2023年（文部科学省）商用利用可・出所明記条件
 const MEXT_FOODS=[
-  {id:'mext-18024',name:'青菜の白和え',store:'お惣菜',type:'super',kcal:122,protein:6.3,fat:5.1,carb:13.8,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18025',name:'いんげんのごま和え',store:'お惣菜',type:'super',kcal:116,protein:5.5,fat:5.1,carb:10.8,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18026',name:'わかめとねぎの酢みそ和え',store:'お惣菜',type:'super',kcal:128,protein:5.7,fat:1.4,carb:22.4,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18028',name:'とん汁',store:'お惣菜',type:'super',kcal:39,protein:2.2,fat:2.2,carb:2.4,gluten:false,meat:true,estimated:true,desc:'1人前150g',meal_time:['B','L','D']},
-  {id:'mext-18027',name:'紅白なます',store:'お惣菜',type:'super',kcal:51,protein:0.9,fat:0.9,carb:9.8,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18029',name:'卯の花いり',store:'お惣菜',type:'super',kcal:126,protein:6.6,fat:6.2,carb:11.1,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18030',name:'親子丼の具',store:'お惣菜',type:'super',kcal:202,protein:16.8,fat:10.4,carb:11.6,gluten:false,meat:true,estimated:true,desc:'1人前200g',meal_time:['L','D']},
-  {id:'mext-18031',name:'牛飯の具',store:'お惣菜',type:'super',kcal:244,protein:8.2,fat:18.8,carb:13.2,gluten:false,meat:true,estimated:true,desc:'1人前200g',meal_time:['L','D']},
-  {id:'mext-18032',name:'切り干し大根の煮物',store:'お惣菜',type:'super',kcal:72,protein:3.5,fat:3.8,carb:7.2,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18033',name:'きんぴらごぼう',store:'お惣菜',type:'super',kcal:126,protein:2.1,fat:6.8,carb:9.6,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18034',name:'ぜんまいのいため煮',store:'お惣菜',type:'super',kcal:120,protein:5.1,fat:6.3,carb:10.7,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18035',name:'筑前煮',store:'お惣菜',type:'super',kcal:153,protein:7.9,fat:6.3,carb:15.8,gluten:false,meat:true,estimated:true,desc:'1人前180g',meal_time:['L','D']},
-  {id:'mext-18036',name:'肉じゃが',store:'お惣菜',type:'super',kcal:156,protein:8.6,fat:2.6,carb:25.0,gluten:false,meat:true,estimated:true,desc:'1人前200g',meal_time:['L','D']},
-  {id:'mext-18037',name:'ひじきのいため煮',store:'お惣菜',type:'super',kcal:112,protein:4.7,fat:6.0,carb:10.9,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18038',name:'アジの南蛮漬け',store:'お惣菜',type:'super',kcal:164,protein:12.2,fat:9.2,carb:11.2,gluten:false,meat:true,estimated:true,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18053',name:'お好み焼き',store:'お惣菜',type:'super',kcal:340,protein:13.0,fat:16.2,carb:31.0,gluten:true,meat:false,estimated:false,desc:'1人前250g',meal_time:['L','D']},
-  {id:'mext-18054',name:'とりから揚げ',store:'お惣菜',type:'super',kcal:306,protein:23.4,fat:15.2,carb:26.4,gluten:false,meat:true,estimated:false,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18023',name:'松前漬け しょうゆ漬',store:'お惣菜',type:'super',kcal:249,protein:25.5,fat:2.1,carb:31.5,gluten:false,meat:false,estimated:false,desc:'1人前150g',meal_time:['L','D','S']},
-  {id:'mext-18040',name:'チキンカレー',store:'お惣菜',type:'super',kcal:707,protein:30.2,fat:47.5,carb:42.1,gluten:false,meat:true,estimated:true,desc:'1人前540g',meal_time:['L','D']},
-  {id:'mext-18001',name:'ビーフカレー',store:'お惣菜',type:'super',kcal:643,protein:13.0,fat:48.6,carb:42.7,gluten:false,meat:true,estimated:true,desc:'1人前540g',meal_time:['L','D']},
-  {id:'mext-18041',name:'ポークカレー',store:'お惣菜',type:'super',kcal:626,protein:15.1,fat:46.4,carb:41.6,gluten:false,meat:true,estimated:true,desc:'1人前540g',meal_time:['L','D']},
-  {id:'mext-18043',name:'カニクリームコロッケ',store:'お惣菜',type:'super',kcal:306,protein:6.1,fat:20.5,carb:26.9,gluten:true,meat:false,estimated:true,desc:'1人前120g',meal_time:['L','D']},
-  {id:'mext-18044',name:'コーンクリームコロッケ',store:'お惣菜',type:'super',kcal:294,protein:6.1,fat:19.2,carb:28.1,gluten:true,meat:false,estimated:true,desc:'1人前120g',meal_time:['L','D']},
-  {id:'mext-18018',name:'ポテトコロッケ',store:'お惣菜',type:'super',kcal:271,protein:6.4,fat:15.1,carb:29.5,gluten:true,meat:false,estimated:true,desc:'1人前120g',meal_time:['L','D']},
-  {id:'mext-18045',name:'チキンシチュー',store:'お惣菜',type:'super',kcal:372,protein:18.6,fat:24.0,carb:22.5,gluten:false,meat:true,estimated:true,desc:'1人前300g',meal_time:['L','D']},
-  {id:'mext-18011',name:'ビーフシチュー',store:'お惣菜',type:'super',kcal:459,protein:12.3,fat:37.8,carb:22.5,gluten:false,meat:true,estimated:true,desc:'1人前300g',meal_time:['D']},
-  {id:'mext-18015',name:'ミートボール',store:'お惣菜',type:'super',kcal:298,protein:15.3,fat:18.8,carb:21.4,gluten:true,meat:true,estimated:true,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18042',name:'かぼちゃのクリームスープ',store:'お惣菜',type:'super',kcal:110,protein:2.2,fat:5.8,carb:14.1,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['B','L','S']},
-  {id:'mext-18005',name:'コーンクリームスープ',store:'お惣菜',type:'super',kcal:93,protein:2.5,fat:3.9,carb:12.4,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['B','L','S']},
-  {id:'mext-18050',name:'合いびきハンバーグ',store:'お惣菜',type:'super',kcal:236,protein:16.1,fat:14.6,carb:13.9,gluten:true,meat:true,estimated:true,desc:'1人前120g',meal_time:['L','D']},
-  {id:'mext-18051',name:'チキンハンバーグ',store:'お惣菜',type:'super',kcal:205,protein:15.1,fat:12.2,carb:11.9,gluten:true,meat:true,estimated:true,desc:'1人前120g',meal_time:['L','D']},
-  {id:'mext-18052',name:'豆腐ハンバーグ',store:'お惣菜',type:'super',kcal:170,protein:11.9,fat:11.0,carb:10.6,gluten:true,meat:true,estimated:true,desc:'1人前120g',meal_time:['L','D']},
-  {id:'mext-18019',name:'いかフライ',store:'お惣菜',type:'super',kcal:227,protein:13.3,fat:11.3,carb:22.6,gluten:true,meat:true,estimated:true,desc:'1人前100g',meal_time:['L','D']},
-  {id:'mext-18020',name:'えびフライ',store:'お惣菜',type:'super',kcal:283,protein:19.1,fat:13.9,carb:27.2,gluten:true,meat:true,estimated:true,desc:'1人前120g',meal_time:['L','D']},
-  {id:'mext-18055',name:'かきフライ',store:'お惣菜',type:'super',kcal:347,protein:10.7,fat:21.6,carb:32.2,gluten:true,meat:true,estimated:false,desc:'1人前120g',meal_time:['L','D']},
-  {id:'mext-18021',name:'白身フライ',store:'お惣菜',type:'super',kcal:448,protein:14.6,fat:32.7,carb:23.9,gluten:true,meat:true,estimated:false,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18022',name:'メンチカツ',store:'お惣菜',type:'super',kcal:328,protein:12.8,fat:22.4,carb:23.2,gluten:true,meat:true,estimated:true,desc:'1人前120g',meal_time:['L','D']},
-  {id:'mext-18003',name:'えびグラタン',store:'お惣菜',type:'super',kcal:256,protein:11.0,fat:13.8,carb:24.6,gluten:true,meat:true,estimated:true,desc:'1人前200g',meal_time:['L','D']},
-  {id:'mext-18014',name:'えびピラフ',store:'お惣菜',type:'super',kcal:511,protein:11.6,fat:8.0,carb:102.9,gluten:false,meat:true,estimated:true,desc:'1人前350g',meal_time:['L','D']},
-  {id:'mext-18002',name:'ぎょうざ',store:'お惣菜',type:'super',kcal:314,protein:10.3,fat:16.9,carb:35.0,gluten:true,meat:true,estimated:true,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18012',name:'しゅうまい',store:'お惣菜',type:'super',kcal:229,protein:10.9,fat:11.0,carb:23.9,gluten:true,meat:true,estimated:true,desc:'1人前120g',meal_time:['L','D']},
-  {id:'mext-18046',name:'中華ちまき',store:'お惣菜',type:'super',kcal:261,protein:8.8,fat:8.2,carb:42.6,gluten:true,meat:true,estimated:true,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18056',name:'春巻き',store:'お惣菜',type:'super',kcal:332,protein:9.0,fat:28.9,carb:39.8,gluten:true,meat:true,estimated:false,desc:'1人前150g',meal_time:['L','D']},
-  {id:'mext-18047',name:'酢豚',store:'お惣菜',type:'super',kcal:154,protein:9.2,fat:6.6,carb:15.4,gluten:false,meat:true,estimated:true,desc:'1人前200g',meal_time:['L','D']},
-  {id:'mext-18057',name:'チャーハン',store:'お惣菜',type:'super',kcal:721,protein:17.5,fat:18.2,carb:109.9,gluten:false,meat:false,estimated:false,desc:'1人前350g',meal_time:['L','D']},
-  {id:'mext-18048',name:'八宝菜',store:'お惣菜',type:'super',kcal:160,protein:14.5,fat:8.0,carb:10.0,gluten:false,meat:true,estimated:true,desc:'1人前250g',meal_time:['L','D']},
-  {id:'mext-18049',name:'麻婆豆腐',store:'お惣菜',type:'super',kcal:260,protein:19.5,fat:17.0,carb:10.2,gluten:false,meat:false,estimated:true,desc:'1人前250g',meal_time:['L','D']},
-  {id:'mext-18039',name:'もやしのナムル',store:'お惣菜',type:'super',kcal:56,protein:2.5,fat:3.6,carb:3.2,gluten:false,meat:false,estimated:true,desc:'1人前80g',meal_time:['L','D','S']},
+  {id:'mext-18024',name:'青菜の白和え',store:'お惣菜',type:'super',kcal:122,protein:6.3,fat:5.1,carb:13.8,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D'],role:'side'},
+  {id:'mext-18025',name:'いんげんのごま和え',store:'お惣菜',type:'super',kcal:116,protein:5.5,fat:5.1,carb:10.8,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D'],role:'side'},
+  {id:'mext-18026',name:'わかめとねぎの酢みそ和え',store:'お惣菜',type:'super',kcal:128,protein:5.7,fat:1.4,carb:22.4,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D'],role:'side'},
+  {id:'mext-18028',name:'とん汁',store:'お惣菜',type:'super',kcal:39,protein:2.2,fat:2.2,carb:2.4,gluten:false,meat:true,estimated:true,desc:'1人前150g',meal_time:['B','L','D'],role:'side'},
+  {id:'mext-18027',name:'紅白なます',store:'お惣菜',type:'super',kcal:51,protein:0.9,fat:0.9,carb:9.8,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D'],role:'side'},
+  {id:'mext-18029',name:'卯の花いり',store:'お惣菜',type:'super',kcal:126,protein:6.6,fat:6.2,carb:11.1,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D'],role:'side'},
+  {id:'mext-18030',name:'親子丼の具',store:'お惣菜',type:'super',kcal:202,protein:16.8,fat:10.4,carb:11.6,gluten:false,meat:true,estimated:true,desc:'1人前200g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18031',name:'牛飯の具',store:'お惣菜',type:'super',kcal:244,protein:8.2,fat:18.8,carb:13.2,gluten:false,meat:true,estimated:true,desc:'1人前200g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18032',name:'切り干し大根の煮物',store:'お惣菜',type:'super',kcal:72,protein:3.5,fat:3.8,carb:7.2,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D'],role:'side'},
+  {id:'mext-18033',name:'きんぴらごぼう',store:'お惣菜',type:'super',kcal:126,protein:2.1,fat:6.8,carb:9.6,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D'],role:'side'},
+  {id:'mext-18034',name:'ぜんまいのいため煮',store:'お惣菜',type:'super',kcal:120,protein:5.1,fat:6.3,carb:10.7,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D'],role:'side'},
+  {id:'mext-18035',name:'筑前煮',store:'お惣菜',type:'super',kcal:153,protein:7.9,fat:6.3,carb:15.8,gluten:false,meat:true,estimated:true,desc:'1人前180g',meal_time:['L','D'],role:'both'},
+  {id:'mext-18036',name:'肉じゃが',store:'お惣菜',type:'super',kcal:156,protein:8.6,fat:2.6,carb:25.0,gluten:false,meat:true,estimated:true,desc:'1人前200g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18037',name:'ひじきのいため煮',store:'お惣菜',type:'super',kcal:112,protein:4.7,fat:6.0,carb:10.9,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['L','D'],role:'side'},
+  {id:'mext-18038',name:'アジの南蛮漬け',store:'お惣菜',type:'super',kcal:164,protein:12.2,fat:9.2,carb:11.2,gluten:false,meat:true,estimated:true,desc:'1人前150g',meal_time:['L','D'],role:'both'},
+  {id:'mext-18053',name:'お好み焼き',store:'お惣菜',type:'super',kcal:340,protein:13.0,fat:16.2,carb:31.0,gluten:true,meat:false,estimated:false,desc:'1人前250g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18054',name:'とりから揚げ',store:'お惣菜',type:'super',kcal:306,protein:23.4,fat:15.2,carb:26.4,gluten:false,meat:true,estimated:false,desc:'1人前150g',meal_time:['L','D'],role:'both'},
+  {id:'mext-18023',name:'松前漬け しょうゆ漬',store:'お惣菜',type:'super',kcal:249,protein:25.5,fat:2.1,carb:31.5,gluten:false,meat:false,estimated:false,desc:'1人前150g',meal_time:['L','D','S'],role:'side'},
+  {id:'mext-18040',name:'チキンカレー',store:'お惣菜',type:'super',kcal:707,protein:30.2,fat:47.5,carb:42.1,gluten:false,meat:true,estimated:true,desc:'1人前540g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18001',name:'ビーフカレー',store:'お惣菜',type:'super',kcal:643,protein:13.0,fat:48.6,carb:42.7,gluten:false,meat:true,estimated:true,desc:'1人前540g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18041',name:'ポークカレー',store:'お惣菜',type:'super',kcal:626,protein:15.1,fat:46.4,carb:41.6,gluten:false,meat:true,estimated:true,desc:'1人前540g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18043',name:'カニクリームコロッケ',store:'お惣菜',type:'super',kcal:306,protein:6.1,fat:20.5,carb:26.9,gluten:true,meat:false,estimated:true,desc:'1人前120g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18044',name:'コーンクリームコロッケ',store:'お惣菜',type:'super',kcal:294,protein:6.1,fat:19.2,carb:28.1,gluten:true,meat:false,estimated:true,desc:'1人前120g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18018',name:'ポテトコロッケ',store:'お惣菜',type:'super',kcal:271,protein:6.4,fat:15.1,carb:29.5,gluten:true,meat:false,estimated:true,desc:'1人前120g',meal_time:['L','D'],role:'both'},
+  {id:'mext-18045',name:'チキンシチュー',store:'お惣菜',type:'super',kcal:372,protein:18.6,fat:24.0,carb:22.5,gluten:false,meat:true,estimated:true,desc:'1人前300g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18011',name:'ビーフシチュー',store:'お惣菜',type:'super',kcal:459,protein:12.3,fat:37.8,carb:22.5,gluten:false,meat:true,estimated:true,desc:'1人前300g',meal_time:['D'],role:'main'},
+  {id:'mext-18015',name:'ミートボール',store:'お惣菜',type:'super',kcal:298,protein:15.3,fat:18.8,carb:21.4,gluten:true,meat:true,estimated:true,desc:'1人前150g',meal_time:['L','D'],role:'both'},
+  {id:'mext-18042',name:'かぼちゃのクリームスープ',store:'お惣菜',type:'super',kcal:110,protein:2.2,fat:5.8,carb:14.1,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['B','L','S'],role:'side'},
+  {id:'mext-18005',name:'コーンクリームスープ',store:'お惣菜',type:'super',kcal:93,protein:2.5,fat:3.9,carb:12.4,gluten:false,meat:false,estimated:true,desc:'1人前150g',meal_time:['B','L','S'],role:'side'},
+  {id:'mext-18050',name:'合いびきハンバーグ',store:'お惣菜',type:'super',kcal:236,protein:16.1,fat:14.6,carb:13.9,gluten:true,meat:true,estimated:true,desc:'1人前120g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18051',name:'チキンハンバーグ',store:'お惣菜',type:'super',kcal:205,protein:15.1,fat:12.2,carb:11.9,gluten:true,meat:true,estimated:true,desc:'1人前120g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18052',name:'豆腐ハンバーグ',store:'お惣菜',type:'super',kcal:170,protein:11.9,fat:11.0,carb:10.6,gluten:true,meat:true,estimated:true,desc:'1人前120g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18019',name:'いかフライ',store:'お惣菜',type:'super',kcal:227,protein:13.3,fat:11.3,carb:22.6,gluten:true,meat:true,estimated:true,desc:'1人前100g',meal_time:['L','D'],role:'both'},
+  {id:'mext-18020',name:'えびフライ',store:'お惣菜',type:'super',kcal:283,protein:19.1,fat:13.9,carb:27.2,gluten:true,meat:true,estimated:true,desc:'1人前120g',meal_time:['L','D'],role:'both'},
+  {id:'mext-18055',name:'かきフライ',store:'お惣菜',type:'super',kcal:347,protein:10.7,fat:21.6,carb:32.2,gluten:true,meat:true,estimated:false,desc:'1人前120g',meal_time:['L','D'],role:'both'},
+  {id:'mext-18021',name:'白身フライ',store:'お惣菜',type:'super',kcal:448,protein:14.6,fat:32.7,carb:23.9,gluten:true,meat:true,estimated:false,desc:'1人前150g',meal_time:['L','D'],role:'both'},
+  {id:'mext-18022',name:'メンチカツ',store:'お惣菜',type:'super',kcal:328,protein:12.8,fat:22.4,carb:23.2,gluten:true,meat:true,estimated:true,desc:'1人前120g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18003',name:'えびグラタン',store:'お惣菜',type:'super',kcal:256,protein:11.0,fat:13.8,carb:24.6,gluten:true,meat:true,estimated:true,desc:'1人前200g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18014',name:'えびピラフ',store:'お惣菜',type:'super',kcal:511,protein:11.6,fat:8.0,carb:102.9,gluten:false,meat:true,estimated:true,desc:'1人前350g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18002',name:'ぎょうざ',store:'お惣菜',type:'super',kcal:314,protein:10.3,fat:16.9,carb:35.0,gluten:true,meat:true,estimated:true,desc:'1人前150g',meal_time:['L','D'],role:'both'},
+  {id:'mext-18012',name:'しゅうまい',store:'お惣菜',type:'super',kcal:229,protein:10.9,fat:11.0,carb:23.9,gluten:true,meat:true,estimated:true,desc:'1人前120g',meal_time:['L','D'],role:'both'},
+  {id:'mext-18046',name:'中華ちまき',store:'お惣菜',type:'super',kcal:261,protein:8.8,fat:8.2,carb:42.6,gluten:true,meat:true,estimated:true,desc:'1人前150g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18056',name:'春巻き',store:'お惣菜',type:'super',kcal:332,protein:9.0,fat:28.9,carb:39.8,gluten:true,meat:true,estimated:false,desc:'1人前150g',meal_time:['L','D'],role:'both'},
+  {id:'mext-18047',name:'酢豚',store:'お惣菜',type:'super',kcal:154,protein:9.2,fat:6.6,carb:15.4,gluten:false,meat:true,estimated:true,desc:'1人前200g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18057',name:'チャーハン',store:'お惣菜',type:'super',kcal:721,protein:17.5,fat:18.2,carb:109.9,gluten:false,meat:false,estimated:false,desc:'1人前350g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18048',name:'八宝菜',store:'お惣菜',type:'super',kcal:160,protein:14.5,fat:8.0,carb:10.0,gluten:false,meat:true,estimated:true,desc:'1人前250g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18049',name:'麻婆豆腐',store:'お惣菜',type:'super',kcal:260,protein:19.5,fat:17.0,carb:10.2,gluten:false,meat:false,estimated:true,desc:'1人前250g',meal_time:['L','D'],role:'main'},
+  {id:'mext-18039',name:'もやしのナムル',store:'お惣菜',type:'super',kcal:56,protein:2.5,fat:3.6,carb:3.2,gluten:false,meat:false,estimated:true,desc:'1人前80g',meal_time:['L','D','S'],role:'side'},
 ];
 
 // ========== 状態 ==========
@@ -1104,6 +1161,16 @@ function togAgree(){
   document.getElementById('agree-chk').textContent=agreedToTerms?'✓':'';
   document.getElementById('start-btn').disabled=!agreedToTerms;
 }
+function goBack(toStep){
+  ['s1','s2','s3','s4','s5'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.classList.remove('active');
+  });
+  const target=document.getElementById('s'+toStep);
+  if(target)target.classList.add('active');
+  saveStep(toStep);
+}
+
 function go(n){
   saveStep(n);
   // 設定ステップ画面だけ非表示（s-mainは触らない）
@@ -1152,77 +1219,206 @@ async function goMain(){
 // ========== 1日の食事プラン生成（調査データに基づく） ==========
 function renderDayPlan(){
   const el=document.getElementById('day-plan-wrap');
-  if(!el){console.error('[DayPlan] day-plan-wrap not found');return;}
+  if(!el){return;}
   console.log('[DayPlan] ALL_FOODS='+ALL_FOODS.length);
 
   const tgt=S.tgt||2000;
   const mealDefs=[
-    {lbl:'朝食', maxKcal:400,  timeCode:'B', exclude:[]},
-    {lbl:'昼食', maxKcal:800,  timeCode:'L', exclude:[]},
-    {lbl:'夕食', maxKcal:800,  timeCode:'D', exclude:[]},
-    {lbl:'間食', maxKcal:200,  timeCode:'S', exclude:['ハンバーグ','定食','丼','カレー','フライ','シチュー','チャーハン']},
+    {lbl:'朝食', timeCode:'B', budgetRatio:.20, maxKcal:450},
+    {lbl:'昼食', timeCode:'L', budgetRatio:.35, maxKcal:800},
+    {lbl:'夕食', timeCode:'D', budgetRatio:.35, maxKcal:800},
   ];
 
   const usedIds=new Set();
-  const plans=mealDefs.map(md=>{
-    // まずmeal_time一致 + カロリー制限で絞る
-    let pool=ALL_FOODS.filter(f=>{
-      if(f.kcal>md.maxKcal||f.kcal<20)return false;
+
+  function pickMeal(md){
+    const budget=Math.round(tgt*md.budgetRatio);
+    const mainPool=ALL_FOODS.filter(f=>{
+      if(usedIds.has(f.id))return false;
+      if(f.kcal>md.maxKcal||f.kcal<80)return false;
+      if(!f.role||f.role==='side')return false;
       if(S.restrictions.includes('no_gluten')&&f.gluten)return false;
       if(S.restrictions.includes('vegetarian')&&f.meat)return false;
-      if(md.exclude.some(w=>f.name.includes(w)))return false;
-      if(usedIds.has(f.id))return false;
+      // meal_timeが設定されている場合、その時間帯に合わないものは除外
+      // ただしmeal_timeが['L','D']など複数の場合は含む
+      if(f.meal_time&&f.meal_time.length>0&&!f.meal_time.includes(md.timeCode)){
+        // 完全不一致：間食(S)専用品は他の時間帯に出さない
+        // 朝食(B)専用品は昼夕に出さない
+        const onlySnack=f.meal_time.every(t=>t==='S');
+        const onlyBreakfast=f.meal_time.every(t=>t==='B');
+        if(onlySnack)return false;
+        if(onlyBreakfast&&md.timeCode!=='B')return false;
+        // それ以外の不一致はスコアで下げる（除外はしない）
+      }
       return true;
     });
+    const matched=mainPool.filter(f=>f.meal_time&&f.meal_time.includes(md.timeCode));
+    // matchedがあればそちらを優先、なければmainPoolからmeal_time一致しないものも使うが
+    // S専用・B専用は除外済みなので安全
+    const mainSource=matched.length>0?matched:mainPool;
+    if(!mainSource.length)return null;
 
-    // meal_time一致を優先（なければpool全体を使う）
-    const matched=pool.filter(f=>f.meal_time&&f.meal_time.includes(md.timeCode));
-    const source=(matched.length>0?matched:pool).filter(f=>!usedIds.has(f.id));
-
-    // それでも空なら全体から（カロリー制限のみ）
-    const fallback=ALL_FOODS.filter(f=>f.kcal<=md.maxKcal&&f.kcal>=20&&!usedIds.has(f.id));
-    const finalSource=source.length>0?source:fallback;
-
-    console.log('[DayPlan] '+md.lbl+': pool='+pool.length+' matched='+matched.length+' final='+finalSource.length);
-
-    if(!finalSource.length)return{...md,food:null};
-
-    const pctMap={朝食:.2,昼食:.35,夕食:.35,間食:.1};
-    const scored=finalSource.map(f=>{
-      let s=-Math.abs(f.kcal-(tgt*pctMap[md.lbl]))/40;
+    const scored=mainSource.map(f=>{
+      let s=-Math.abs(f.kcal-budget*0.85)/40;
       if(f.protein>=15)s+=3;
-      if(md.lbl==='朝食'&&f.meal_time&&f.meal_time.includes('B'))s+=5;
-      if(md.lbl==='間食'&&f.kcal<=150)s+=3;
       if(S.preferredChains.length>0&&S.preferredChains.includes(f.store))s+=4;
+      // meal_time一致ボーナス・不一致ペナルティ
+      if(f.meal_time){
+        if(f.meal_time.includes(md.timeCode))s+=6;
+        else s-=10;
+      }
       return{...f,s};
     }).sort((a,b)=>b.s-a.s);
 
-    const top=scored.slice(0,3);
-    const pick=top[Math.floor(Math.random()*top.length)];
-    if(pick)usedIds.add(pick.id);
-    return{...md,food:pick||null};
-  });
+    const mainPick=scored.slice(0,4)[Math.floor(Math.random()*Math.min(4,scored.length))];
+    if(!mainPick)return null;
+    usedIds.add(mainPick.id);
 
-  const total=plans.reduce((a,p)=>a+(p.food?p.food.kcal:0),0);
-  console.log('[DayPlan] total='+total+' plans='+plans.map(p=>p.food?p.food.name:'なし').join(','));
+    const remainBudget=budget-mainPick.kcal;
+    let sidePick=null;
+    if(remainBudget>=50&&Math.random()<0.6){
+      // 同一店舗 or お惣菜同士で絞る
+      const sameStore=mainPick.store==='お惣菜'?'お惣菜':mainPick.store;
+      const sidePool=ALL_FOODS.filter(f=>{
+        if(usedIds.has(f.id))return false;
+        if(f.role!=='side'&&f.role!=='both')return false;
+        if(f.kcal>remainBudget||f.kcal<20)return false;
+        if(S.restrictions.includes('no_gluten')&&f.gluten)return false;
+        if(S.restrictions.includes('vegetarian')&&f.meat)return false;
+        // 同一店舗縛り（お惣菜はお惣菜同士、チェーンはそのチェーン内）
+        // チェーン店は同一チェーンのsideのみ、お惣菜はお惣菜のみ
+        return f.store===sameStore;
+      });
+      if(sidePool.length){
+        const sideSorted=sidePool.map(f=>({...f,s:-Math.abs(f.kcal-remainBudget/2)/20+(f.protein>=5?2:0)})).sort((a,b)=>b.s-a.s);
+        sidePick=sideSorted.slice(0,3)[Math.floor(Math.random()*Math.min(3,sideSorted.length))];
+        if(sidePick)usedIds.add(sidePick.id);
+      }
+    }
+    return{main:mainPick,side:sidePick,kcal:(mainPick.kcal+(sidePick?sidePick.kcal:0))};
+  }
+
+  const plans=mealDefs.map(md=>({...md,meal:pickMeal(md)}));
+  // グローバルに保持（個別シャッフル用）
+  window._currentPlans=plans;
+  window._pickMealFn=pickMeal;
+  renderPlanHTML(plans);
+}
+
+function renderPlanHTML(plans){
+  const el=document.getElementById('day-plan-wrap');
+  if(!el)return;
+  const total=plans.reduce((a,p)=>a+(p.meal?p.meal.kcal:0),0);
+
+  const renderMealCard=(p,idx)=>{
+    const lbl=p.lbl;const meal=p.meal;
+    if(!meal)return`<div data-plan-card="${idx}" style="background:rgba(255,255,255,0.5);border:1px dashed var(--border);border-radius:12px;padding:7px 9px;display:flex;align-items:center;justify-content:center"><div style="font-size:9px;color:var(--text-h)">${lbl}：未設定</div></div>`;
+    return`<div data-plan-card="${idx}" style="background:rgba(255,255,255,0.85);border:1px solid var(--border);border-radius:12px;padding:7px 9px;position:relative;transform-style:preserve-3d">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div style="font-size:9px;color:var(--text-h);font-weight:700;margin-bottom:3px">${lbl}</div>
+        <button onclick="reshuffleMeal(${idx})" style="background:none;border:none;cursor:pointer;font-size:13px;padding:0;line-height:1;color:var(--main-m)" title="変える">🔄</button>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--text);line-height:1.3">${meal.main.name}</div>
+      <div style="font-size:9px;color:var(--text-h);margin-top:1px">${meal.main.store}</div>
+      ${meal.side?`<div style="margin-top:5px;padding-top:5px;border-top:1px dashed var(--border)">
+        <div style="font-size:10px;font-weight:700;color:var(--text)">＋${meal.side.name}</div>
+        <div style="font-size:9px;color:var(--text-h)">${meal.side.store}</div>
+      </div>`:''}
+      <div style="font-size:10px;color:var(--main-m);font-weight:700;margin-top:4px">${meal.kcal} kcal</div>
+    </div>`;
+  };
 
   el.innerHTML=`
     <div style="background:linear-gradient(135deg,rgba(255,255,255,0.9),rgba(253,242,248,0.9));border:1.5px solid var(--pk-b);border-radius:var(--rl);padding:11px 14px;box-shadow:var(--sh-s);margin-bottom:8px">
-      <div style="font-size:11px;font-weight:700;color:var(--main-m);margin-bottom:8px">🌅 今日のプラン（計${total} kcal）</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--main-m)">🌅 今日のプラン（計${total} kcal）</div>
+        <button onclick="reshuffleAll()" style="background:linear-gradient(135deg,var(--main-m),var(--pk));color:#fff;border:none;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit">全部変える 🔄</button>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-        ${plans.map(p=>p.food?`
-        <div style="background:rgba(255,255,255,0.85);border:1px solid var(--border);border-radius:12px;padding:7px 9px">
-          <div style="font-size:9px;color:var(--text-h);font-weight:700;margin-bottom:2px">${p.lbl}</div>
-          <div style="font-size:11px;font-weight:700;color:var(--text);line-height:1.3">${p.food.name}</div>
-          <div style="font-size:10px;color:var(--text-h);margin-top:1px">${p.food.store}</div>
-          <div style="font-size:10px;color:var(--main-m);font-weight:700;margin-top:1px">${p.food.kcal} kcal</div>
-        </div>`:
-        `<div style="background:rgba(255,255,255,0.5);border:1px dashed var(--border);border-radius:12px;padding:7px 9px;display:flex;align-items:center;justify-content:center">
-          <div style="font-size:9px;color:var(--text-h)">${p.lbl}：未設定</div>
-        </div>`
-        ).join('')}
+        ${plans.map((p,i)=>renderMealCard(p,i)).join('')}
       </div>
     </div>`;
+}
+
+function reshuffleAll(){
+  const el=document.getElementById('day-plan-wrap');
+  if(!el)return;
+  // 全カードにフリップアニメーション
+  el.querySelectorAll('[data-plan-card]').forEach(c=>{
+    c.classList.remove('card-flip');
+    void c.offsetWidth; // reflow
+    c.classList.add('card-flip');
+  });
+  setTimeout(()=>renderDayPlan(),250);
+}
+
+function reshuffleMeal(idx){
+  // 該当カードのみフリップ
+  const el=document.getElementById('day-plan-wrap');
+  const card=el?el.querySelector(`[data-plan-card="${idx}"]`):null;
+  if(card){card.classList.remove('card-flip');void card.offsetWidth;card.classList.add('card-flip');}
+  setTimeout(()=>_doReshuffleMeal(idx),250);
+}
+function _doReshuffleMeal(idx){
+  const plans=window._currentPlans;
+  if(!plans||!plans[idx])return;
+  const md=plans[idx];
+  const usedIds=new Set(
+    plans.filter((_,i)=>i!==idx).flatMap(p=>p.meal?[p.meal.main.id,...(p.meal.side?[p.meal.side.id]:[])]:[] )
+  );
+  const tgt=S.tgt||2000;
+  const budget=Math.round(tgt*md.budgetRatio);
+
+  const mainPool=ALL_FOODS.filter(f=>{
+    if(usedIds.has(f.id))return false;
+    if(f.kcal>md.maxKcal||f.kcal<80)return false;
+    if(!f.role||f.role==='side')return false;
+    if(S.restrictions.includes('no_gluten')&&f.gluten)return false;
+    if(S.restrictions.includes('vegetarian')&&f.meat)return false;
+    const onlySnack=f.meal_time&&f.meal_time.every(t=>t==='S');
+    const onlyBreakfast=f.meal_time&&f.meal_time.every(t=>t==='B');
+    if(onlySnack)return false;
+    if(onlyBreakfast&&md.timeCode!=='B')return false;
+    return true;
+  });
+  const matched=mainPool.filter(f=>f.meal_time&&f.meal_time.includes(md.timeCode));
+  const mainSource=matched.length>0?matched:mainPool;
+  if(!mainSource.length){showToast('他の候補が見つかりませんでした');return;}
+
+  const scored=mainSource.map(f=>{
+    let s=-Math.abs(f.kcal-budget*0.85)/40;
+    if(f.protein>=15)s+=3;
+    if(f.meal_time&&f.meal_time.includes(md.timeCode))s+=6;else s-=10;
+    if(S.preferredChains.length>0&&S.preferredChains.includes(f.store))s+=4;
+    return{...f,s};
+  }).sort((a,b)=>b.s-a.s);
+
+  // 現在と違うものを選ぶ（上位8件からランダム・現在のmainを除く）
+  const currentMainId=plans[idx].meal?.main?.id;
+  const candidates=scored.slice(0,8).filter(f=>f.id!==currentMainId);
+  const mainPick=candidates.length?candidates[Math.floor(Math.random()*candidates.length)]:scored[0];
+  if(!mainPick)return;
+  usedIds.add(mainPick.id);
+
+  const remainBudget=budget-mainPick.kcal;
+  let sidePick=null;
+  if(remainBudget>=50&&Math.random()<0.6){
+    const sameStore=mainPick.store==='お惣菜'?'お惣菜':mainPick.store;
+    const sidePool=ALL_FOODS.filter(f=>{
+      if(usedIds.has(f.id))return false;
+      if(f.role!=='side'&&f.role!=='both')return false;
+      if(f.kcal>remainBudget||f.kcal<20)return false;
+      return f.store===sameStore;
+    });
+    if(sidePool.length){
+      const sideSorted=sidePool.map(f=>({...f,s:-Math.abs(f.kcal-remainBudget/2)/20})).sort((a,b)=>b.s-a.s);
+      sidePick=sideSorted[Math.floor(Math.random()*Math.min(3,sideSorted.length))];
+    }
+  }
+  plans[idx].meal={main:mainPick,side:sidePick,kcal:(mainPick.kcal+(sidePick?sidePick.kcal:0))};
+  window._currentPlans=plans;
+  renderPlanHTML(plans);
+  showToast(`${md.lbl}を変えたにゃ！`);
 }
 
 // ========== ホーム描画（メシネコ＋ヘッダーのみ） ==========
@@ -1247,6 +1443,7 @@ function renderHome(){
   const hfb=document.getElementById('hdr-f-bar');if(hfb)hfb.style.width=Math.min(100,Math.round(t.fat/S.macros.fat*100))+'%';
   const hcb=document.getElementById('hdr-c-bar');if(hcb)hcb.style.width=Math.min(100,Math.round(t.carb/S.macros.carb*100))+'%';
   updateMeshiko();
+  checkKcalSecret();
 }
 
 // ========== 記録タブ描画 ==========
@@ -1333,13 +1530,72 @@ function renderSuggest(){
   const scored=filtered.map(f=>scoreFood(f,t,m,remK,recentIds)).filter(f=>f.score>-5).sort((a,b)=>b.score-a.score).slice(0,20);
   const maxScore=scored.length>0?scored[0].score:1;
   document.getElementById('ranking-sub').textContent=`${ALL_FOODS.length}品から算出 · 上位20件`;
+
+  // 1〜3位の背景スタイル定義
+  const topStyles={
+    1:{
+      bg:'linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 50%,#FFF7ED 100%)',
+      border:'2px solid #F59E0B',
+      shadow:'0 6px 20px rgba(245,158,11,0.2)',
+      badge:'linear-gradient(135deg,#F59E0B,#FCD34D)',
+      badgeShadow:'0 3px 8px rgba(245,158,11,0.5)',
+      label:'👑',
+      labelColor:'#92400E',
+    },
+    2:{
+      bg:'linear-gradient(135deg,#F8FAFC 0%,#F1F5F9 50%,#F8FAFC 100%)',
+      border:'2px solid #94A3B8',
+      shadow:'0 4px 14px rgba(148,163,184,0.2)',
+      badge:'linear-gradient(135deg,#64748B,#CBD5E1)',
+      badgeShadow:'0 2px 6px rgba(100,116,139,0.4)',
+      label:'🥈',
+      labelColor:'#475569',
+    },
+    3:{
+      bg:'linear-gradient(135deg,#FFF7F0 0%,#FFEDD5 50%,#FFF7F0 100%)',
+      border:'2px solid #D97706',
+      shadow:'0 4px 14px rgba(217,119,6,0.15)',
+      badge:'linear-gradient(135deg,#92400E,#D97706)',
+      badgeShadow:'0 2px 6px rgba(146,64,14,0.4)',
+      label:'🥉',
+      labelColor:'#92400E',
+    },
+  };
+
   document.getElementById('slist').innerHTML=scored.length===0?`<p style="font-size:12px;color:var(--text-h);padding:8px 0">条件に合うメニューがありません</p>`:scored.map((f,i)=>{
     const rank=i+1;
-    const rankCls=rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'rank-n';
-    const pct=Math.max(0,Math.round((f.score/Math.max(maxScore,1))*100));
+    const ts=topStyles[rank];
     const estTag=f.estimated?`<span class="chip chip-warn">推定値</span>`:'';
     const dbTag=String(f.id).startsWith('db-')?`<span class="db-badge">DB</span>`:'';
     const rtags=f.reasons.slice(0,2).map(r=>`<span class="reason-tag">${r}</span>`).join('');
+
+    if(ts){
+      // 1〜3位：特別カード
+      return`<div onclick="addFS('${f.id}')" style="background:${ts.bg};border:${ts.border};border-radius:var(--rl);padding:14px 15px;margin-bottom:10px;cursor:pointer;display:flex;gap:12px;align-items:flex-start;box-shadow:${ts.shadow};transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0">
+          <div style="font-size:18px;line-height:1">${ts.label}</div>
+          <div style="background:${ts.badge};color:#fff;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;box-shadow:${ts.badgeShadow};white-space:nowrap">${rank}位</div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:700;color:${ts.labelColor}">${f.name}</div>
+              <div style="font-size:12px;font-weight:700;color:var(--main-m);margin-top:2px">${f.store}</div>
+            </div>
+            <div style="font-size:13px;font-weight:700;color:${ts.labelColor};white-space:nowrap">${f.kcal} kcal</div>
+          </div>
+          <div style="margin-top:5px;display:flex;gap:4px;align-items:center;flex-wrap:wrap">${dbTag}${estTag}${rtags}</div>
+          <div class="chips" style="margin-top:5px">
+            <span class="chip ${f.protein>=20?'chipg':''}">タンパク質 ${f.protein.toFixed(1)}g</span>
+            <span class="chip">脂質 ${f.fat.toFixed(1)}g</span>
+            <span class="chip">糖質 ${f.carb.toFixed(1)}g</span>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    // 4位以降：通常カード
+    const rankCls='rank-n';
     return`<div class="si" onclick="addFS('${f.id}')">
       <div class="rank-badge ${rankCls}">${rank}</div>
       <div class="si-body">
@@ -1410,6 +1666,7 @@ function showMealTimeModal(id,callback){
   _pendingFoodCallback=callback;
   const f=ALL_FOODS.find(f=>String(f.id)===String(id));
   document.getElementById('mealtime-food-name').textContent=f?f.name:'';
+  document.getElementById('mealtime-food-store').textContent=f?f.store:'';
   // デフォルト時間帯をハイライト
   const guess=_guessCurrentMealTime();
   document.querySelectorAll('.mealtime-btn').forEach(b=>{
@@ -1420,6 +1677,11 @@ function showMealTimeModal(id,callback){
   document.getElementById('mealtime-modal').classList.add('open');
 }
 
+function cancelMealTime(){
+  document.getElementById('mealtime-modal').classList.remove('open');
+  _pendingFoodId=null;_pendingFoodCallback=null;
+  showToast('追加をキャンセルしました');
+}
 function confirmMealTime(mealTime){
   document.getElementById('mealtime-modal').classList.remove('open');
   if(_pendingFoodId&&_addFood(_pendingFoodId,mealTime)){
@@ -1587,7 +1849,16 @@ function renderPastMeals(){
 function togAuto(el){el.classList.toggle('on');S.autoMacro=el.classList.contains('on');const m=document.getElementById('manual-mac');m.style.opacity=S.autoMacro?'.4':'1';m.style.pointerEvents=S.autoMacro?'none':'auto';saveProfile()}
 function togS(k,el){el.classList.toggle('on');if(el.classList.contains('on')){if(!S.restrictions.includes(k))S.restrictions.push(k)}else{S.restrictions=S.restrictions.filter(r=>r!==k)};if(S.autoMacro){S.macros=calcMacros(S.tgt);renderHome()};saveProfile()}
 function applyManual(){S.tgt=+document.getElementById('m-k').value||S.tgt;S.macros={protein:+document.getElementById('m-p').value||S.macros.protein,fat:+document.getElementById('m-f').value||S.macros.fat,carb:+document.getElementById('m-c').value||S.macros.carb};renderHome()}
-function applyProfile(){S.wt=+document.getElementById('st-wt').value||S.wt;S.age=+document.getElementById('st-age').value||S.age;S.tdee=calcTDEE();S.tgt=calcTgt(S.tdee);S.macros=calcMacros(S.tgt);renderHome();saveProfile();showToast('プロフィールを更新しました')}
+function applyProfile(){
+  S.wt=+document.getElementById('st-wt').value||S.wt;
+  S.age=+document.getElementById('st-age').value||S.age;
+  const ht=+document.getElementById('st-ht').value;if(ht>0)S.ht=ht;
+  const gender=document.getElementById('st-gender').value;if(gender)S.gender=gender;
+  const act=+document.getElementById('st-act').value;if(act)S.act=act;
+  const goal=document.getElementById('st-goal').value;if(goal)S.goal=goal;
+  S.tdee=calcTDEE();S.tgt=calcTgt(S.tdee);S.macros=calcMacros(S.tgt);
+  renderHome();saveProfile();showToast('プロフィールを更新しました');
+}
 function resetSetup(){
   if(!confirm('初期設定をやり直しますか？\n食事記録・体重ログは保持されます。'))return;
   try{localStorage.removeItem(LS_PROFILE);localStorage.removeItem(LS_SETUP);}catch(e){}
@@ -1622,6 +1893,22 @@ function sw(tab){
   if(tab==='home'){renderHome();renderDayPlan();window.scrollTo(0,0);}
   if(tab==='suggest')renderSuggest();
   if(tab==='kiroku')renderKiroku();
+  if(tab==='settings'){
+    // プロフィール現在値をセット
+    const stWt=document.getElementById('st-wt');if(stWt)stWt.value=S.wt;
+    const stAge=document.getElementById('st-age');if(stAge)stAge.value=S.age;
+    const stHt=document.getElementById('st-ht');if(stHt)stHt.value=S.ht||'';
+    const stGender=document.getElementById('st-gender');if(stGender)stGender.value=S.gender||'male';
+    const stAct=document.getElementById('st-act');if(stAct)stAct.value=S.act||1.2;
+    const stGoal=document.getElementById('st-goal');if(stGoal)stGoal.value=S.goal||'maintain';
+    // 食事制限トグルの状態を反映
+    [['tog-lc','low_carb'],['tog-hp','high_protein'],['tog-lf','low_fat'],
+     ['tog-lo','low_cal'],['tog-gl','no_gluten'],['tog-vg','vegetarian']
+    ].forEach(([id,key])=>{
+      const el=document.getElementById(id);
+      if(el){el.className='tog'+(S.restrictions.includes(key)?' on':'');}
+    });
+  }
   if(tab==='add'){filterF('');document.getElementById('fsearch').value='';searchTabMode='all';document.getElementById('stab-all').classList.add('on');document.getElementById('stab-hist').classList.remove('on');window.scrollTo(0,0);}
   if(tab==='history')renderPastMeals();
   if(tab==='weight')renderWeightLogs();
@@ -1726,19 +2013,83 @@ function updateMeshiko(){
 
 
 let meshinekoBubbleTimer=null;
-function showMeshikoBubble(comment){
+function showMeshikoBubble(comment,emotionOverride){
   const bubble=document.getElementById('meshineko-bubble');
   const textEl=document.getElementById('meshineko-bubble-text');
   if(!bubble||!textEl)return;
   textEl.innerHTML=comment.replace(/\n/g,'<br>');
   bubble.style.visibility='visible';
+  if(emotionOverride){
+    const img=document.getElementById('meshineko-img');
+    if(img){
+      const prev=img.src;
+      img.src=MESHINEKO_IMGS[emotionOverride]||img.src;
+      setTimeout(()=>{img.src=prev;},6000);
+    }
+  }
   if(meshinekoBubbleTimer)clearTimeout(meshinekoBubbleTimer);
-  meshinekoBubbleTimer=setTimeout(()=>{bubble.style.visibility='hidden';textEl.innerHTML='　';},5000);
+  meshinekoBubbleTimer=setTimeout(()=>{bubble.style.visibility='hidden';textEl.innerHTML='　';},6000);
 }
+
+// ===== 隠し要素 =====
+let _tapCount=0;
+let _tapTimer=null;
+
 function meshinekoTap(){
+  _tapCount++;
+  if(_tapTimer)clearTimeout(_tapTimer);
+  _tapTimer=setTimeout(()=>{_tapCount=0;},1200);
+
+  const h=new Date().getHours();
+
+  // 🌙 深夜（0〜4時）タップ
+  if(h>=0&&h<5){
+    showMeshikoBubble('こんな時間に何してるにゃ…\nはやく寝てにゃ！','sad');
+    return;
+  }
+  // 🌅 朝6時台タップ
+  if(h===6||h===7){
+    showMeshikoBubble('わ！朝活してるにゃ！\nえらいにゃ！メシネコも応援するにゃ！','joy');
+    return;
+  }
+
+  // 😡 5連打
+  if(_tapCount===5){
+    showMeshikoBubble('何度も押さないでにゃ！！\nくすぐったいにゃ！！','angry');
+    return;
+  }
+  // 😆 10連打（仲直り）
+  if(_tapCount===10){
+    _tapCount=0;
+    showMeshikoBubble('…もう、しょうがないにゃ。\n許してあげるにゃ♪','joy');
+    return;
+  }
+  // 15連打（限界突破）
+  if(_tapCount>=15){
+    _tapCount=0;
+    showMeshikoBubble('にゃにゃにゃにゃにゃ！！！\nもうやめてにゃーーー！！','angry');
+    return;
+  }
+
+  // 通常コメント
   const emotion=document.getElementById('meshineko-img')?.getAttribute('data-emotion')||'fun';
   const comments=EMOTION_COMMENTS[emotion]||MESHINEKO_COMMENTS;
   showMeshikoBubble(comments[Math.floor(Math.random()*comments.length)]);
+}
+
+// 🎯 カロリーぴったり隠しコメント（renderHomeから呼ぶ）
+function checkKcalSecret(){
+  const t=tots();const tgt=S.tgt;
+  if(t.kcal===0)return;
+  const diff=Math.abs(t.kcal-tgt);
+  if(diff<=5&&!window._kcalSecretShown){
+    window._kcalSecretShown=true;
+    setTimeout(()=>{
+      showMeshikoBubble('カロリーぴったりにゃ！！\n神業すぎるにゃ！！！✨','balance');
+    },500);
+  }else if(diff>5){
+    window._kcalSecretShown=false;
+  }
 }
 
 
@@ -1784,19 +2135,57 @@ function showReviewModal(date,meals){
   const cPct=Math.min(120,Math.round(t.carb/m.carb*100));
 
   // メシネコのコメントと表情を決定
+  // 判定（厚生労働省基準：脂質20〜30%E、タンパク質13〜20%E、炭水化物50〜65%E）
+  const fatPctE=Math.round(t.fat*9/t.kcal*100); // 脂質エネルギー比
+  const carbPctE=Math.round(t.carb*4/t.kcal*100); // 炭水化物エネルギー比
+  const protPctE=Math.round(t.protein*4/t.kcal*100); // タンパク質エネルギー比
+  const fatOver=fPct>120; // 脂質20%超過
+  const carbOver=cPct>120; // 糖質20%超過
+  const protLow=pPct<60; // タンパク質60%未達
+  const kcalOver=kcalPct>115;
+  const kcalLow=kcalPct<70;
+  const balanced=kcalPct>=85&&kcalPct<=110&&pPct>=80&&!fatOver&&!carbOver;
+
   let emotion='fun',msg='';
-  if(kcalPct>=90&&kcalPct<=110&&pPct>=80){
-    emotion='balance';msg='昨日は完璧なバランスだったにゃ！\nすごい！今日も続けてにゃ！';
-  }else if(kcalPct>=85&&kcalPct<=115){
-    emotion='joy';msg='昨日はいい感じだったにゃ！\n今日もこの調子でいこうにゃ！';
-  }else if(kcalPct>115){
-    emotion='overate';msg='昨日は少し食べすぎたにゃ…\n今日は少し軽めにしてみてにゃ。';
-  }else if(kcalPct<60){
-    emotion='sad';msg='昨日は食事が少なかったにゃ…\n今日はしっかり食べてほしいにゃ！';
-  }else if(pPct<60){
-    emotion='angry';msg='昨日はタンパク質が少なかったにゃ！\n今日はお肉・お魚を意識してにゃ！';
+  if(balanced){
+    emotion='balance';
+    const msgs=['昨日は栄養バランスが\nとても良かったにゃ！今日も続けてにゃ！',
+                'カロリー・PFCが\nきれいに整っていたにゃ！素晴らしいにゃ！',
+                '完璧な1日だったにゃ！\nこの食べ方を続けてほしいにゃ！'];
+    msg=msgs[Math.floor(Math.random()*msgs.length)];
+  }else if(kcalOver&&fatOver){
+    emotion='overate';
+    msg='昨日はカロリーも脂質も\n多かったにゃ…今日は揚げ物を控えてにゃ。';
+  }else if(kcalOver){
+    emotion='overate';
+    const msgs=['昨日は少し食べすぎたにゃ…\n今日は少し軽めにしてみてにゃ。',
+                'カロリーオーバーだったにゃ…\n明日また頑張ればいいにゃ！'];
+    msg=msgs[Math.floor(Math.random()*msgs.length)];
+  }else if(fatOver&&!kcalOver){
+    emotion='angry';
+    msg='昨日は脂質が多かったにゃ！\n揚げ物・バターを少し控えてみてにゃ。';
+  }else if(carbOver&&!kcalOver){
+    emotion='angry';
+    msg='昨日は糖質が多めだったにゃ！\ご飯やパンの量を少し減らしてみてにゃ。';
+  }else if(kcalLow&&protLow){
+    emotion='sad';
+    msg='昨日は食事量が足りなかったにゃ…\nしっかり食べないと体に良くないにゃよ！';
+  }else if(protLow){
+    emotion='angry';
+    const msgs=['昨日はタンパク質が足りなかったにゃ！\nお肉・魚・卵を意識してにゃ！',
+                'タンパク質が不足してたにゃ…\n筋肉が減ってしまうにゃよ！'];
+    msg=msgs[Math.floor(Math.random()*msgs.length)];
+  }else if(kcalLow){
+    emotion='sad';
+    msg='昨日は食事が少なかったにゃ…\n代謝が下がるから今日はしっかり食べてにゃ！';
+  }else if(kcalPct>=85&&kcalPct<=110){
+    emotion='joy';
+    const msgs=['昨日はいい感じだったにゃ！\n今日もこの調子でいこうにゃ！',
+                'カロリーがちょうど良かったにゃ！\n素晴らしいにゃ！'];
+    msg=msgs[Math.floor(Math.random()*msgs.length)];
   }else{
-    emotion='fun';msg='昨日の記録、ありがとうにゃ！\n今日も一緒に頑張ろうにゃ！';
+    emotion='fun';
+    msg='昨日の記録、ありがとうにゃ！\n今日も一緒に頑張ろうにゃ！';
   }
 
   // UIに反映
@@ -1842,9 +2231,46 @@ function showReviewModal(date,meals){
 
 function closeReviewModal(){
   document.getElementById('review-modal').classList.remove('open');
-  // 閉じた後に今日のプランを表示
-  renderDayPlan();
   updateMeshiko();
+  // 今日のプランをモーダルで表示
+  showTodayPlanModal();
+}
+
+function showTodayPlanModal(){
+  renderDayPlan();
+  const planHtml=document.getElementById('day-plan-wrap')?.innerHTML||'';
+  if(!planHtml)return;
+  const modal=document.getElementById('today-plan-modal');
+  const body=document.getElementById('today-plan-body');
+  if(!modal||!body)return;
+  body.innerHTML=planHtml;
+  modal.classList.add('open');
+}
+
+function closeTodayPlanModal(){
+  document.getElementById('today-plan-modal').classList.remove('open');
+}
+
+// ========== フィードバック送信 ==========
+async function sendFeedback(){
+  const el=document.getElementById('feedback-text');
+  if(!el)return;
+  const message=el.value.trim();
+  if(!message){showToast('内容を入力してください');return;}
+  if(message.length>1000){showToast('1000文字以内で入力してください');return;}
+  const btn=document.querySelector('[onclick="sendFeedback()"]');
+  if(btn){btn.disabled=true;btn.textContent='送信中...';}
+  try{
+    const{error}=await sb.from('feedbacks').insert([{message}]);
+    if(error)throw error;
+    el.value='';
+    showToast('フィードバックを送信しました！ありがとうございます');
+  }catch(e){
+    console.warn('feedback error:',e.message);
+    showToast('送信に失敗しました。時間をおいて再度お試しください');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='送信する';}
+  }
 }
 
 // ========== バージョン管理 ==========
