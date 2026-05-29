@@ -1956,12 +1956,14 @@ async function submitFood(){
     if(error)throw error;
     // 登録したデータをALL_FOODSに即時追加
     const newFood={name,store,type,kcal,protein,fat,carb,gluten,meat,estimated,
-      meal_time:getRegMealTime()||['L','D'],role:'main',id:'db-tmp-'+Date.now(),estimated:true};
+      meal_time:getRegMealTime()||['L','D'],role:'main',id:'db-tmp-'+Date.now()};
     dbFoods.unshift(newFood);mergeFoods();updateDBCount();
     // 画面を更新
     renderHome();renderDayPlan();filterF(document.getElementById('fsearch')?.value||'');
     closeRegModal();btn.disabled=false;btn.textContent='データベースに登録する';
-    showToast('登録しました！ありがとうございます');
+    showToast('登録しました！食事記録にも追加しますか？');
+    // 時間帯モーダルを出して食事記録に追加
+    showMealTimeModal(newFood.id,()=>{renderHome();renderKiroku();});
     ['reg-name','reg-store','reg-kcal','reg-protein','reg-fat','reg-carb','reg-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
     document.getElementById('reg-gluten').checked=false;document.getElementById('reg-meat').checked=false;document.getElementById('reg-estimated').checked=false;
     resetMealTimeUI();
