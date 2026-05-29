@@ -1347,6 +1347,8 @@ async function goMain(){
   await loadFoodsFromDB();
   subscribeRealtime();
   checkDateAndShowReview();
+  // DBロード完了後におすすめを更新
+  if(document.getElementById("t-suggest").style.display!=="none")renderSuggest();
 }
 
 // ========== 1日の食事プラン生成（調査データに基づく） ==========
@@ -1354,6 +1356,13 @@ function renderDayPlan(){
   const el=document.getElementById('day-plan-wrap');
   if(!el){return;}
   console.log('[DayPlan] ALL_FOODS='+ALL_FOODS.length);
+
+  // セッション内で一度生成した献立を保持（リロードで変わらない）
+  const savedKey='sotomeshi_dayplan_'+new Date().toDateString();
+  try{
+    const saved=sessionStorage.getItem(savedKey);
+    if(saved&&window._currentPlans){renderPlanHTML(window._currentPlans);return;}
+  }catch(e){}
 
   const tgt=S.tgt||2000;
   const mealDefs=[
@@ -1474,6 +1483,8 @@ function renderPlanHTML(plans){
 }
 
 function reshuffleAll(){
+  try{sessionStorage.removeItem('sotomeshi_dayplan_'+new Date().toDateString());}catch(e){}
+  window._currentPlans=null;
   const el=document.getElementById('day-plan-wrap');
   if(!el)return;
   // 全カードにフリップアニメーション
@@ -2534,7 +2545,10 @@ function checkVersion(){
     document.getElementById('m-f').value=S.macros.fat;document.getElementById('m-c').value=S.macros.carb;
     document.getElementById('total-count').textContent=INIT_FOODS.length+MEXT_FOODS.length;
     renderHome();renderDayPlan();renderKiroku();updateMeshiko();
-    loadFoodsFromDB().then(()=>{subscribeRealtime();checkDateAndShowReview();});
+    loadFoodsFromDB().then(()=>{subscribeRealtime();checkDateAndShowReview();
+      // DBロード完了後にALL_FOODSが増えたのでおすすめを再描画
+      if(document.getElementById('t-suggest')&&document.getElementById('t-suggest').style.display!=='none')renderSuggest();
+    });
   } else {
     // 途中のステップから再開（s-mainは非表示のまま）
     const step=loadStep();
