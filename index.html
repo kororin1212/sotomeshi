@@ -1262,7 +1262,7 @@ function gainExpForRegister() {
 // レベルアップ処理
 function onLevelUp(newLv) {
   // メシネコが喜ぶ
-  showMeshikoBubble(`レベルアップにゃ！！\nLv ${newLv} になったにゃ！✨`, 'joy');
+  showMeshikoBubble(`レベルアップにゃ！！\nLv ${newLv} になったにゃ！✨`, 'surprised');
   showExpToast(`🎉 Lv ${newLv} にレベルアップ！`, true);
 
   // 解禁コンテンツのメッセージ
@@ -1718,6 +1718,7 @@ async function goMain(){
   document.getElementById('total-count').textContent=INIT_FOODS.length+MEXT_FOODS.length;
   renderHome();renderDayPlan();renderKiroku();updateMeshiko();
   updateExpUI();
+  preloadMeshinekoImgs();
   await loadFoodsFromDB();
   subscribeRealtime();
   checkDateAndShowReview();
@@ -2236,8 +2237,19 @@ function _addFood(id,mealTime){
   S.eaten.push(entry);
   S.weeklyTotals.protein+=f.protein;S.weeklyTotals.fat+=f.fat;S.weeklyTotals.carb+=f.carb;S.weeklyTotals.kcal+=f.kcal;
   saveMeals();saveProfile();
-  // EXP付与（食事記録）
+  // EXP付与
   gainExpForMeal(entry.mealTime);
+  // C: 食事記録イベントポップアップ
+  eventMealRecorded(entry.mealTime);
+  // C: 3食コンプリートチェック
+  const today=new Date().toISOString().slice(0,10);
+  const expData=loadExp();
+  const mealsSet=new Set(Array.isArray(expData.mealsToday)?expData.mealsToday:[]);
+  const slots=['朝食','昼食','夕食'];
+  const done=slots.filter(s=>mealsSet.has(`${today}_${s}`));
+  if(done.length===3) setTimeout(()=>eventThreeMeals(),1500);
+  // C: ストリークイベント
+  if(expData.streak>=2) setTimeout(()=>eventStreak(expData.streak),3000);
   return entry;
 }
 
@@ -2572,66 +2584,217 @@ function sw(tab){
 }
 
 // ========== メシネコ ==========
-const MESHINEKO_COMMENTS=[
-  '今日もごはん、\nちゃんと食べてね！にゃ',
-  'タンパク質が足りてないにゃ…\nお肉かお魚、選んでみて！',
-  '野菜も忘れずに！\nメシネコが応援してるにゃ🥦',
-  '今日の栄養バランス、\nバッチリだにゃ！えらい！',
-  'ちゃんと食べてくれると、\nメシネコもうれしいにゃ！',
-  '鶏むね肉って実は万能なんだにゃ。\n今日どうかにゃ？',
-  'メシネコ的には、\n夜はタンパク質多めがおすすめだにゃ！',
-  '食べる順番も大事にゃよ〜！\n野菜→タンパク質→炭水化物がいいにゃ',
-  '朝ごはん抜いてないにゃ？\n代謝が下がっちゃうにゃよ！',
-  'ご主人のこと、\nいつも気にしてるにゃ！',
-  '今日もがんばってるにゃって、\nちゃんと知ってるにゃよ！',
-  'ご主人が元気でいてくれるのが、\nメシネコの一番の幸せにゃ！',
-  'えらい！今日も記録して\nくれてありがとうにゃ！',
-  'メシネコ、\nずっとそばにいるにゃよ！',
-  'お腹すいてるにゃ？\nメシネコもすいてきたにゃ',
-  '食べすぎた日も、\n次の日があるにゃ！気にしないにゃよ♪',
-  '深夜のごはんは…\nメシネコ的にはちょっと心配にゃ…💧',
-  '今日のランキング1位、見た？\nメシネコのおすすめだにゃ！',
-  'ご主人の食事記録、全部見てるにゃ。\nもっと教えてほしいにゃ！',
-  'カレーにもタンパク質入れたら\nもっとよくなるにゃ♪',
-];
+// ========== メシネコ セリフシステム ==========
 
-// ========== メシネコ（表情別画像版） ==========
+// 表情別画像
 const MESHINEKO_IMGS={
   joy:      'https://sotomeshi.vercel.app/meshineko_joy.png',
   angry:    'https://sotomeshi.vercel.app/meshineko_angry.png',
   sad:      'https://sotomeshi.vercel.app/meshineko_sad.png',
   fun:      'https://sotomeshi.vercel.app/meshineko_fun.png',
-  relax:    'https://sotomeshi.vercel.app/meshineko_joy.png'   ,
+  relax:    'https://sotomeshi.vercel.app/meshineko_joy.png',
   overate:  'https://sotomeshi.vercel.app/meshineko_overate.png',
   balance:  'https://sotomeshi.vercel.app/meshineko_balance.png',
-  ganba:    'https://sotomeshi.vercel.app/meshineko_balance.png',
   hungry:   'https://sotomeshi.vercel.app/meshineko_hungry.png',
-  recording:'https://sotomeshi.vercel.app/meshineko_fun.png'     ,
+  recording:'https://sotomeshi.vercel.app/meshineko_fun.png',
+  // 新規4種
+  ganba:    'https://sotomeshi.vercel.app/meshineko_ganba.png',
+  love:     'https://sotomeshi.vercel.app/meshineko_love.png',
+  sleepy:   'https://sotomeshi.vercel.app/meshineko_sleepy.png',
+  surprised:'https://sotomeshi.vercel.app/meshineko_surprised.png',
 };
 
-
-// ========== 表情別コメント ==========
+// 互換用（旧コードの参照が残っているため）
+const MESHINEKO_COMMENTS=['今日もよろしくにゃ！'];
 const EMOTION_COMMENTS={
-  joy:['今日の栄養バランス、\nバッチリだにゃ！えらい！','目標に近づいてるにゃ！\nこの調子でいこう！','いい感じにゃ！\n食事記録、続けてにゃ！'],
-  angry:['タンパク質が足りてないにゃ！\nお肉かお魚、選んでみて！','このままでは心配にゃ…\nタンパク質を補おうにゃ！','脂質が多すぎるにゃ！\n気をつけてほしいにゃ！'],
-  sad:['タンパク質が不足してるにゃ…\nもう少し食べてほしいにゃ','このバランスだと心配にゃ…\n何か食べてにゃ','記録はあるけど\n栄養が偏ってるにゃ…'],
-  fun:['今日もごはん、\nちゃんと食べてにゃ！','何食べるか\n決まったにゃ？','一緒に頑張ろうにゃ！\n今日もよろしくにゃ！'],
-  relax:['目標達成が見えてきたにゃ！\nもう少しにゃ！','いい感じに\n整ってきたにゃ！','バランスが\n安定してるにゃ！'],
-  overate:['食べすぎちゃったにゃ…\n次の食事は軽めにしようにゃ','カロリーオーバーにゃ…\n明日また頑張ろうにゃ','今日は食べすぎたにゃ。\n気にしすぎないことも大事にゃ'],
-  balance:['栄養バランス◎にゃ！\nとても上手にゃ！','PFCが\nきれいに揃ってるにゃ！','完璧な食事にゃ！\n素晴らしいにゃ！'],
-  ganba:['3食ちゃんと記録してるにゃ！\nえらいにゃ！','今日も頑張ってるにゃ！\nメシネコも応援してるにゃ！','毎日続けることが\n大切にゃよ！'],
-  hungry:['お腹すいてるにゃ？\n早めに食べてほしいにゃ','夕方なのに\nまだ食事が足りてないにゃ…','何か食べてにゃ！\nエネルギー補給が必要にゃ！'],
-  recording:['食事を記録してにゃ♪\nデータが積み重なるにゃ！','記録すると\n振り返りができるにゃよ！','今日の食事、\n教えてにゃ！'],
+  joy:['今日の食事、いい感じにゃ！'],angry:['脂質取りすぎにゃ！'],
+  sad:['タンパク質が足りてないにゃ…'],fun:['今日もよろしくにゃ！'],
+  relax:['いい感じにゃ！'],overate:['食べすぎちゃったにゃ…'],
+  balance:['完璧な食事にゃ！'],ganba:['続けてるご主人が大好きにゃ！'],
+  hungry:['早く何か食べてほしいにゃ'],recording:['記録してにゃ♪'],
 };
+
+// A: 栄養状態ベース（条件付き）
+const SERIF_A = {
+  fun:      { e:'fun',      lines:['今日はなに食べるにゃ？\nメシネコと一緒に決めようにゃ！','お腹すいてるにゃ？\n今日のごはん、記録してにゃ♪','ご主人〜！今日もよろしくにゃ！'] },
+  joy:      { e:'joy',      lines:['今日の食事、いい感じにゃ！\nこの調子にゃ！','バランスばっちりにゃ！\nメシネコも満足にゃ♡','目標に近づいてるにゃ！\nえらいにゃ！'] },
+  balance:  { e:'balance',  lines:['完璧な食事にゃ！\nさすがご主人にゃ！','PFCがきれいに揃ってるにゃ！\nプロだにゃ！','こんなに整ってるの…\nメシネコ感動したにゃ…'] },
+  ganba:    { e:'ganba',    lines:['3食ちゃんと記録してくれてるにゃ！\nえらいにゃ！','続けてるご主人が\n大好きにゃ！','毎日記録してくれると、\nメシネコも元気出るにゃ！'] },
+  sad:      { e:'sad',      lines:['タンパク質が全然足りてないにゃ…\nお肉かお魚食べてほしいにゃ','筋肉が悲しんでるにゃ…\nタンパク質補ってにゃ','このままだと体が心配にゃ…\n何か食べてにゃ'] },
+  angry:    { e:'angry',    lines:['脂質取りすぎにゃ！\nちょっと落ち着くにゃ！','揚げ物続きじゃないにゃ…？\nメシネコ心配にゃ','今日はここらで一回\nリセットにゃ！'] },
+  overate:  { e:'overate',  lines:['食べすぎちゃったにゃ…\n次の食事は軽めにしようにゃ','カロリーオーバーにゃ…\nでも気にしすぎないにゃよ♪','明日また頑張れば大丈夫にゃ！\nメシネコ信じてるにゃ'] },
+  hungry:   { e:'hungry',   lines:['夕方なのに全然食べてないにゃ！\n倒れちゃうにゃよ！','お腹すいてるにゃ？\n早く何か食べてほしいにゃ','ご主人の体が心配にゃ…\nちゃんと食べてにゃ！'] },
+};
+
+// B: 時間帯ベース
+const SERIF_B = {
+  morning:  { e:'fun',    lines:['おはようにゃ！\n朝ごはん食べたにゃ？','朝ごはん抜くと\n代謝下がるにゃよ！','今日もいい一日にするにゃ！\nメシネコも応援してるにゃ！'] },
+  lunch:    { e:'fun',    lines:['お昼の時間にゃ！\n何食べるか決まったにゃ？','ランチはタンパク質多めが\nいいにゃよ♪','外でごはん食べるにゃ？\nランキング見てにゃ！'] },
+  dinner:   { e:'fun',    lines:['夕ご飯の時間にゃ！\n今日の締めは何にするにゃ？','夜はタンパク質多めが\nメシネコのおすすめにゃ！','一日お疲れ様にゃ！\nおいしいもの食べてにゃ♡'] },
+  latenight:{ e:'sleepy', lines:['深夜ごはんは…\nメシネコ的にはちょっと心配にゃ','遅い時間の食事は\n脂肪になりやすいにゃよ…','どうしても食べるなら\n軽めにしてほしいにゃ'] },
+};
+
+// D: キャラ全開・状況問わずランダム20
+const SERIF_D = [
+  { e:'love',     line:'ご主人のこと、\nいつも気にしてるにゃよ♡' },
+  { e:'fun',      line:'メシネコ、今日も\nお腹すいてるにゃ〜' },
+  { e:'ganba',    line:'おいしいもの食べると、\nなんでも頑張れるにゃ！' },
+  { e:'love',     line:'ご主人が元気でいてくれるのが、\nメシネコの一番の幸せにゃ' },
+  { e:'joy',      line:'食べることって、\n最高の娯楽にゃよ！' },
+  { e:'love',     line:'今日も一緒にいるにゃよ。\nずっとにゃ！' },
+  { e:'ganba',    line:'失敗しても次があるにゃ！\nメシネコはずっと応援してるにゃ' },
+  { e:'fun',      line:'ご主人の好きな食べ物、\nメシネコも好きになりたいにゃ♪' },
+  { e:'balance',  line:'たまには好きなもの食べていいにゃよ！\nそれも大事にゃ' },
+  { e:'ganba',    line:'記録するだけでえらいにゃ！\nそれだけで十分にゃよ' },
+  { e:'fun',      line:'メシネコ的には、\nまぐろが世界一おいしいにゃ♡' },
+  { e:'love',     line:'ご主人と一緒にいると、\nメシネコも元気が出るにゃ！' },
+  { e:'ganba',    line:'完璧じゃなくていいにゃ。\n続けることが一番大事にゃよ' },
+  { e:'joy',      line:'今日のごはん、楽しめたにゃ？\nそれが一番大事にゃ！' },
+  { e:'surprised',line:'にゃんと！気づいたら\nもうこんな時間にゃ。ごはん食べたにゃ？' },
+  { e:'fun',      line:'メシネコ、プリンも大好きにゃ…\nこっそり教えるにゃ♡' },
+  { e:'love',     line:'ご主人が記録してくれる度に、\nメシネコしっぽ振れるにゃ！' },
+  { e:'ganba',    line:'無理しないでにゃよ。\nゆっくりでいいにゃ' },
+  { e:'love',     line:'今日も会えてうれしいにゃ！\n会いたかったにゃ〜！' },
+  { e:'joy',      line:'食べることを楽しんでるご主人が、\nメシネコは大好きにゃ！' },
+];
+
+// A該当セリフを取得（条件チェック）
+function getSerifA() {
+  const t=tots(); const m=S.macros; const tgt=S.tgt;
+  const results = [];
+  if(t.kcal===0) results.push(...SERIF_A.fun.lines.map(l=>({e:'fun',line:l})));
+  else {
+    if(t.kcal>tgt*1.15) results.push(...SERIF_A.overate.lines.map(l=>({e:'overate',line:l})));
+    if(t.fat>m.fat*1.3)  results.push(...SERIF_A.angry.lines.map(l=>({e:'angry',line:l})));
+    const remP=m.protein-t.protein;
+    if(remP>m.protein*0.8&&t.kcal>tgt*0.5) results.push(...SERIF_A.sad.lines.map(l=>({e:'sad',line:l})));
+    const pctP=t.protein/m.protein, pctF=t.fat/m.fat, pctC=t.carb/m.carb;
+    if(pctP>=0.8&&pctF<=1.1&&pctC<=1.1&&t.kcal>tgt*0.7) results.push(...SERIF_A.balance.lines.map(l=>({e:'balance',line:l})));
+    if(t.kcal>tgt*0.8&&t.kcal<=tgt*1.05) results.push(...SERIF_A.joy.lines.map(l=>({e:'joy',line:l})));
+    if(S.eaten.length>=3) results.push(...SERIF_A.ganba.lines.map(l=>({e:'ganba',line:l})));
+    if(t.kcal<tgt*0.3&&new Date().getHours()>=17) results.push(...SERIF_A.hungry.lines.map(l=>({e:'hungry',line:l})));
+  }
+  return results;
+}
+
+// B該当セリフを取得（時間帯チェック）
+function getSerifB() {
+  const h = new Date().getHours();
+  let slot = null;
+  if(h>=6&&h<10)  slot='morning';
+  else if(h>=11&&h<14) slot='lunch';
+  else if(h>=17&&h<21) slot='dinner';
+  else if(h>=22||h<4)  slot='latenight';
+  if(!slot) return [];
+  return SERIF_B[slot].lines.map(l=>({e:SERIF_B[slot].e, line:l}));
+}
+
+// A+B+Dプールからランダムに1つ選んで表示
+function pickAndShowSerif() {
+  const pool = [...getSerifA(), ...getSerifB(), ...SERIF_D];
+  const pick = pool[Math.floor(Math.random()*pool.length)];
+  _applyEmotion(pick.e);
+  showMeshikoBubble(pick.line);
+}
+
+// 表情を画像に反映（セリフは即時・画像はロード完了後に差し替え）
+function _applyEmotion(e) {
+  const img = document.getElementById('meshineko-img');
+  if(!img) return;
+  const url = MESHINEKO_IMGS[e] || MESHINEKO_IMGS.fun;
+  if(img.src === url || img.getAttribute('data-emotion') === e) return; // 同じなら何もしない
+  // プリロード→完了後に差し替え（チラつき・遅延なし）
+  const preload = new Image();
+  preload.onload = () => {
+    img.src = url;
+    img.setAttribute('data-emotion', e);
+  };
+  preload.onerror = () => {}; // 失敗時は現状維持
+  preload.src = url;
+}
+
+// C: イベントポップアップ（通常セリフとは別レイヤー）
+function showEventPopup(line, emotion, duration=4000) {
+  let el = document.getElementById('meshineko-event-popup');
+  if(!el) {
+    el = document.createElement('div');
+    el.id = 'meshineko-event-popup';
+    el.style.cssText = `
+      position:fixed;bottom:110px;left:50%;transform:translateX(-50%);
+      z-index:8000;pointer-events:none;
+      display:flex;flex-direction:column;align-items:center;gap:6px;
+      animation:eventPopIn .4s cubic-bezier(.34,1.56,.64,1);
+    `;
+    document.body.appendChild(el);
+  }
+  // アニメCSS（初回のみ追加）
+  if(!document.getElementById('event-popup-style')) {
+    const s = document.createElement('style');
+    s.id = 'event-popup-style';
+    s.textContent = `
+      @keyframes eventPopIn{from{opacity:0;transform:translateX(-50%) scale(.7)}to{opacity:1;transform:translateX(-50%) scale(1)}}
+      @keyframes eventPopOut{from{opacity:1;transform:translateX(-50%) scale(1)}to{opacity:0;transform:translateX(-50%) scale(.8)}}
+      #meshineko-event-popup.hiding{animation:eventPopOut .3s ease forwards}
+    `;
+    document.head.appendChild(s);
+  }
+  el.classList.remove('hiding');
+  el.innerHTML = `
+    <div style="
+      background:linear-gradient(135deg,#fff,#FDF2F8);
+      border:2.5px solid var(--pk);
+      border-radius:20px;padding:12px 20px;
+      font-size:13px;font-weight:800;color:#6B21A8;
+      line-height:1.7;text-align:center;
+      box-shadow:0 8px 32px rgba(244,114,182,0.35);
+      font-family:'Zen Maru Gothic',sans-serif;
+      max-width:260px;white-space:pre-line;
+    ">${line.replace(/\\n/g,'\n')}</div>
+    <div style="width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid var(--pk)"></div>
+  `;
+  _applyEmotion(emotion);
+  if(el._timer) clearTimeout(el._timer);
+  el._timer = setTimeout(()=>{
+    el.classList.add('hiding');
+    setTimeout(()=>{ el.innerHTML=''; }, 350);
+  }, duration);
+}
+
+// ========== C イベント別セリフ ==========
+function eventMealRecorded(mealTime) {
+  const lines = [
+    `${mealTime}の記録、ありがとうにゃ！\nえらいにゃ！`,
+    `ちゃんと食べてるにゃ！\nメシネコうれしいにゃ♡`,
+    `記録したにゃ！\n続けてにゃよ！`,
+  ];
+  showEventPopup(lines[Math.floor(Math.random()*lines.length)], 'ganba');
+}
+
+function eventThreeMeals() {
+  const lines = [
+    '3食コンプリートにゃ！\n完璧にゃ！今日のご主人最高にゃ！',
+    '3食ちゃんと食べてくれたにゃ…\nメシネコ感動にゃ…！',
+  ];
+  showEventPopup(lines[Math.floor(Math.random()*lines.length)], 'surprised', 5000);
+}
+
+function eventStreak(days) {
+  const lines = [
+    `${days}日連続記録にゃ！\nすごいにゃ！！`,
+    `毎日続けてくれてるにゃ…\nメシネコ泣きそうにゃ…`,
+  ];
+  showEventPopup(lines[Math.floor(Math.random()*lines.length)], 'love', 5000);
+}
+
+// ========== getMeshinekoEmotion（updateMeshiko互換用）==========
 function getMeshinekoEmotion(){
   const t=tots();const m=S.macros;const tgt=S.tgt;
   if(t.kcal===0)return'fun';
-  const remP=m.protein-t.protein;
   if(t.kcal>tgt*1.15)return'overate';
-  if(remP<-10)return'angry';
-  // sadは「タンパク質が目標の80%以上残っていて、かつカロリーも半分以上摂っている」時のみ
+  if(t.fat>m.fat*1.3)return'angry';
+  const remP=m.protein-t.protein;
   if(remP>m.protein*0.8&&t.kcal>tgt*0.5)return'sad';
-  const pctP=t.protein/m.protein;const pctF=t.fat/m.fat;const pctC=t.carb/m.carb;
+  const pctP=t.protein/m.protein,pctF=t.fat/m.fat,pctC=t.carb/m.carb;
   if(pctP>=0.8&&pctF<=1.1&&pctC<=1.1&&t.kcal>tgt*0.7)return'balance';
   if(t.kcal>tgt*0.8&&t.kcal<=tgt*1.05)return'joy';
   if(S.eaten.length>=3)return'ganba';
@@ -2642,18 +2805,10 @@ function getMeshinekoEmotion(){
 function updateMeshiko(){
   const img=document.getElementById('meshineko-img');
   if(!img)return;
-  const emotion=getMeshinekoEmotion();
-  const url=MESHINEKO_IMGS[emotion]||MESHINEKO_IMGS.fun;
-  const changed=img.getAttribute('data-emotion')!==emotion;
-  img.src=url;
-  img.setAttribute('data-emotion',emotion);
-  // 表情に対応したコメントを表示
-  const comments=EMOTION_COMMENTS[emotion]||EMOTION_COMMENTS.fun;
-  showMeshikoBubble(comments[Math.floor(Math.random()*comments.length)]);
+  pickAndShowSerif();
   img.onerror=()=>{
     img.onerror=null;
     img.src=MESHINEKO_IMGS.fun;
-    // funも失敗したら絵文字で代替
     img.onerror=()=>{
       const wrap=document.getElementById('meshineko-wrap');
       if(wrap&&!wrap.querySelector('.meshineko-fallback')){
@@ -2768,6 +2923,14 @@ function openExpGuideModal() {
   document.getElementById('exp-guide-modal').classList.add('open');
 }
 
+// 起動時に全表情画像をプリロード（タップ時の遅延をなくす）
+function preloadMeshinekoImgs() {
+  Object.values(MESHINEKO_IMGS).forEach(url => {
+    const img = new Image();
+    img.src = url;
+  });
+}
+
 function openCharaModal() {
   document.getElementById('chara-modal').classList.add('open');
 }
@@ -2827,12 +2990,12 @@ function meshinekoTap(){
 
   // 🌙 深夜（0〜4時）タップ
   if(h>=0&&h<5){
-    showMeshikoBubble('こんな時間に何してるにゃ…\nはやく寝てにゃ！','sad');
+    showMeshikoBubble('こんな時間に何してるにゃ…\nはやく寝てにゃ！','sleepy');
     return;
   }
   // 🌅 朝6時台タップ
   if(h===6||h===7){
-    showMeshikoBubble('わ！朝活してるにゃ！\nえらいにゃ！メシネコも応援するにゃ！','joy');
+    showMeshikoBubble('わ！朝活してるにゃ！\nえらいにゃ！メシネコも応援するにゃ！','ganba');
     return;
   }
 
@@ -2855,9 +3018,8 @@ function meshinekoTap(){
   }
 
   // 通常コメント
-  const emotion=document.getElementById('meshineko-img')?.getAttribute('data-emotion')||'fun';
-  const comments=EMOTION_COMMENTS[emotion]||MESHINEKO_COMMENTS;
-  showMeshikoBubble(comments[Math.floor(Math.random()*comments.length)]);
+  // 通常：A+B+Dプールからランダム（即時）
+  pickAndShowSerif();
 }
 
 // 🎯 カロリーぴったり隠しコメント（renderHomeから呼ぶ）
