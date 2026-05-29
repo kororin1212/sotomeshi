@@ -1614,7 +1614,7 @@ function renderKiroku(){
           <div class="mn">${f.name}</div>
           <div class="ms">
             <span class="tag ${f.type==='chain'?'tc':f.type==='super'?'ts2':'tr'}">${f.store}</span>
-            ${f.kcal} kcal${String(f.id).startsWith('db-')?` <span class="db-badge">DB</span>`:''}
+            ${f.kcal} kcal
           </div>
         </div>
         <button onclick="rmF(${i})" style="background:none;border:none;color:var(--text-h);cursor:pointer;font-size:18px;line-height:1;flex-shrink:0">×</button>
@@ -1751,7 +1751,7 @@ function renderSuggest(){
     const rank=i+1;
     const ts=topStyles[rank];
     const estTag=f.estimated?`<span class="chip chip-warn">推定値</span>`:'';
-    const dbTag=String(f.id).startsWith('db-')?`<span class="db-badge">DB</span>`:'';
+    const dbTag='';
     const rtags=f.reasons.slice(0,2).map(r=>`<span class="reason-tag">${r}</span>`).join('');
 
     if(ts){
@@ -1822,7 +1822,7 @@ function filterF(q){
   }
   if(q)foods=foods.filter(f=>f.name.includes(q)||f.store.includes(q));
   document.getElementById('f-count-lbl').textContent=foods.length+'件';
-  document.getElementById('flist').innerHTML=foods.length===0?`<p style="font-size:12px;color:var(--text-h);padding:8px 0">見つかりません</p>`:foods.map(f=>`<div class="fr-row" onclick="addF('${f.id}')"><div><span style="font-weight:500">${f.name}</span><span class="tag ${f.type==='chain'?'tc':f.type==='super'?'ts2':'tr'}" style="margin-left:5px">${f.store}</span>${String(f.id).startsWith('db-')?` <span class="db-badge">DB</span>`:''}</div><span style="color:var(--blue);font-size:12px;font-weight:500">${f.kcal} kcal</span></div>`).join('');
+  document.getElementById('flist').innerHTML=foods.length===0?`<p style="font-size:12px;color:var(--text-h);padding:8px 0">見つかりません</p>`:foods.map(f=>`<div class="fr-row" onclick="addF('${f.id}')"><div><span style="font-weight:500">${f.name}</span><span class="tag ${f.type==='chain'?'tc':f.type==='super'?'ts2':'tr'}" style="margin-left:5px">${f.store}</span></div><span style="color:var(--blue);font-size:12px;font-weight:500">${f.kcal} kcal</span></div>`).join('');
 }
 let _pendingFoodId=null;
 let _pendingFoodCallback=null;
@@ -1954,6 +1954,12 @@ async function submitFood(){
     }
     const{error}=await sb.from('foods').insert([{name,store,type,kcal,protein,fat,carb,gluten,meat,estimated,desc,image_url,meal_time:getRegMealTime()}]);
     if(error)throw error;
+    // 登録したデータをALL_FOODSに即時追加
+    const newFood={name,store,type,kcal,protein,fat,carb,gluten,meat,estimated,
+      meal_time:getRegMealTime()||['L','D'],role:'main',id:'db-tmp-'+Date.now(),estimated:true};
+    dbFoods.unshift(newFood);mergeFoods();updateDBCount();
+    // 画面を更新
+    renderHome();renderDayPlan();filterF(document.getElementById('fsearch')?.value||'');
     closeRegModal();btn.disabled=false;btn.textContent='データベースに登録する';
     showToast('登録しました！ありがとうございます');
     ['reg-name','reg-store','reg-kcal','reg-protein','reg-fat','reg-carb','reg-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
